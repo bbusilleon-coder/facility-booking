@@ -1,9 +1,9 @@
 import Link from "next/link";
 import FacilityCalendar from "@/components/FacilityCalendar";
 import FacilityDetailClient from "@/components/FacilityDetailClient";
-import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@/lib/supabase/server";
 
-export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -25,18 +25,26 @@ type Facility = {
 };
 
 async function getFacility(id: string) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-  const supabase = createClient(supabaseUrl, anonKey);
+  try {
+    const supabase = createServerClient();
 
-  const { data, error } = await supabase
-    .from("facilities")
-    .select("*")
-    .eq("id", id)
-    .single();
+    const { data, error } = await supabase
+      .from("facilities")
+      .select("*")
+      .eq("id", id)
+      .eq("is_active", true)
+      .single();
 
-  if (error || !data) return null;
-  return data as Facility;
+    if (error) {
+      console.error("[getFacility] Error:", error.message);
+      return null;
+    }
+    
+    return data as Facility;
+  } catch (err) {
+    console.error("[getFacility] Exception:", err);
+    return null;
+  }
 }
 
 const featureLabels: Record<string, string> = {
