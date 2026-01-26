@@ -15,7 +15,7 @@ cp .env.example .env.local
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-```
+SUPABASE_SERVICE_ROLE_KEY (Server-only, DO NOT expose to client)
 
 ### 설치 및 실행
 
