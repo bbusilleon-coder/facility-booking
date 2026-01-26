@@ -174,7 +174,13 @@ export default async function FacilityDetailPage({ params }: PageProps) {
         marginBottom: 32,
       }}>
         <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>📅 예약하기</h2>
-        <FacilityCalendar facility={facility} />
+        <FacilityCalendar 
+          facilityId={facility.id} 
+          facilityName={facility.name}
+          openTime={facility.open_time || "09:00"}
+          closeTime={facility.close_time || "22:00"}
+          closedDays={facility.closed_days || []}
+        />
       </div>
 
       {/* 클라이언트 컴포넌트 (리뷰, 대기열) */}

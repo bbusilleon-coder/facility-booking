@@ -82,7 +82,7 @@ type RecentReservation = {
   applicant_phone: string;
   start_at: string;
   created_at: string;
-  facility?: { name: string };
+  facility?: { name: string } | null;
 };
 
 async function getRecentReservations(): Promise<RecentReservation[]> {
@@ -97,7 +97,13 @@ async function getRecentReservations(): Promise<RecentReservation[]> {
     .order("created_at", { ascending: false })
     .limit(10);
 
-  return (data || []) as RecentReservation[];
+  if (!data) return [];
+
+  // Supabase join 결과를 변환 (배열 -> 단일 객체)
+  return data.map((item: any) => ({
+    ...item,
+    facility: Array.isArray(item.facility) ? item.facility[0] : item.facility,
+  }));
 }
 
 const statusLabels: Record<string, string> = {

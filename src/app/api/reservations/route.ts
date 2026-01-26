@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
-import { sendNewReservationNotification } from "@/lib/email";
+import { sendReservationConfirmation, sendNewReservationNotification } from "@/lib/email";
 
 // GET: 예약 목록 조회 (관리자용)
 export async function GET(req: Request) {
@@ -57,6 +57,16 @@ export async function GET(req: Request) {
       { status: 500 }
     );
   }
+}
+
+// QR 코드 생성
+function generateQRCode(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
 }
 
 // POST: 예약 생성
@@ -141,6 +151,9 @@ export async function POST(req: Request) {
       );
     }
 
+    // QR 코드 생성
+    const qrCode = generateQRCode();
+
     // 예약 생성
     const reservationData: any = {
       facility_id: body.facility_id,
@@ -156,6 +169,7 @@ export async function POST(req: Request) {
       purpose: body.purpose,
       attendees: body.attendees || 1,
       notes: body.notes || null,
+      qr_code: qrCode,
     };
 
     const { data, error } = await supabase
@@ -166,23 +180,29 @@ export async function POST(req: Request) {
 
     if (error) throw error;
 
-    // 관리자에게 알림 이메일 발송
-    const { data: adminSettings } = await supabase
-      .from("admin_settings")
-      .select("value")
-      .eq("key", "notification_email")
-      .single();
-
-    if (adminSettings?.value) {
-      const dateStr = startAt.toLocaleDateString("ko-KR");
-      const timeStr = `${startAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} ~ ${endAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}`;
-
-      await sendNewReservationNotification(adminSettings.value, {
+    // 사용자에게 예약 확인 이메일 발송
+    if (body.applicant_email) {
+      await sendReservationConfirmation({
+        to: body.applicant_email,
+        name: body.applicant_name,
         facilityName: facility.name,
-        date: dateStr,
-        time: timeStr,
+        startAt: body.start_at,
+        endAt: body.end_at,
+        purpose: body.purpose,
+        qrCode: qrCode,
+      });
+    }
+
+    // 관리자에게 알림 이메일 발송
+    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+    if (adminEmail) {
+      await sendNewReservationNotification({
+        to: adminEmail,
         applicantName: body.applicant_name,
-        applicantPhone: body.applicant_phone,
+        applicantPhone: body.applicant_phone || "",
+        facilityName: facility.name,
+        startAt: body.start_at,
+        endAt: body.end_at,
         purpose: body.purpose,
       });
     }

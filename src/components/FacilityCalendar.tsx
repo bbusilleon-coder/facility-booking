@@ -5,7 +5,8 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import type { DateSelectArg, DatesSetArg, DateClickArg } from "@fullcalendar/core";
+import type { DateSelectArg, DatesSetArg } from "@fullcalendar/core";
+import type { DateClickArg } from "@fullcalendar/interaction";
 import ReservationModal from "./reservation/ReservationModal";
 import RecurringReservationModal from "./reservation/RecurringReservationModal";
 

@@ -49,15 +49,15 @@ export default function NoticeList() {
 
   return (
     <div style={{ marginBottom: 24 }}>
-      <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: "#888" }}>
+      <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: "var(--text-muted, #888)" }}>
         📢 공지사항
       </h3>
-      <div style={{ background: "#1a1a1a", borderRadius: 12, overflow: "hidden" }}>
+      <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, overflow: "hidden" }}>
         {notices.map((notice, idx) => (
           <div
             key={notice.id}
             style={{
-              borderBottom: idx < notices.length - 1 ? "1px solid #222" : "none",
+              borderBottom: idx < notices.length - 1 ? "1px solid var(--border-color, #222)" : "none",
             }}
           >
             <div
@@ -72,11 +72,11 @@ export default function NoticeList() {
             >
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 {notice.is_pinned && <span style={{ color: "#eab308" }}>📌</span>}
-                <span style={{ fontSize: 14 }}>{notice.title}</span>
+                <span style={{ fontSize: 14, color: "var(--foreground, white)" }}>{notice.title}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ fontSize: 12, color: "#666" }}>{formatDate(notice.created_at)}</span>
-                <span style={{ color: "#666", fontSize: 12 }}>
+                <span style={{ fontSize: 12, color: "var(--text-muted, #666)" }}>{formatDate(notice.created_at)}</span>
+                <span style={{ color: "var(--text-muted, #666)", fontSize: 12 }}>
                   {expanded === notice.id ? "▲" : "▼"}
                 </span>
               </div>
@@ -86,7 +86,7 @@ export default function NoticeList() {
               <div style={{
                 padding: "0 16px 16px",
                 fontSize: 14,
-                color: "#aaa",
+                color: "var(--text-muted, #aaa)",
                 lineHeight: 1.6,
                 whiteSpace: "pre-wrap",
               }}>

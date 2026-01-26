@@ -10,7 +10,7 @@ function generateToken(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
-// POST: 회원가입
+// POST: 회원가입/로그인
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
           department: department || null,
           is_active: true,
         }])
-        .select("id, email, name, department")
+        .select("id, email, name, phone, department")
         .single();
 
       if (error) throw error;
@@ -108,6 +108,7 @@ export async function POST(req: Request) {
           id: user.id,
           email: user.email,
           name: user.name,
+          phone: user.phone,
           department: user.department,
         },
       });
@@ -143,7 +144,7 @@ export async function GET(req: Request) {
       .from("user_sessions")
       .select(`
         *,
-        user:users(id, email, name, department)
+        user:users(id, email, name, phone, department)
       `)
       .eq("token", token)
       .gt("expires_at", new Date().toISOString())

@@ -3,6 +3,7 @@ import { createServerClient } from "@/lib/supabase/server";
 import DashboardClient from "@/components/DashboardClient";
 import NoticeList from "@/components/NoticeList";
 import HomeClient from "@/components/HomeClient";
+import HeaderAuth from "@/components/HeaderAuth";
 
 type Facility = {
   id: string;
@@ -56,60 +57,7 @@ export default async function Home() {
               시설물을 선택하고 예약을 진행합니다.
             </p>
           </div>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <Link
-              href="/reservation"
-              style={{
-                padding: "10px 16px",
-                borderRadius: 10,
-                border: "1px solid var(--border-color, #333)",
-                color: "var(--text-muted, #ccc)",
-                textDecoration: "none",
-                fontSize: 14,
-              }}
-            >
-              내 예약 조회
-            </Link>
-            <Link
-              href="/checkin"
-              style={{
-                padding: "10px 16px",
-                borderRadius: 10,
-                border: "1px solid var(--border-color, #333)",
-                color: "var(--text-muted, #ccc)",
-                textDecoration: "none",
-                fontSize: 14,
-              }}
-            >
-              QR 체크인
-            </Link>
-            <Link
-              href="/auth"
-              style={{
-                padding: "10px 16px",
-                borderRadius: 10,
-                background: "var(--color-primary, #3b82f6)",
-                color: "white",
-                textDecoration: "none",
-                fontSize: 14,
-              }}
-            >
-              로그인
-            </Link>
-            <Link
-              href="/admin"
-              style={{
-                padding: "10px 16px",
-                borderRadius: 10,
-                background: "var(--card-bg, #1a1a1a)",
-                color: "var(--text-muted, #888)",
-                textDecoration: "none",
-                fontSize: 14,
-              }}
-            >
-              관리자
-            </Link>
-          </div>
+          <HeaderAuth />
         </header>
 
         {/* 공지사항 */}

@@ -93,39 +93,39 @@ export default function DashboardClient() {
       {/* 통계 카드 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12, marginBottom: 24 }}>
         <div style={{
-          background: "#1a1a1a",
+          background: "var(--card-bg, #1a1a1a)",
           borderRadius: 12,
           padding: 16,
-          borderLeft: "4px solid #3b82f6",
+          borderLeft: "4px solid var(--color-primary, #3b82f6)",
         }}>
-          <div style={{ color: "#888", fontSize: 12, marginBottom: 4 }}>등록된 시설물</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>{data.stats.totalFacilities}</div>
+          <div style={{ color: "var(--text-muted, #888)", fontSize: 12, marginBottom: 4 }}>등록된 시설물</div>
+          <div style={{ fontSize: 28, fontWeight: 700, color: "var(--foreground, white)" }}>{data.stats.totalFacilities}</div>
         </div>
         
         <div style={{
-          background: "#1a1a1a",
+          background: "var(--card-bg, #1a1a1a)",
           borderRadius: 12,
           padding: 16,
           borderLeft: "4px solid #22c55e",
         }}>
-          <div style={{ color: "#888", fontSize: 12, marginBottom: 4 }}>오늘 예약</div>
+          <div style={{ color: "var(--text-muted, #888)", fontSize: 12, marginBottom: 4 }}>오늘 예약</div>
           <div style={{ fontSize: 28, fontWeight: 700, color: "#22c55e" }}>{data.stats.todayCount}</div>
         </div>
         
         <div style={{
-          background: "#1a1a1a",
+          background: "var(--card-bg, #1a1a1a)",
           borderRadius: 12,
           padding: 16,
           borderLeft: "4px solid #8b5cf6",
         }}>
-          <div style={{ color: "#888", fontSize: 12, marginBottom: 4 }}>이번 주 예약</div>
-          <div style={{ fontSize: 28, fontWeight: 700 }}>{data.stats.weekCount}</div>
+          <div style={{ color: "var(--text-muted, #888)", fontSize: 12, marginBottom: 4 }}>이번 주 예약</div>
+          <div style={{ fontSize: 28, fontWeight: 700, color: "var(--foreground, white)" }}>{data.stats.weekCount}</div>
         </div>
       </div>
 
       {/* 오늘 예약 */}
       {data.todayReservations.length > 0 && (
-        <div style={{ background: "#1a1a1a", borderRadius: 12, padding: 16, marginBottom: 16 }}>
+        <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 16, marginBottom: 16 }}>
           <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: "#22c55e" }}>
             📅 오늘 예약 ({data.todayReservations.length}건)
           </h3>
@@ -138,16 +138,16 @@ export default function DashboardClient() {
                   justifyContent: "space-between",
                   alignItems: "center",
                   padding: "10px 12px",
-                  background: "#0f0f0f",
+                  background: "var(--background, #0f0f0f)",
                   borderRadius: 8,
                   fontSize: 13,
                 }}
               >
                 <div>
-                  <span style={{ fontWeight: 600 }}>{r.facility?.name}</span>
-                  <span style={{ color: "#888", marginLeft: 8 }}>{r.purpose}</span>
+                  <span style={{ fontWeight: 600, color: "var(--foreground, white)" }}>{r.facility?.name}</span>
+                  <span style={{ color: "var(--text-muted, #888)", marginLeft: 8 }}>{r.purpose}</span>
                 </div>
-                <div style={{ color: "#888" }}>
+                <div style={{ color: "var(--text-muted, #888)" }}>
                   {formatTime(r.start_at)} - {formatTime(r.end_at)}
                 </div>
               </div>
@@ -158,8 +158,8 @@ export default function DashboardClient() {
 
       {/* 다가오는 예약 */}
       {data.upcomingReservations.length > 0 && (
-        <div style={{ background: "#1a1a1a", borderRadius: 12, padding: 16 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>
+        <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 16 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: "var(--foreground, white)" }}>
             ⏰ 다가오는 예약
           </h3>
           <div style={{ display: "grid", gap: 8 }}>
@@ -171,7 +171,7 @@ export default function DashboardClient() {
                   justifyContent: "space-between",
                   alignItems: "center",
                   padding: "10px 12px",
-                  background: "#0f0f0f",
+                  background: "var(--background, #0f0f0f)",
                   borderRadius: 8,
                   fontSize: 13,
                 }}
@@ -185,10 +185,10 @@ export default function DashboardClient() {
                       background: r.status === "approved" ? "#22c55e" : "#eab308",
                     }}
                   />
-                  <span style={{ fontWeight: 600 }}>{r.facility?.name}</span>
-                  <span style={{ color: "#888" }}>{r.purpose}</span>
+                  <span style={{ fontWeight: 600, color: "var(--foreground, white)" }}>{r.facility?.name}</span>
+                  <span style={{ color: "var(--text-muted, #888)" }}>{r.purpose}</span>
                 </div>
-                <div style={{ color: "#888", fontSize: 12 }}>
+                <div style={{ color: "var(--text-muted, #888)", fontSize: 12 }}>
                   {formatDateTime(r.start_at)}
                 </div>
               </div>
@@ -199,8 +199,8 @@ export default function DashboardClient() {
 
       {/* 시설물별 이번 주 이용 현황 */}
       {data.facilityStats.length > 0 && (
-        <div style={{ background: "#1a1a1a", borderRadius: 12, padding: 16, marginTop: 16 }}>
-          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12 }}>
+        <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 16, marginTop: 16 }}>
+          <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: "var(--foreground, white)" }}>
             🏢 이번 주 시설물 이용 현황
           </h3>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -209,13 +209,13 @@ export default function DashboardClient() {
                 key={f.id}
                 style={{
                   padding: "8px 14px",
-                  background: "#0f0f0f",
+                  background: "var(--background, #0f0f0f)",
                   borderRadius: 8,
                   fontSize: 13,
                 }}
               >
-                <span style={{ fontWeight: 600 }}>{f.name}</span>
-                <span style={{ color: "#3b82f6", marginLeft: 8 }}>{f.count}건</span>
+                <span style={{ fontWeight: 600, color: "var(--foreground, white)" }}>{f.name}</span>
+                <span style={{ color: "var(--color-primary, #3b82f6)", marginLeft: 8 }}>{f.count}건</span>
               </div>
             ))}
           </div>

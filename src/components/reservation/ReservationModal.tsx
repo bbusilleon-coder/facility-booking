@@ -41,6 +41,24 @@ export default function ReservationModal({
     notes: "",
   });
 
+  // 모달이 열릴 때 로그인된 사용자 정보 자동 채우기
+  useEffect(() => {
+    if (isOpen) {
+      const userName = localStorage.getItem("userName") || "";
+      const userEmail = localStorage.getItem("userEmail") || "";
+      const userPhone = localStorage.getItem("userPhone") || "";
+      const userDept = localStorage.getItem("userDept") || "";
+
+      setFormData((prev) => ({
+        ...prev,
+        applicantName: userName,
+        applicantEmail: userEmail,
+        applicantPhone: userPhone,
+        applicantDept: userDept,
+      }));
+    }
+  }, [isOpen]);
+
   // 선택된 시간이 변경되면 폼 업데이트
   useEffect(() => {
     if (selectedStart && selectedEnd) {
@@ -103,16 +121,21 @@ export default function ReservationModal({
 
       alert("예약 신청이 완료되었습니다. 승인을 기다려주세요.");
       
-      // 폼 초기화
+      // 폼 초기화 (사용자 정보는 유지)
+      const userName = localStorage.getItem("userName") || "";
+      const userEmail = localStorage.getItem("userEmail") || "";
+      const userPhone = localStorage.getItem("userPhone") || "";
+      const userDept = localStorage.getItem("userDept") || "";
+
       setFormData({
         startAt: "",
         endAt: "",
         purpose: "",
         attendees: 1,
-        applicantName: "",
-        applicantPhone: "",
-        applicantEmail: "",
-        applicantDept: "",
+        applicantName: userName,
+        applicantPhone: userPhone,
+        applicantEmail: userEmail,
+        applicantDept: userDept,
         notes: "",
       });
       

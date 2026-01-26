@@ -84,27 +84,25 @@ export async function PUT(req: Request, { params }: RouteParams) {
     const applicantEmail = reservation.applicant_email;
     const applicantName = reservation.applicant_name || reservation.booker_name || "신청자";
     const facilityName = reservation.facility?.name || "시설";
-    const startAt = new Date(reservation.start_at);
-    const endAt = new Date(reservation.end_at);
-    
-    const dateStr = startAt.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
-    const timeStr = `${startAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} ~ ${endAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}`;
+    const qrCode = reservation.qr_code;
 
     if (applicantEmail) {
       if (status === "approved") {
-        await sendApprovalEmail(applicantEmail, {
+        await sendApprovalEmail({
+          to: applicantEmail,
+          name: applicantName,
           facilityName,
-          date: dateStr,
-          time: timeStr,
-          applicantName,
-          reservationId: id,
+          startAt: reservation.start_at,
+          endAt: reservation.end_at,
+          qrCode,
         });
       } else if (status === "rejected") {
-        await sendRejectionEmail(applicantEmail, {
+        await sendRejectionEmail({
+          to: applicantEmail,
+          name: applicantName,
           facilityName,
-          date: dateStr,
-          time: timeStr,
-          applicantName,
+          startAt: reservation.start_at,
+          endAt: reservation.end_at,
           reason,
         });
       }

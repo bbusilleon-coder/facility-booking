@@ -5,8 +5,8 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import type { DateClickArg, EventClickArg } from "@fullcalendar/interaction";
-import type { DatesSetArg, EventInput } from "@fullcalendar/core";
+import type { DateClickArg } from "@fullcalendar/interaction";
+import type { DatesSetArg, EventInput, EventClickArg } from "@fullcalendar/core";
 import { Reservation, RESERVATION_STATUS_COLORS } from "@/types";
 
 interface ReservationCalendarProps {

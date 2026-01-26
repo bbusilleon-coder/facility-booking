@@ -24,67 +24,109 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [adminName, setAdminName] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  // 인증 체크
   useEffect(() => {
+    // 로그인 페이지면 체크 안함
+    if (pathname === "/admin/login") {
+      setIsAuthed(true);
+      return;
+    }
+
     const checkAuth = async () => {
       const token = localStorage.getItem("adminToken");
+      const expiresAt = localStorage.getItem("adminExpiresAt");
+
+      // 토큰이 없으면 로그인 필요
       if (!token) {
         setIsAuthed(false);
         return;
       }
 
+      // 만료 시간 체크 (로컬에서 먼저)
+      if (expiresAt) {
+        const expiry = new Date(expiresAt);
+        if (expiry < new Date()) {
+          // 만료됨
+          localStorage.removeItem("adminToken");
+          localStorage.removeItem("adminExpiresAt");
+          localStorage.removeItem("adminName");
+          localStorage.removeItem("adminRole");
+          setIsAuthed(false);
+          return;
+        }
+      }
+
+      // 서버에서 세션 확인
       try {
         const res = await fetch("/api/admin/auth", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const json = await res.json();
+        
         if (json.ok) {
           setIsAuthed(true);
           setAdminName(localStorage.getItem("adminName") || "관리자");
         } else {
-          setIsAuthed(false);
-          localStorage.removeItem("adminToken");
+          // 서버에서 세션 무효 - 하지만 로컬 만료 전이면 유지
+          if (expiresAt && new Date(expiresAt) > new Date()) {
+            setIsAuthed(true);
+            setAdminName(localStorage.getItem("adminName") || "관리자");
+          } else {
+            setIsAuthed(false);
+            localStorage.removeItem("adminToken");
+            localStorage.removeItem("adminExpiresAt");
+          }
         }
-      } catch {
-        setIsAuthed(false);
+      } catch (err) {
+        // 네트워크 오류시 로컬 토큰 기준으로 유지
+        if (expiresAt && new Date(expiresAt) > new Date()) {
+          setIsAuthed(true);
+          setAdminName(localStorage.getItem("adminName") || "관리자");
+        } else {
+          setIsAuthed(false);
+        }
       }
     };
 
-    if (pathname !== "/admin/login") {
-      checkAuth();
-    } else {
-      setIsAuthed(true);
-    }
+    checkAuth();
   }, [pathname]);
+
+  // 미인증 시 리다이렉트 (별도 useEffect로 분리)
+  useEffect(() => {
+    if (isAuthed === false && pathname !== "/admin/login") {
+      router.push("/admin/login");
+    }
+  }, [isAuthed, pathname, router]);
 
   const handleLogout = async () => {
     const token = localStorage.getItem("adminToken");
     if (token) {
-      await fetch("/api/admin/auth", {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      try {
+        await fetch("/api/admin/auth", {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      } catch {}
     }
     localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminExpiresAt");
     localStorage.removeItem("adminName");
     localStorage.removeItem("adminRole");
     router.push("/admin/login");
   };
 
-  if (isAuthed === null) {
+  // 로그인 페이지
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
+  // 로딩 중 또는 미인증 (리다이렉트 대기)
+  if (isAuthed === null || isAuthed === false) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--background, #0a0a0a)" }}>
         <div style={{ color: "var(--text-muted, #888)" }}>로딩 중...</div>
       </div>
     );
-  }
-
-  if (isAuthed === false && pathname !== "/admin/login") {
-    router.push("/admin/login");
-    return null;
-  }
-
-  if (pathname === "/admin/login") {
-    return <>{children}</>;
   }
 
   return (

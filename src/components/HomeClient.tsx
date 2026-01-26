@@ -67,7 +67,7 @@ export default function HomeClient({ facilities }: HomeClientProps) {
   return (
     <section style={{ marginTop: 32 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 700 }}>시설물 목록</h2>
+        <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--foreground, white)" }}>시설물 목록</h2>
         
         <div style={{ display: "flex", gap: 8 }}>
           <button
@@ -138,7 +138,7 @@ export default function HomeClient({ facilities }: HomeClientProps) {
                     height: 36,
                     borderRadius: "50%",
                     border: "none",
-                    background: isFavorite ? "#fef3c7" : "rgba(0,0,0,0.5)",
+                    background: isFavorite ? "#fef3c7" : "var(--card-bg, rgba(0,0,0,0.5))",
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
@@ -161,11 +161,11 @@ export default function HomeClient({ facilities }: HomeClientProps) {
                   <div style={{
                     width: "100%",
                     height: 140,
-                    background: "var(--card-bg, #1a1a1a)",
+                    background: "var(--background, #1a1a1a)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    color: "#444",
+                    color: "var(--text-muted, #444)",
                     fontSize: 32,
                   }}>
                     🏢
@@ -173,7 +173,7 @@ export default function HomeClient({ facilities }: HomeClientProps) {
                 )}
 
                 <div style={{ padding: 16 }}>
-                  <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6 }}>{f.name}</div>
+                  <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 6, color: "var(--foreground, white)" }}>{f.name}</div>
                   <div style={{ color: "var(--text-muted, #888)", fontSize: 13 }}>
                     📍 {f.location || "위치 미입력"} · 👥 {f.min_people}~{f.max_people}명
                   </div>
@@ -230,7 +230,7 @@ function FeatureBadges({ features }: { features: Record<string, boolean> | null 
         </span>
       ))}
       {onKeys.length > 3 && (
-        <span style={{ fontSize: 11, color: "#666" }}>+{onKeys.length - 3}</span>
+        <span style={{ fontSize: 11, color: "var(--text-muted, #666)" }}>+{onKeys.length - 3}</span>
       )}
     </div>
   );

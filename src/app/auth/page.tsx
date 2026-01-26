@@ -47,10 +47,13 @@ export default function AuthPage() {
       }
 
       if (isLogin) {
+        // 로그인 성공 - 모든 사용자 정보 저장
         localStorage.setItem("userToken", json.token);
         localStorage.setItem("userExpiresAt", json.expiresAt);
-        localStorage.setItem("userName", json.user.name);
-        localStorage.setItem("userEmail", json.user.email);
+        localStorage.setItem("userName", json.user.name || "");
+        localStorage.setItem("userEmail", json.user.email || "");
+        localStorage.setItem("userPhone", json.user.phone || "");
+        localStorage.setItem("userDept", json.user.department || "");
         router.push("/");
       } else {
         setSuccess("회원가입이 완료되었습니다. 로그인해주세요.");
@@ -203,15 +206,15 @@ export default function AuthPage() {
               cursor: loading ? "not-allowed" : "pointer",
               fontSize: 14,
               fontWeight: 600,
-              marginTop: 8,
+              marginBottom: 16,
             }}
           >
             {loading ? "처리 중..." : isLogin ? "로그인" : "회원가입"}
           </button>
         </form>
 
-        <p style={{ marginTop: 20, textAlign: "center", fontSize: 14, color: "var(--text-muted, #888)" }}>
-          {isLogin ? "계정이 없으신가요? " : "이미 계정이 있으신가요? "}
+        <div style={{ textAlign: "center", fontSize: 14, color: "var(--text-muted, #888)" }}>
+          {isLogin ? "계정이 없으신가요?" : "이미 계정이 있으신가요?"}{" "}
           <button
             onClick={() => {
               setIsLogin(!isLogin);
@@ -223,12 +226,13 @@ export default function AuthPage() {
               border: "none",
               color: "var(--color-primary, #3b82f6)",
               cursor: "pointer",
-              fontWeight: 600,
+              textDecoration: "underline",
+              fontSize: 14,
             }}
           >
             {isLogin ? "회원가입" : "로그인"}
           </button>
-        </p>
+        </div>
       </div>
     </div>
   );
@@ -244,7 +248,7 @@ const labelStyle: React.CSSProperties = {
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "12px 14px",
-  borderRadius: 10,
+  borderRadius: 8,
   border: "1px solid var(--border-color, #333)",
   background: "var(--background, #0f0f0f)",
   color: "var(--foreground, white)",
