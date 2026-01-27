@@ -96,13 +96,14 @@ export default function ReservationModal({
     setError(null);
 
     try {
+      // datetime-local 형식 그대로 전송 (UTC 변환 X)
       const res = await fetch("/api/reservations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           facility_id: facilityId,
-          start_at: start.toISOString(),
-          end_at: end.toISOString(),
+          start_at: formData.startAt,  // "YYYY-MM-DDTHH:mm" 형식
+          end_at: formData.endAt,      // "YYYY-MM-DDTHH:mm" 형식
           purpose: formData.purpose,
           attendees: formData.attendees,
           applicant_name: formData.applicantName,

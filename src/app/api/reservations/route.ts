@@ -263,7 +263,10 @@ export async function POST(req: Request) {
         facilityName: facility.name,
         applicantName: body.applicant_name,
         applicantPhone: body.applicant_phone?.replace(/-/g, "") || "",
+<<<<<<< HEAD
         applicantEmail: body.applicant_email || "",
+=======
+>>>>>>> f1ad50b (Fix facility detail page - use createServerClient)
         startAt: body.start_at,
         endAt: body.end_at,
         purpose: body.purpose,
