@@ -1,12 +1,12 @@
 import Link from "next/link";
 import FacilityCalendar from "@/components/FacilityCalendar";
 import FacilityDetailClient from "@/components/FacilityDetailClient";
-import { createServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  params: Promise<{ id: string }>;
+  // ✅ Next App Router params는 Promise가 아니라 객체입니다.
+  params: { id: string };
 };
 
 type Facility = {
@@ -24,29 +24,6 @@ type Facility = {
   usage_guide: string | null;
 };
 
-async function getFacility(id: string) {
-  try {
-    const supabase = createServerClient();
-
-    const { data, error } = await supabase
-      .from("facilities")
-      .select("*")
-      .eq("id", id)
-      .eq("is_active", true)
-      .single();
-
-    if (error) {
-      console.error("[getFacility] Error:", error.message);
-      return null;
-    }
-    
-    return data as Facility;
-  } catch (err) {
-    console.error("[getFacility] Exception:", err);
-    return null;
-  }
-}
-
 const featureLabels: Record<string, string> = {
   wifi: "무선인터넷",
   audio: "음향시설",
@@ -58,21 +35,60 @@ const featureLabels: Record<string, string> = {
 
 const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
 
+/**
+ * ✅ 상세 조회를 Supabase 직접 호출이 아니라,
+ * 이미 배포에서 검증된 내부 API로 통일합니다.
+ * - 로컬/배포 환경변수 차이
+ * - RLS 차이
+ * - service role 사용 여부
+ * 이런 문제를 재발시키지 않습니다.
+ */
+async function getFacility(id: string): Promise<Facility | null> {
+  try {
+    // 상대경로 fetch는 서버 컴포넌트에서도 정상 동작합니다.
+    // cache: "no-store"로 최신 데이터 보장
+    const res = await fetch(`/api/facilities/${id}`, { cache: "no-store" });
+
+    if (!res.ok) {
+      console.error("[getFacility] API error:", res.status, res.statusText);
+      return null;
+    }
+
+    const json = await res.json();
+
+    // API 응답 형태가 { ok: true, facility: {...} } 또는
+    // { ok: true, data: {...} } 등일 수 있어서 안전 처리
+    const facility = (json?.facility ?? json?.data ?? null) as Facility | null;
+
+    if (!facility) return null;
+
+    // 혹시 비활성 시설은 상세에서 제외하고 싶다면 이 체크 유지
+    // (API 쪽에서 이미 처리하면 여기서는 필요 없음)
+    return facility;
+  } catch (err) {
+    console.error("[getFacility] Exception:", err);
+    return null;
+  }
+}
+
 export default async function FacilityDetailPage({ params }: PageProps) {
-  const { id } = await params;
+  const { id } = params;
+
   const facility = await getFacility(id);
 
   if (!facility) {
     return (
       <div style={{ maxWidth: 800, margin: "0 auto", padding: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 800 }}>시설을 찾을 수 없습니다</h1>
-        <Link href="/" style={{ color: "var(--color-primary, #3b82f6)" }}>← 홈으로 돌아가기</Link>
+        <Link href="/" style={{ color: "var(--color-primary, #3b82f6)" }}>
+          ← 홈으로 돌아가기
+        </Link>
       </div>
     );
   }
 
   const openFeatures = facility.features
-    ? Object.keys(facility.features).filter((k) => facility.features![k])
+    ? Object.keys(facility.features).filter((k) => facility.features?.[k])
     : [];
 
   const closedDayNames = facility.closed_days
@@ -83,7 +99,14 @@ export default async function FacilityDetailPage({ params }: PageProps) {
     <div style={{ maxWidth: 1000, margin: "0 auto", padding: 24 }}>
       {/* 헤더 */}
       <div style={{ marginBottom: 24 }}>
-        <Link href="/" style={{ color: "var(--text-muted, #888)", textDecoration: "none", fontSize: 14 }}>
+        <Link
+          href="/"
+          style={{
+            color: "var(--text-muted, #888)",
+            textDecoration: "none",
+            fontSize: 14,
+          }}
+        >
           ← 시설 목록으로
         </Link>
       </div>
@@ -98,17 +121,19 @@ export default async function FacilityDetailPage({ params }: PageProps) {
               style={{ width: "100%", height: 280, objectFit: "cover", borderRadius: 16 }}
             />
           ) : (
-            <div style={{
-              width: "100%",
-              height: 280,
-              background: "var(--card-bg, #1a1a1a)",
-              borderRadius: 16,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 48,
-              color: "#444",
-            }}>
+            <div
+              style={{
+                width: "100%",
+                height: 280,
+                background: "var(--card-bg, #1a1a1a)",
+                borderRadius: 16,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 48,
+                color: "#444",
+              }}
+            >
               🏢
             </div>
           )}
@@ -116,16 +141,18 @@ export default async function FacilityDetailPage({ params }: PageProps) {
 
         <div>
           <h1 style={{ fontSize: 28, fontWeight: 800, marginBottom: 12 }}>{facility.name}</h1>
-          
+
           <div style={{ display: "grid", gap: 8, color: "var(--text-muted, #888)", fontSize: 14 }}>
             <div>📍 {facility.location || "위치 미입력"}</div>
-            <div>👥 수용 인원: {facility.min_people} ~ {facility.max_people}명</div>
+            <div>
+              👥 수용 인원: {facility.min_people} ~ {facility.max_people}명
+            </div>
             {facility.open_time && facility.close_time && (
-              <div>🕐 운영 시간: {facility.open_time} ~ {facility.close_time}</div>
+              <div>
+                🕐 운영 시간: {facility.open_time} ~ {facility.close_time}
+              </div>
             )}
-            {closedDayNames && (
-              <div>🚫 휴무일: {closedDayNames}</div>
-            )}
+            {closedDayNames && <div>🚫 휴무일: {closedDayNames}</div>}
           </div>
 
           {facility.description && (
@@ -161,12 +188,14 @@ export default async function FacilityDetailPage({ params }: PageProps) {
 
       {/* 이용 안내 */}
       {facility.usage_guide && (
-        <div style={{
-          background: "var(--card-bg, #1a1a1a)",
-          borderRadius: 16,
-          padding: 24,
-          marginBottom: 32,
-        }}>
+        <div
+          style={{
+            background: "var(--card-bg, #1a1a1a)",
+            borderRadius: 16,
+            padding: 24,
+            marginBottom: 32,
+          }}
+        >
           <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>📋 이용 안내</h2>
           <div style={{ color: "var(--text-muted, #ccc)", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>
             {facility.usage_guide}
@@ -175,15 +204,17 @@ export default async function FacilityDetailPage({ params }: PageProps) {
       )}
 
       {/* 캘린더 */}
-      <div style={{
-        background: "var(--card-bg, #1a1a1a)",
-        borderRadius: 16,
-        padding: 24,
-        marginBottom: 32,
-      }}>
+      <div
+        style={{
+          background: "var(--card-bg, #1a1a1a)",
+          borderRadius: 16,
+          padding: 24,
+          marginBottom: 32,
+        }}
+      >
         <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>📅 예약하기</h2>
-        <FacilityCalendar 
-          facilityId={facility.id} 
+        <FacilityCalendar
+          facilityId={facility.id}
           facilityName={facility.name}
           openTime={facility.open_time || "09:00"}
           closeTime={facility.close_time || "22:00"}
