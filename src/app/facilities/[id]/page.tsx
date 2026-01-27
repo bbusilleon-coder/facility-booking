@@ -1,13 +1,10 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import FacilityCalendar from "@/components/FacilityCalendar";
 import FacilityDetailClient from "@/components/FacilityDetailClient";
-import { createClient } from "@supabase/supabase-js";
-
-export const dynamic = "force-dynamic";
-
-type PageProps = {
-  params: Promise<{ id: string }>;
-};
 
 type Facility = {
   id: string;
@@ -36,40 +33,51 @@ const featureLabels: Record<string, string> = {
 
 const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
 
-async function getFacility(id: string): Promise<Facility | null> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+export default function FacilityDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
 
-  if (!supabaseUrl || !supabaseKey) {
-    console.error("[getFacility] Missing Supabase env vars");
-    return null;
+  const [facility, setFacility] = useState<Facility | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchFacility() {
+      try {
+        const res = await fetch(`/api/facilities/${id}`);
+        const json = await res.json();
+
+        if (!json.ok || !json.facility) {
+          setError("시설을 찾을 수 없습니다.");
+          return;
+        }
+
+        setFacility(json.facility);
+      } catch (err) {
+        setError("시설 정보를 불러오는데 실패했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    if (id) {
+      fetchFacility();
+    }
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: 24, textAlign: "center" }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>⏳</div>
+        <p style={{ color: "var(--text-muted, #888)" }}>로딩 중...</p>
+      </div>
+    );
   }
 
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
-  const { data, error } = await supabase
-    .from("facilities")
-    .select("*")
-    .eq("id", id)
-    .eq("is_active", true)
-    .single();
-
-  if (error) {
-    console.error("[getFacility] Supabase error:", error.message);
-    return null;
-  }
-
-  return data as Facility;
-}
-
-export default async function FacilityDetailPage({ params }: PageProps) {
-  const { id } = await params;
-  const facility = await getFacility(id);
-
-  if (!facility) {
+  if (error || !facility) {
     return (
       <div style={{ maxWidth: 800, margin: "0 auto", padding: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>시설을 찾을 수 없습니다</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 800 }}>{error || "시설을 찾을 수 없습니다"}</h1>
         <Link href="/" style={{ color: "var(--color-primary, #3b82f6)" }}>
           ← 홈으로 돌아가기
         </Link>
