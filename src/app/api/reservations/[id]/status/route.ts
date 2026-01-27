@@ -84,7 +84,6 @@ export async function PUT(req: Request, { params }: RouteParams) {
     const applicantEmail = reservation.applicant_email;
     const applicantName = reservation.applicant_name || reservation.booker_name || "신청자";
     const facilityName = reservation.facility?.name || "시설";
-    const qrCode = reservation.qr_code;
 
     if (applicantEmail) {
       if (status === "approved") {
@@ -94,7 +93,6 @@ export async function PUT(req: Request, { params }: RouteParams) {
           facilityName,
           startAt: reservation.start_at,
           endAt: reservation.end_at,
-          qrCode,
         });
       } else if (status === "rejected") {
         await sendRejectionEmail({
