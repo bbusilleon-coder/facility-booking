@@ -385,14 +385,12 @@ export default function AdminReservationsPage() {
                 >
                   상세
                 </button>
-                {(r.status === "rejected" || r.status === "cancelled") && (
-                  <button
-                    onClick={() => handleDelete(r.id)}
-                    style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #dc2626", background: "#dc262622", color: "#dc2626", cursor: "pointer", fontSize: 12 }}
-                  >
-                    🗑️ 삭제
-                  </button>
-                )}
+                <button
+                  onClick={() => handleDelete(r.id)}
+                  style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #dc2626", background: "#dc262622", color: "#dc2626", cursor: "pointer", fontSize: 12 }}
+                >
+                  🗑️ 삭제
+                </button>
               </div>
             </div>
           ))}

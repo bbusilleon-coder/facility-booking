@@ -97,12 +97,28 @@ export default function FacilityCalendar({
         cancelled: "#6b7280",
       };
 
+      // 시간을 로컬 시간 형식으로 변환 (UTC Z 제거)
+      const toLocalTimeString = (isoString: string) => {
+        // "2026-02-03T20:00" 형식이면 그대로 사용
+        if (!isoString.includes("Z") && !isoString.includes("+")) {
+          return isoString;
+        }
+        // UTC 형식이면 로컬 시간으로 변환
+        const date = new Date(isoString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+      };
+
       setEvents(
         rows.map((r) => ({
           id: r.id,
           title: r.status === "approved" ? "예약확정" : r.status === "pending" ? "승인대기" : "예약",
-          start: r.start_at,
-          end: r.end_at,
+          start: toLocalTimeString(r.start_at),
+          end: toLocalTimeString(r.end_at),
           color: statusColors[r.status] || "#3b82f6",
         }))
       );

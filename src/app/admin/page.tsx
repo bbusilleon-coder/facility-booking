@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createServerClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 type Stats = {
   totalFacilities: number;
   activeFacilities: number;
