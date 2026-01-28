@@ -109,9 +109,18 @@ export async function POST(req: Request) {
         continue;
       }
 
-      // 시작/종료 시간 생성
+      // 시작/종료 시간 생성 (한국 시간대 포함)
       const [startH, startM] = start_time.split(":").map(Number);
       const [endH, endM] = end_time.split(":").map(Number);
+
+      // "YYYY-MM-DDTHH:mm:00+09:00" 형식으로 저장
+      const pad = (n: number) => n.toString().padStart(2, "0");
+      const year = date.getFullYear();
+      const month = pad(date.getMonth() + 1);
+      const day = pad(date.getDate());
+      
+      const startAtStr = `${year}-${month}-${day}T${pad(startH)}:${pad(startM)}:00+09:00`;
+      const endAtStr = `${year}-${month}-${day}T${pad(endH)}:${pad(endM)}:00+09:00`;
 
       const startAt = new Date(date);
       startAt.setHours(startH, startM, 0, 0);
@@ -135,8 +144,8 @@ export async function POST(req: Request) {
 
       reservations.push({
         facility_id,
-        start_at: startAt.toISOString(),
-        end_at: endAt.toISOString(),
+        start_at: startAtStr,
+        end_at: endAtStr,
         status: "pending",
         purpose,
         attendees,

@@ -44,11 +44,22 @@ export async function POST(req: Request, { params }: RouteParams) {
       );
     }
 
+    // 타임존 추가 함수
+    const addTimezone = (dt: string) => {
+      // 이미 타임존이 있으면 그대로 반환
+      if (dt.includes("+") || dt.includes("Z")) return dt;
+      // "2026-02-24T10:00" -> "2026-02-24T10:00:00+09:00"
+      return dt.includes(":00:00") ? dt + "+09:00" : dt + ":00+09:00";
+    };
+
+    const startAtWithTz = addTimezone(start_at);
+    const endAtWithTz = addTimezone(end_at);
+
     // 새 예약 생성
     const newReservation = {
       facility_id: original.facility_id,
-      start_at,
-      end_at,
+      start_at: startAtWithTz,
+      end_at: endAtWithTz,
       status: "pending",
       booker_name: original.booker_name,
       booker_phone: original.booker_phone,

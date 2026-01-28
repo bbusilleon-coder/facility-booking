@@ -84,11 +84,19 @@ export async function POST(req: Request, { params }: RouteParams) {
       }
     }
 
+    // 타임존 추가 함수
+    const addTimezone = (dt: string) => {
+      if (dt.includes("+") || dt.includes("Z")) return dt;
+      return dt.includes(":00:00") ? dt + "+09:00" : dt + ":00+09:00";
+    };
+
+    const newEndAtWithTz = addTimezone(new_end_at);
+
     // 예약 연장
     const { data, error } = await supabase
       .from("reservations")
       .update({
-        end_at: new_end_at,
+        end_at: newEndAtWithTz,
         notes: reservation.notes 
           ? `${reservation.notes} [연장됨]` 
           : "[연장된 예약]",

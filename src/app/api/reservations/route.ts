@@ -183,10 +183,14 @@ export async function POST(req: Request) {
     }
 
     // 예약 데이터 구성 (qr_code 제거)
+    // 로컬 시간에 한국 시간대(+09:00)를 명시적으로 추가하여 저장
+    const startAtWithTz = body.start_at + ":00+09:00";  // "2026-02-24T10:00:00+09:00"
+    const endAtWithTz = body.end_at + ":00+09:00";      // "2026-02-24T17:00:00+09:00"
+
     const reservationData: any = {
       facility_id: body.facility_id,
-      start_at: body.start_at,
-      end_at: body.end_at,
+      start_at: startAtWithTz,
+      end_at: endAtWithTz,
       status: "pending",
 
       booker_name: body.applicant_name,
