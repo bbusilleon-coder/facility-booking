@@ -84,6 +84,27 @@ export default function AdminReservationsPage() {
     fetchReservations();
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm("정말로 이 예약을 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.")) return;
+
+    try {
+      const res = await fetch(`/api/reservations/${id}`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (json.ok) {
+        alert("예약이 삭제되었습니다.");
+        fetchReservations();
+        setSelectedReservation(null);
+      } else {
+        alert("삭제 실패: " + json.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
+  };
+
   const handleStatusChange = async (id: string, status: string, reason?: string) => {
     try {
       const res = await fetch(`/api/reservations/${id}/status`, {
@@ -364,6 +385,14 @@ export default function AdminReservationsPage() {
                 >
                   상세
                 </button>
+                {(r.status === "rejected" || r.status === "cancelled") && (
+                  <button
+                    onClick={() => handleDelete(r.id)}
+                    style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #dc2626", background: "#dc262622", color: "#dc2626", cursor: "pointer", fontSize: 12 }}
+                  >
+                    🗑️ 삭제
+                  </button>
+                )}
               </div>
             </div>
           ))}
