@@ -246,6 +246,7 @@ export default function FacilityCalendar({
           headerToolbar={headerToolbar}
           height="auto"
           locale="ko"
+          timeZone="local"
           nowIndicator={true}
           selectable={true}
           selectMirror={true}
