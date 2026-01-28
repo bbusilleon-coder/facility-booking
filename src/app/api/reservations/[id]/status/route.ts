@@ -117,3 +117,8 @@ export async function PUT(req: Request, { params }: RouteParams) {
     );
   }
 }
+
+// PATCH: PUT과 동일 (클라이언트 호환성)
+export async function PATCH(req: Request, { params }: RouteParams) {
+  return PUT(req, { params });
+}
