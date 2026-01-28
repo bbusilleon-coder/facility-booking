@@ -195,8 +195,26 @@ export default function MyReservationPage() {
     }
   };
 
+  // 로컬 시간 문자열을 올바르게 파싱
+  const parseLocalDate = (dateStr: string): Date => {
+    if (!dateStr) return new Date();
+    
+    // UTC 형식(Z 또는 +포함)이 아니면 로컬 시간으로 직접 파싱
+    if (!dateStr.includes("Z") && !dateStr.includes("+")) {
+      const [datePart, timePart] = dateStr.split("T");
+      if (!datePart || !timePart) return new Date(dateStr);
+      
+      const [year, month, day] = datePart.split("-").map(Number);
+      const [hour, minute] = timePart.split(":").map(Number);
+      
+      return new Date(year, month - 1, day, hour, minute);
+    }
+    
+    return new Date(dateStr);
+  };
+
   const formatDateTime = (dateStr: string) => {
-    const date = new Date(dateStr);
+    const date = parseLocalDate(dateStr);
     return date.toLocaleString("ko-KR", {
       year: "numeric",
       month: "long",
@@ -208,7 +226,7 @@ export default function MyReservationPage() {
   };
 
   const formatDateTimeShort = (dateStr: string) => {
-    const date = new Date(dateStr);
+    const date = parseLocalDate(dateStr);
     return date.toLocaleString("ko-KR", {
       month: "numeric",
       day: "numeric",

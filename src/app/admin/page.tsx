@@ -135,7 +135,27 @@ export default async function AdminDashboard() {
     { label: "전체 예약", value: stats.totalReservations, color: "#6b7280", icon: "📊" },
   ];
 
+  // 로컬 시간 문자열을 올바르게 파싱
   const formatDate = (dateStr: string) => {
+    if (!dateStr) return "-";
+    
+    // UTC 형식(Z 또는 +포함)이 아니면 로컬 시간으로 직접 파싱
+    if (!dateStr.includes("Z") && !dateStr.includes("+")) {
+      const [datePart, timePart] = dateStr.split("T");
+      if (!datePart || !timePart) return dateStr;
+      
+      const [year, month, day] = datePart.split("-").map(Number);
+      const [hour, minute] = timePart.split(":").map(Number);
+      
+      const d = new Date(year, month - 1, day, hour, minute);
+      return d.toLocaleString("ko-KR", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+    
     const d = new Date(dateStr);
     return d.toLocaleString("ko-KR", {
       month: "short",

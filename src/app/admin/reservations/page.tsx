@@ -179,7 +179,30 @@ export default function AdminReservationsPage() {
     }
   };
 
+  // 로컬 시간 문자열을 올바르게 파싱
   const formatDate = (dateStr: string) => {
+    // "2026-02-24T10:00" 형식 -> 로컬 시간으로 파싱
+    if (!dateStr) return "-";
+    
+    // UTC 형식(Z 또는 +포함)이 아니면 로컬 시간으로 직접 파싱
+    if (!dateStr.includes("Z") && !dateStr.includes("+")) {
+      const [datePart, timePart] = dateStr.split("T");
+      if (!datePart || !timePart) return dateStr;
+      
+      const [year, month, day] = datePart.split("-").map(Number);
+      const [hour, minute] = timePart.split(":").map(Number);
+      
+      const date = new Date(year, month - 1, day, hour, minute);
+      return date.toLocaleString("ko-KR", {
+        month: "short",
+        day: "numeric",
+        weekday: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+    
+    // UTC 형식이면 그대로 변환
     return new Date(dateStr).toLocaleString("ko-KR", {
       month: "short",
       day: "numeric",
