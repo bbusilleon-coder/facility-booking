@@ -85,7 +85,17 @@ export default async function Home() {
           <p style={{ color: "var(--text-muted, #888)", fontSize: 13, margin: "4px 0 0 0" }}>
             TEL: 042-551-1543 &nbsp;|&nbsp; E-mail: pik8241@konyang.ac.kr
           </p>
-          <p style={{ color: "#555", fontSize: 12, marginTop: 16 }}>
+          <p style={{ margin: "12px 0 0 0" }}>
+            <a 
+              href="https://sites.google.com/d/1vaqyC_wLXOUP-UWwLMARmyS8sJf9AmL7/p/1VAkK7t33fSPzxZ8dq9yV9i1ZTTePuFOG/edit"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#6b7280", fontSize: 12, textDecoration: "none" }}
+            >
+              개인정보처리방침
+            </a>
+          </p>
+          <p style={{ color: "#555", fontSize: 12, marginTop: 12 }}>
             Copyrightⓒbbusilleon 2026. All Rights Reserved.
           </p>
         </div>
