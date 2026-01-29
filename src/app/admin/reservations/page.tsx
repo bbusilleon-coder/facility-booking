@@ -54,9 +54,14 @@ export default function AdminReservationsPage() {
   const [extendTime, setExtendTime] = useState("");
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [copyDate, setCopyDate] = useState("");
+  
+  // 체크박스 선택 상태
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchReservations = async () => {
     setLoading(true);
+    setSelectedIds(new Set()); // 검색 시 선택 초기화
     try {
       const params = new URLSearchParams();
       if (filter !== "all") params.append("status", filter);
@@ -215,6 +220,68 @@ export default function AdminReservationsPage() {
   const getName = (r: Reservation) => r.applicant_name || r.booker_name || "-";
   const getPhone = (r: Reservation) => r.applicant_phone || r.booker_phone || "-";
 
+  // 체크박스 토글
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  // 전체 선택/해제
+  const toggleSelectAll = () => {
+    if (selectedIds.size === reservations.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(reservations.map((r) => r.id)));
+    }
+  };
+
+  // 일괄 삭제
+  const handleBulkDelete = async () => {
+    if (selectedIds.size === 0) {
+      alert("삭제할 예약을 선택해주세요.");
+      return;
+    }
+
+    if (!confirm(`선택한 ${selectedIds.size}개의 예약을 삭제하시겠습니까?\n이 작업은 취소할 수 없습니다.`)) {
+      return;
+    }
+
+    setIsDeleting(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const id of selectedIds) {
+      try {
+        const res = await fetch(`/api/reservations/${id}`, { method: "DELETE" });
+        const json = await res.json();
+        if (json.ok) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch {
+        failCount++;
+      }
+    }
+
+    setIsDeleting(false);
+    setSelectedIds(new Set());
+    fetchReservations();
+
+    if (failCount === 0) {
+      alert(`${successCount}개의 예약이 삭제되었습니다.`);
+    } else {
+      alert(`${successCount}개 삭제 성공, ${failCount}개 삭제 실패`);
+    }
+  };
+
   return (
     <div style={{ padding: 24 }}>
       <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 24 }}>예약 관리</h1>
@@ -304,6 +371,26 @@ export default function AdminReservationsPage() {
           <option value="rejected">거절됨</option>
           <option value="cancelled">취소됨</option>
         </select>
+
+        {/* 일괄 삭제 버튼 */}
+        {selectedIds.size > 0 && (
+          <button
+            onClick={handleBulkDelete}
+            disabled={isDeleting}
+            style={{
+              padding: "8px 16px",
+              borderRadius: 8,
+              border: "none",
+              background: "#dc2626",
+              color: "white",
+              cursor: isDeleting ? "not-allowed" : "pointer",
+              fontWeight: 600,
+              opacity: isDeleting ? 0.6 : 1,
+            }}
+          >
+            {isDeleting ? "삭제 중..." : `🗑️ 선택 삭제 (${selectedIds.size})`}
+          </button>
+        )}
       </div>
 
       {/* 예약 목록 */}
@@ -315,11 +402,31 @@ export default function AdminReservationsPage() {
         </div>
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
+          {/* 전체 선택 헤더 */}
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "8px 16px",
+            background: "#111",
+            borderRadius: 8,
+          }}>
+            <input
+              type="checkbox"
+              checked={selectedIds.size === reservations.length && reservations.length > 0}
+              onChange={toggleSelectAll}
+              style={{ width: 18, height: 18, cursor: "pointer" }}
+            />
+            <span style={{ color: "#888", fontSize: 13 }}>
+              전체 선택 ({selectedIds.size}/{reservations.length})
+            </span>
+          </div>
+
           {reservations.map((r) => (
             <div
               key={r.id}
               style={{
-                background: "#1a1a1a",
+                background: selectedIds.has(r.id) ? "#1f2937" : "#1a1a1a",
                 borderRadius: 12,
                 padding: 16,
                 display: "flex",
@@ -328,8 +435,17 @@ export default function AdminReservationsPage() {
                 flexWrap: "wrap",
                 gap: 12,
                 borderLeft: `4px solid ${statusColors[r.status]}`,
+                transition: "background 0.2s",
               }}
             >
+              {/* 체크박스 */}
+              <input
+                type="checkbox"
+                checked={selectedIds.has(r.id)}
+                onChange={() => toggleSelect(r.id)}
+                style={{ width: 18, height: 18, cursor: "pointer", flexShrink: 0 }}
+              />
+
               <div style={{ flex: 1, minWidth: 200 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                   <span style={{ fontWeight: 600 }}>{r.facility?.name || "시설"}</span>
