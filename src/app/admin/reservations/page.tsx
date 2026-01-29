@@ -51,6 +51,8 @@ export default function AdminReservationsPage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [viewMode, setViewMode] = useState<"active" | "archive">("active"); // 활성/보관함
+  const [sortBy, setSortBy] = useState<"date" | "facility">("date"); // 정렬 기준
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // 정렬 순서
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [adminMemo, setAdminMemo] = useState("");
   const [showExtendModal, setShowExtendModal] = useState(false);
@@ -115,6 +117,26 @@ export default function AdminReservationsPage() {
     } else {
       // 활성: 승인대기, 승인됨 (만료되지 않은)
       return displayStatus === "pending" || displayStatus === "approved";
+    }
+  });
+
+  // 정렬된 예약 목록
+  const sortedReservations = [...filteredReservations].sort((a, b) => {
+    if (sortBy === "facility") {
+      // 시설명으로 1차 정렬
+      const facilityA = a.facility?.name || "";
+      const facilityB = b.facility?.name || "";
+      const facilityCompare = facilityA.localeCompare(facilityB, "ko");
+      if (facilityCompare !== 0) {
+        return sortOrder === "asc" ? facilityCompare : -facilityCompare;
+      }
+      // 같은 시설이면 날짜순 (항상 오름차순)
+      return parseLocalDate(a.start_at).getTime() - parseLocalDate(b.start_at).getTime();
+    } else {
+      // 날짜순 정렬
+      const dateA = parseLocalDate(a.start_at).getTime();
+      const dateB = parseLocalDate(b.start_at).getTime();
+      return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
     }
   });
 
@@ -294,10 +316,10 @@ export default function AdminReservationsPage() {
 
   // 전체 선택/해제
   const toggleSelectAll = () => {
-    if (selectedIds.size === filteredReservations.length) {
+    if (selectedIds.size === sortedReservations.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(filteredReservations.map((r) => r.id)));
+      setSelectedIds(new Set(sortedReservations.map((r) => r.id)));
     }
   };
 
@@ -668,14 +690,60 @@ export default function AdminReservationsPage() {
             fontWeight: 600,
           }}
         >
-          📊 엑셀 내보내기 {selectedIds.size > 0 ? `(${selectedIds.size})` : `(${filteredReservations.length})`}
+          📊 엑셀 내보내기 {selectedIds.size > 0 ? `(${selectedIds.size})` : `(${sortedReservations.length})`}
         </button>
+
+        {/* 정렬 버튼 */}
+        <div style={{ display: "flex", gap: 4, marginLeft: "auto" }}>
+          <button
+            onClick={() => {
+              if (sortBy === "date") {
+                setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+              } else {
+                setSortBy("date");
+                setSortOrder("asc");
+              }
+            }}
+            style={{
+              padding: "8px 12px",
+              borderRadius: "8px 0 0 8px",
+              border: sortBy === "date" ? "1px solid #3b82f6" : "1px solid #333",
+              background: sortBy === "date" ? "#3b82f622" : "#1a1a1a",
+              color: sortBy === "date" ? "#3b82f6" : "#888",
+              cursor: "pointer",
+              fontSize: 13,
+            }}
+          >
+            📅 날짜순 {sortBy === "date" && (sortOrder === "asc" ? "↑" : "↓")}
+          </button>
+          <button
+            onClick={() => {
+              if (sortBy === "facility") {
+                setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+              } else {
+                setSortBy("facility");
+                setSortOrder("asc");
+              }
+            }}
+            style={{
+              padding: "8px 12px",
+              borderRadius: "0 8px 8px 0",
+              border: sortBy === "facility" ? "1px solid #3b82f6" : "1px solid #333",
+              background: sortBy === "facility" ? "#3b82f622" : "#1a1a1a",
+              color: sortBy === "facility" ? "#3b82f6" : "#888",
+              cursor: "pointer",
+              fontSize: 13,
+            }}
+          >
+            🏢 호실별 {sortBy === "facility" && (sortOrder === "asc" ? "↑" : "↓")}
+          </button>
+        </div>
       </div>
 
       {/* 예약 목록 */}
       {loading ? (
         <div style={{ color: "#888", padding: 40, textAlign: "center" }}>로딩 중...</div>
-      ) : filteredReservations.length === 0 ? (
+      ) : sortedReservations.length === 0 ? (
         <div style={{ padding: 40, background: "#1a1a1a", borderRadius: 12, textAlign: "center", color: "#888" }}>
           {viewMode === "archive" ? "보관함이 비어있습니다." : "진행중인 예약이 없습니다."}
         </div>
@@ -692,16 +760,16 @@ export default function AdminReservationsPage() {
           }}>
             <input
               type="checkbox"
-              checked={selectedIds.size === filteredReservations.length && filteredReservations.length > 0}
+              checked={selectedIds.size === sortedReservations.length && sortedReservations.length > 0}
               onChange={toggleSelectAll}
               style={{ width: 18, height: 18, cursor: "pointer" }}
             />
             <span style={{ color: "#888", fontSize: 13 }}>
-              전체 선택 ({selectedIds.size}/{filteredReservations.length})
+              전체 선택 ({selectedIds.size}/{sortedReservations.length})
             </span>
           </div>
 
-          {filteredReservations.map((r) => {
+          {sortedReservations.map((r) => {
             const displayStatus = getDisplayStatus(r);
             return (
             <div
