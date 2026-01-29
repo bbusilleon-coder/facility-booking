@@ -2,11 +2,11 @@
   --color-primary: #3b82f6;
   --color-primary-hover: #2563eb;
   --color-primary-light: #3b82f622;
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --card-bg: #1a1a1a;
-  --border-color: #333333;
-  --text-muted: #888888;
+  --background: #f5f5f5;
+  --foreground: #1a1a1a;
+  --card-bg: #ffffff;
+  --border-color: #e5e5e5;
+  --text-muted: #666666;
 }
 
 * { box-sizing: border-box; }

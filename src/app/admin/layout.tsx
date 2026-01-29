@@ -4,17 +4,24 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const menuItems = [
+type MenuItem = {
+  href: string;
+  label: string;
+  exact?: boolean;
+  superOnly?: boolean; // 슈퍼관리자만 접근 가능
+};
+
+const menuItems: MenuItem[] = [
   { href: "/admin", label: "📊 대시보드", exact: true },
   { href: "/admin/reservations", label: "📅 예약 관리" },
-  { href: "/admin/facilities", label: "🏢 시설물 관리" },
+  { href: "/admin/facilities", label: "🏢 시설물 관리", superOnly: true },
   { href: "/admin/waitlist", label: "⏰ 대기열 관리" },
   { href: "/admin/reviews", label: "⭐ 리뷰 관리" },
   { href: "/admin/notices", label: "📢 공지사항" },
   { href: "/admin/holidays", label: "🗓️ 휴일 관리" },
   { href: "/admin/logs", label: "📋 활동 로그" },
-  { href: "/admin/users", label: "👥 관리자 계정" },
-  { href: "/admin/settings", label: "⚙️ 설정" },
+  { href: "/admin/users", label: "👥 관리자 계정", superOnly: true },
+  { href: "/admin/settings", label: "⚙️ 설정", superOnly: true },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -22,6 +29,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
   const [adminName, setAdminName] = useState<string>("");
+  const [adminRole, setAdminRole] = useState<string>("admin");
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   // 인증 체크
@@ -66,11 +74,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         if (json.ok) {
           setIsAuthed(true);
           setAdminName(localStorage.getItem("adminName") || "관리자");
+          setAdminRole(localStorage.getItem("adminRole") || "admin");
         } else {
           // 서버에서 세션 무효 - 하지만 로컬 만료 전이면 유지
           if (expiresAt && new Date(expiresAt) > new Date()) {
             setIsAuthed(true);
             setAdminName(localStorage.getItem("adminName") || "관리자");
+            setAdminRole(localStorage.getItem("adminRole") || "admin");
           } else {
             setIsAuthed(false);
             localStorage.removeItem("adminToken");
@@ -82,6 +92,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         if (expiresAt && new Date(expiresAt) > new Date()) {
           setIsAuthed(true);
           setAdminName(localStorage.getItem("adminName") || "관리자");
+          setAdminRole(localStorage.getItem("adminRole") || "admin");
         } else {
           setIsAuthed(false);
         }
@@ -97,6 +108,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       router.push("/admin/login");
     }
   }, [isAuthed, pathname, router]);
+
+  // 권한 체크: 일반 관리자가 슈퍼관리자 전용 페이지 접근 시 리다이렉트
+  useEffect(() => {
+    if (isAuthed && adminRole !== "super" && pathname !== "/admin/login") {
+      const restrictedPaths = ["/admin/facilities", "/admin/users", "/admin/settings"];
+      const isRestricted = restrictedPaths.some(
+        (p) => pathname === p || pathname.startsWith(p + "/")
+      );
+      if (isRestricted) {
+        alert("접근 권한이 없습니다. 슈퍼관리자만 접근할 수 있습니다.");
+        router.push("/admin");
+      }
+    }
+  }, [isAuthed, adminRole, pathname, router]);
+
+  // 권한에 따라 메뉴 필터링
+  const filteredMenuItems = menuItems.filter((item) => {
+    if (item.superOnly && adminRole !== "super") {
+      return false;
+    }
+    return true;
+  });
 
   const handleLogout = async () => {
     const token = localStorage.getItem("adminToken");
@@ -166,7 +199,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         <nav style={{ flex: 1 }}>
-          {menuItems.map((item) => {
+          {filteredMenuItems.map((item) => {
             const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
             return (
               <Link
@@ -198,8 +231,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* 사용자 정보 */}
         {sidebarOpen && (
           <div style={{ borderTop: "1px solid var(--border-color, #222)", paddingTop: 16 }}>
-            <div style={{ fontSize: 13, color: "var(--text-muted, #888)", marginBottom: 8 }}>
+            <div style={{ fontSize: 13, color: "var(--text-muted, #888)", marginBottom: 4 }}>
               👤 {adminName}
+            </div>
+            <div style={{ fontSize: 11, color: adminRole === "super" ? "#22c55e" : "#888", marginBottom: 8 }}>
+              {adminRole === "super" ? "🔑 슈퍼관리자" : "👔 관리자"}
             </div>
             <button
               onClick={handleLogout}

@@ -52,9 +52,9 @@ export default async function Home() {
           gap: 12,
         }}>
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800 }}>시설물 예약</h1>
+            <h1 style={{ fontSize: 24, fontWeight: 800 }}>계룡대 학습관 강의실 예약 시스템</h1>
             <p style={{ color: "var(--text-muted, #888)", marginTop: 4, fontSize: 14 }}>
-              시설물을 선택하고 예약을 진행합니다.
+              강의실을 선택하고 예약을 진행합니다.
             </p>
           </div>
           <HeaderAuth />
