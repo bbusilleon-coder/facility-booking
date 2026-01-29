@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createServerClient } from "@/lib/supabase/server";
+import ExportButton from "@/components/admin/ExportButton";
 
 export const dynamic = "force-dynamic";
 
@@ -167,7 +168,10 @@ export default async function AdminDashboard() {
 
   return (
     <div style={{ padding: 24 }}>
-      <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 24 }}>대시보드</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 800 }}>대시보드</h1>
+        <ExportButton />
+      </div>
 
       {/* 통계 카드 */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 32 }}>

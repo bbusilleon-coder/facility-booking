@@ -298,6 +298,101 @@ export default function AdminReservationsPage() {
     }
   };
 
+  // 엑셀 내보내기
+  const handleExportExcel = () => {
+    const dataToExport = selectedIds.size > 0
+      ? reservations.filter((r) => selectedIds.has(r.id))
+      : reservations;
+
+    if (dataToExport.length === 0) {
+      alert("내보낼 데이터가 없습니다.");
+      return;
+    }
+
+    // 날짜 포맷 함수
+    const formatDateForExcel = (dateStr: string) => {
+      if (!dateStr) return "";
+      if (!dateStr.includes("Z") && !dateStr.includes("+")) {
+        const [datePart, timePart] = dateStr.split("T");
+        if (!datePart || !timePart) return dateStr;
+        const [year, month, day] = datePart.split("-");
+        const [hour, minute] = timePart.split(":");
+        return `${year}-${month}-${day} ${hour}:${minute}`;
+      }
+      const d = new Date(dateStr);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      const hour = String(d.getHours()).padStart(2, "0");
+      const minute = String(d.getMinutes()).padStart(2, "0");
+      return `${year}-${month}-${day} ${hour}:${minute}`;
+    };
+
+    // CSV 헤더
+    const headers = [
+      "예약번호",
+      "시설명",
+      "상태",
+      "시작일시",
+      "종료일시",
+      "신청자",
+      "연락처",
+      "이메일",
+      "소속",
+      "사용목적",
+      "인원",
+      "비고",
+      "체크인시간",
+      "신청일",
+    ];
+
+    // CSV 데이터
+    const rows = dataToExport.map((r) => [
+      r.id.slice(0, 8).toUpperCase(),
+      r.facility?.name || "",
+      statusLabels[r.status] || r.status,
+      formatDateForExcel(r.start_at),
+      formatDateForExcel(r.end_at),
+      r.applicant_name || r.booker_name || "",
+      r.applicant_phone || r.booker_phone || "",
+      r.applicant_email || "",
+      r.applicant_dept || "",
+      r.purpose || "",
+      r.attendees || 1,
+      r.notes || "",
+      r.checked_in_at ? formatDateForExcel(r.checked_in_at) : "",
+      formatDateForExcel(r.created_at),
+    ]);
+
+    // BOM + CSV 생성
+    const BOM = "\uFEFF";
+    const csvContent = BOM + [
+      headers.join(","),
+      ...rows.map((row) =>
+        row.map((cell) => {
+          const str = String(cell).replace(/"/g, '""');
+          return str.includes(",") || str.includes('"') || str.includes("\n")
+            ? `"${str}"`
+            : str;
+        }).join(",")
+      ),
+    ].join("\n");
+
+    // 다운로드
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const today = new Date().toISOString().split("T")[0];
+    link.href = url;
+    link.download = `예약현황_${today}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    alert(`${dataToExport.length}건의 예약이 내보내기 되었습니다.`);
+  };
+
   // 수정 모달 열기
   const openEditModal = (r: Reservation) => {
     setSelectedReservation(r);
@@ -481,6 +576,22 @@ export default function AdminReservationsPage() {
             {isDeleting ? "삭제 중..." : `🗑️ 선택 삭제 (${selectedIds.size})`}
           </button>
         )}
+
+        {/* 엑셀 내보내기 버튼 */}
+        <button
+          onClick={handleExportExcel}
+          style={{
+            padding: "8px 16px",
+            borderRadius: 8,
+            border: "1px solid #22c55e",
+            background: "#22c55e22",
+            color: "#22c55e",
+            cursor: "pointer",
+            fontWeight: 600,
+          }}
+        >
+          📊 엑셀 내보내기 {selectedIds.size > 0 ? `(${selectedIds.size})` : `(${reservations.length})`}
+        </button>
       </div>
 
       {/* 예약 목록 */}
