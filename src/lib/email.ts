@@ -17,6 +17,37 @@ type EmailOptions = {
   html: string;
 };
 
+// 로컬 시간 파싱 함수 (시간대 문제 해결)
+function parseLocalDateTime(dateStr: string): Date {
+  if (!dateStr) return new Date();
+  
+  // UTC 형식(Z 또는 +포함)이 아니면 로컬 시간으로 직접 파싱
+  if (!dateStr.includes("Z") && !dateStr.includes("+")) {
+    const [datePart, timePart] = dateStr.split("T");
+    if (!datePart || !timePart) return new Date(dateStr);
+    
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hour, minute] = timePart.split(":").map(Number);
+    
+    return new Date(year, month - 1, day, hour, minute);
+  }
+  
+  return new Date(dateStr);
+}
+
+// 공통 날짜 포맷 함수
+function formatDateTime(dateStr: string): string {
+  const d = parseLocalDateTime(dateStr);
+  return d.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
 // 기본 이메일 발송 함수
 export async function sendEmail({ to, subject, html }: EmailOptions): Promise<boolean> {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -25,16 +56,17 @@ export async function sendEmail({ to, subject, html }: EmailOptions): Promise<bo
   }
 
   try {
-    await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: `"계룡대학습관 시설예약" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,
     });
-    console.log(`[Email] 발송 성공: ${to}`);
+    console.log(`[Email] 발송 성공: ${to}, messageId: ${info.messageId}`);
     return true;
-  } catch (error) {
-    console.error("[Email] 발송 실패:", error);
+  } catch (error: any) {
+    console.error("[Email] 발송 실패:", error?.message || error);
+    console.error("[Email] 상세 오류:", JSON.stringify(error, null, 2));
     return false;
   }
 }
@@ -49,18 +81,6 @@ export async function sendReservationConfirmation(data: {
   purpose: string;
   qrCode?: string;
 }): Promise<boolean> {
-  const formatDateTime = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return d.toLocaleString("ko-KR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const html = `
     <!DOCTYPE html>
     <html>
@@ -155,18 +175,6 @@ export async function sendApprovalEmail(data: {
   endAt: string;
   qrCode?: string;
 }): Promise<boolean> {
-  const formatDateTime = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return d.toLocaleString("ko-KR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const html = `
     <!DOCTYPE html>
     <html>
@@ -259,18 +267,6 @@ export async function sendRejectionEmail(data: {
   endAt: string;
   reason?: string;
 }): Promise<boolean> {
-  const formatDateTime = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return d.toLocaleString("ko-KR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const html = `
     <!DOCTYPE html>
     <html>
@@ -361,18 +357,6 @@ export async function sendNewReservationNotification(data: {
   endAt: string;
   purpose: string;
 }): Promise<boolean> {
-  const formatDateTime = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return d.toLocaleString("ko-KR", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const html = `
     <!DOCTYPE html>
     <html>
