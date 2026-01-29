@@ -32,6 +32,7 @@ const statusLabels: Record<string, string> = {
   approved: "승인됨",
   rejected: "거절됨",
   cancelled: "취소됨",
+  expired: "사용완료",
 };
 
 const statusColors: Record<string, string> = {
@@ -39,6 +40,7 @@ const statusColors: Record<string, string> = {
   approved: "#22c55e",
   rejected: "#ef4444",
   cancelled: "#6b7280",
+  expired: "#8b5cf6",
 };
 
 export default function AdminReservationsPage() {
@@ -48,6 +50,7 @@ export default function AdminReservationsPage() {
   const [search, setSearch] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [viewMode, setViewMode] = useState<"active" | "archive">("active"); // 활성/보관함
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
   const [adminMemo, setAdminMemo] = useState("");
   const [showExtendModal, setShowExtendModal] = useState(false);
@@ -74,6 +77,46 @@ export default function AdminReservationsPage() {
     status: "",
   });
   const [isSaving, setIsSaving] = useState(false);
+
+  // 만료 여부 체크 함수
+  const isExpired = (r: Reservation): boolean => {
+    if (r.status === "rejected" || r.status === "cancelled") return false;
+    const endAt = parseLocalDate(r.end_at);
+    return endAt < new Date();
+  };
+
+  // 로컬 시간 파싱
+  const parseLocalDate = (dateStr: string): Date => {
+    if (!dateStr) return new Date();
+    if (!dateStr.includes("Z") && !dateStr.includes("+")) {
+      const [datePart, timePart] = dateStr.split("T");
+      if (!datePart || !timePart) return new Date(dateStr);
+      const [year, month, day] = datePart.split("-").map(Number);
+      const [hour, minute] = timePart.split(":").map(Number);
+      return new Date(year, month - 1, day, hour, minute);
+    }
+    return new Date(dateStr);
+  };
+
+  // 표시용 상태 (만료 체크 포함)
+  const getDisplayStatus = (r: Reservation): string => {
+    if (isExpired(r) && (r.status === "approved" || r.status === "pending")) {
+      return "expired";
+    }
+    return r.status;
+  };
+
+  // 필터링된 예약 목록 (활성/보관함)
+  const filteredReservations = reservations.filter((r) => {
+    const displayStatus = getDisplayStatus(r);
+    if (viewMode === "archive") {
+      // 보관함: 만료됨, 거절됨, 취소됨
+      return displayStatus === "expired" || r.status === "rejected" || r.status === "cancelled";
+    } else {
+      // 활성: 승인대기, 승인됨 (만료되지 않은)
+      return displayStatus === "pending" || displayStatus === "approved";
+    }
+  });
 
   const fetchReservations = async () => {
     setLoading(true);
@@ -251,10 +294,10 @@ export default function AdminReservationsPage() {
 
   // 전체 선택/해제
   const toggleSelectAll = () => {
-    if (selectedIds.size === reservations.length) {
+    if (selectedIds.size === filteredReservations.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(reservations.map((r) => r.id)));
+      setSelectedIds(new Set(filteredReservations.map((r) => r.id)));
     }
   };
 
@@ -471,6 +514,40 @@ export default function AdminReservationsPage() {
     <div style={{ padding: 24 }}>
       <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 24 }}>예약 관리</h1>
 
+      {/* 활성/보관함 탭 */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+        <button
+          onClick={() => setViewMode("active")}
+          style={{
+            padding: "10px 20px",
+            borderRadius: 8,
+            border: "none",
+            background: viewMode === "active" ? "#3b82f6" : "#1a1a1a",
+            color: viewMode === "active" ? "white" : "#888",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: 14,
+          }}
+        >
+          📋 진행중 예약
+        </button>
+        <button
+          onClick={() => setViewMode("archive")}
+          style={{
+            padding: "10px 20px",
+            borderRadius: 8,
+            border: "none",
+            background: viewMode === "archive" ? "#8b5cf6" : "#1a1a1a",
+            color: viewMode === "archive" ? "white" : "#888",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: 14,
+          }}
+        >
+          📦 보관함 (완료/취소/거절)
+        </button>
+      </div>
+
       {/* 검색 및 필터 */}
       <div style={{
         display: "flex",
@@ -555,6 +632,7 @@ export default function AdminReservationsPage() {
           <option value="approved">승인됨</option>
           <option value="rejected">거절됨</option>
           <option value="cancelled">취소됨</option>
+          <option value="expired">사용완료</option>
         </select>
 
         {/* 일괄 삭제 버튼 */}
@@ -590,16 +668,16 @@ export default function AdminReservationsPage() {
             fontWeight: 600,
           }}
         >
-          📊 엑셀 내보내기 {selectedIds.size > 0 ? `(${selectedIds.size})` : `(${reservations.length})`}
+          📊 엑셀 내보내기 {selectedIds.size > 0 ? `(${selectedIds.size})` : `(${filteredReservations.length})`}
         </button>
       </div>
 
       {/* 예약 목록 */}
       {loading ? (
         <div style={{ color: "#888", padding: 40, textAlign: "center" }}>로딩 중...</div>
-      ) : reservations.length === 0 ? (
+      ) : filteredReservations.length === 0 ? (
         <div style={{ padding: 40, background: "#1a1a1a", borderRadius: 12, textAlign: "center", color: "#888" }}>
-          예약이 없습니다.
+          {viewMode === "archive" ? "보관함이 비어있습니다." : "진행중인 예약이 없습니다."}
         </div>
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
@@ -614,16 +692,18 @@ export default function AdminReservationsPage() {
           }}>
             <input
               type="checkbox"
-              checked={selectedIds.size === reservations.length && reservations.length > 0}
+              checked={selectedIds.size === filteredReservations.length && filteredReservations.length > 0}
               onChange={toggleSelectAll}
               style={{ width: 18, height: 18, cursor: "pointer" }}
             />
             <span style={{ color: "#888", fontSize: 13 }}>
-              전체 선택 ({selectedIds.size}/{reservations.length})
+              전체 선택 ({selectedIds.size}/{filteredReservations.length})
             </span>
           </div>
 
-          {reservations.map((r) => (
+          {filteredReservations.map((r) => {
+            const displayStatus = getDisplayStatus(r);
+            return (
             <div
               key={r.id}
               style={{
@@ -635,7 +715,7 @@ export default function AdminReservationsPage() {
                 alignItems: "center",
                 flexWrap: "wrap",
                 gap: 12,
-                borderLeft: `4px solid ${statusColors[r.status]}`,
+                borderLeft: `4px solid ${statusColors[displayStatus] || statusColors[r.status]}`,
                 transition: "background 0.2s",
               }}
             >
@@ -655,11 +735,11 @@ export default function AdminReservationsPage() {
                       padding: "2px 8px",
                       borderRadius: 999,
                       fontSize: 11,
-                      background: `${statusColors[r.status]}22`,
-                      color: statusColors[r.status],
+                      background: `${statusColors[displayStatus]}22`,
+                      color: statusColors[displayStatus],
                     }}
                   >
-                    {statusLabels[r.status]}
+                    {statusLabels[displayStatus]}
                   </span>
                   {r.checked_in_at && (
                     <span style={{ padding: "2px 8px", borderRadius: 999, fontSize: 11, background: "#22c55e22", color: "#22c55e" }}>
@@ -676,7 +756,7 @@ export default function AdminReservationsPage() {
               </div>
 
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {r.status === "pending" && (
+                {r.status === "pending" && displayStatus !== "expired" && (
                   <>
                     <button
                       onClick={() => handleStatusChange(r.id, "approved")}
@@ -733,7 +813,8 @@ export default function AdminReservationsPage() {
                 </button>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
