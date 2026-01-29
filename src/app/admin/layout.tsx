@@ -111,7 +111,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // 권한 체크: 일반 관리자가 슈퍼관리자 전용 페이지 접근 시 리다이렉트
   useEffect(() => {
-    if (isAuthed && adminRole !== "super" && pathname !== "/admin/login") {
+    const isSuperAdmin = adminRole === "super" || adminRole === "super_admin";
+    if (isAuthed && !isSuperAdmin && pathname !== "/admin/login") {
       const restrictedPaths = ["/admin/facilities", "/admin/users", "/admin/settings"];
       const isRestricted = restrictedPaths.some(
         (p) => pathname === p || pathname.startsWith(p + "/")
@@ -123,9 +124,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   }, [isAuthed, adminRole, pathname, router]);
 
+  // 슈퍼관리자 여부 확인
+  const isSuperAdmin = adminRole === "super" || adminRole === "super_admin";
+
   // 권한에 따라 메뉴 필터링
   const filteredMenuItems = menuItems.filter((item) => {
-    if (item.superOnly && adminRole !== "super") {
+    if (item.superOnly && !isSuperAdmin) {
       return false;
     }
     return true;
@@ -234,8 +238,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div style={{ fontSize: 13, color: "var(--text-muted, #888)", marginBottom: 4 }}>
               👤 {adminName}
             </div>
-            <div style={{ fontSize: 11, color: adminRole === "super" ? "#22c55e" : "#888", marginBottom: 8 }}>
-              {adminRole === "super" ? "🔑 슈퍼관리자" : "👔 관리자"}
+            <div style={{ fontSize: 11, color: isSuperAdmin ? "#22c55e" : "#888", marginBottom: 8 }}>
+              {isSuperAdmin ? "🔑 슈퍼관리자" : "👔 관리자"}
             </div>
             <button
               onClick={handleLogout}
