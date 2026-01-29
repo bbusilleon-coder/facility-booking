@@ -58,6 +58,22 @@ export default function AdminReservationsPage() {
   // 체크박스 선택 상태
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
+  
+  // 수정 모달 상태
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({
+    startAt: "",
+    endAt: "",
+    purpose: "",
+    attendees: 1,
+    applicantName: "",
+    applicantPhone: "",
+    applicantEmail: "",
+    applicantDept: "",
+    notes: "",
+    status: "",
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   const fetchReservations = async () => {
     setLoading(true);
@@ -279,6 +295,80 @@ export default function AdminReservationsPage() {
       alert(`${successCount}개의 예약이 삭제되었습니다.`);
     } else {
       alert(`${successCount}개 삭제 성공, ${failCount}개 삭제 실패`);
+    }
+  };
+
+  // 수정 모달 열기
+  const openEditModal = (r: Reservation) => {
+    setSelectedReservation(r);
+    
+    // datetime-local 형식으로 변환
+    const formatForInput = (dateStr: string) => {
+      if (!dateStr) return "";
+      if (dateStr.includes("Z") || dateStr.includes("+")) {
+        const d = new Date(dateStr);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const day = String(d.getDate()).padStart(2, "0");
+        const hour = String(d.getHours()).padStart(2, "0");
+        const minute = String(d.getMinutes()).padStart(2, "0");
+        return `${year}-${month}-${day}T${hour}:${minute}`;
+      }
+      return dateStr.slice(0, 16); // "YYYY-MM-DDTHH:mm"
+    };
+
+    setEditForm({
+      startAt: formatForInput(r.start_at),
+      endAt: formatForInput(r.end_at),
+      purpose: r.purpose || "",
+      attendees: r.attendees || 1,
+      applicantName: r.applicant_name || r.booker_name || "",
+      applicantPhone: r.applicant_phone || r.booker_phone || "",
+      applicantEmail: r.applicant_email || "",
+      applicantDept: r.applicant_dept || "",
+      notes: r.notes || "",
+      status: r.status,
+    });
+    setShowEditModal(true);
+  };
+
+  // 수정 저장
+  const handleSaveEdit = async () => {
+    if (!selectedReservation) return;
+
+    setIsSaving(true);
+    try {
+      const res = await fetch(`/api/admin/reservations/${selectedReservation.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          start_at: editForm.startAt + ":00+09:00",
+          end_at: editForm.endAt + ":00+09:00",
+          purpose: editForm.purpose,
+          attendees: editForm.attendees,
+          applicant_name: editForm.applicantName,
+          applicant_phone: editForm.applicantPhone,
+          applicant_email: editForm.applicantEmail || null,
+          applicant_dept: editForm.applicantDept || null,
+          notes: editForm.notes || null,
+          status: editForm.status,
+        }),
+      });
+
+      const json = await res.json();
+      if (json.ok) {
+        alert("예약이 수정되었습니다.");
+        fetchReservations();
+        setShowEditModal(false);
+        setSelectedReservation(null);
+      } else {
+        alert("수정 실패: " + json.message);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("수정 중 오류가 발생했습니다.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -519,10 +609,10 @@ export default function AdminReservationsPage() {
                   복사
                 </button>
                 <button
-                  onClick={() => setSelectedReservation(r)}
-                  style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #444", background: "transparent", color: "#aaa", cursor: "pointer", fontSize: 12 }}
+                  onClick={() => openEditModal(r)}
+                  style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #3b82f6", background: "#3b82f622", color: "#3b82f6", cursor: "pointer", fontSize: 12 }}
                 >
-                  상세
+                  ✏️ 수정
                 </button>
                 <button
                   onClick={() => handleDelete(r.id)}
@@ -536,42 +626,158 @@ export default function AdminReservationsPage() {
         </div>
       )}
 
-      {/* 상세 모달 */}
-      {selectedReservation && !showExtendModal && !showCopyModal && (
+      {/* 수정 모달 */}
+      {showEditModal && selectedReservation && (
         <div
-          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}
-          onClick={() => setSelectedReservation(null)}
+          style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, padding: 16 }}
+          onClick={() => setShowEditModal(false)}
         >
           <div
-            style={{ background: "#1a1a1a", borderRadius: 16, padding: 24, width: "100%", maxWidth: 500, maxHeight: "80vh", overflow: "auto" }}
+            style={{ background: "#1a1a1a", borderRadius: 16, padding: 24, width: "100%", maxWidth: 500, maxHeight: "90vh", overflow: "auto" }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>예약 상세</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>예약 수정</h2>
+            <p style={{ color: "#888", fontSize: 13, marginBottom: 16 }}>
+              {selectedReservation.facility?.name} · 예약번호: {selectedReservation.id.slice(0, 8).toUpperCase()}
+            </p>
             
-            <div style={{ display: "grid", gap: 12 }}>
-              <div><strong>시설:</strong> {selectedReservation.facility?.name}</div>
-              <div><strong>일시:</strong> {formatDate(selectedReservation.start_at)} ~ {formatDate(selectedReservation.end_at)}</div>
-              <div><strong>신청자:</strong> {getName(selectedReservation)}</div>
-              <div><strong>연락처:</strong> {getPhone(selectedReservation)}</div>
-              {selectedReservation.applicant_email && <div><strong>이메일:</strong> {selectedReservation.applicant_email}</div>}
-              {selectedReservation.applicant_dept && <div><strong>소속:</strong> {selectedReservation.applicant_dept}</div>}
-              <div><strong>목적:</strong> {selectedReservation.purpose || "-"}</div>
-              <div><strong>인원:</strong> {selectedReservation.attendees}명</div>
-              {selectedReservation.notes && <div><strong>비고:</strong> {selectedReservation.notes}</div>}
-              <div><strong>상태:</strong> {statusLabels[selectedReservation.status]}</div>
-              {selectedReservation.checked_in_at && <div><strong>체크인:</strong> {formatDate(selectedReservation.checked_in_at)}</div>}
-              <div><strong>예약번호:</strong> {selectedReservation.id.slice(0, 8).toUpperCase()}</div>
+            {/* 시작/종료 시간 */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
               <div>
-                <strong>캘린더 내보내기:</strong>{" "}
-                <a href={`/api/reservations/${selectedReservation.id}/ics`} download style={{ color: "var(--color-primary, #3b82f6)" }}>
-                  📅 ICS 파일 다운로드
-                </a>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>시작 일시</label>
+                <input
+                  type="datetime-local"
+                  value={editForm.startAt}
+                  onChange={(e) => setEditForm({ ...editForm, startAt: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>종료 일시</label>
+                <input
+                  type="datetime-local"
+                  value={editForm.endAt}
+                  onChange={(e) => setEditForm({ ...editForm, endAt: e.target.value })}
+                  style={inputStyle}
+                />
               </div>
             </div>
 
-            <div style={{ marginTop: 20, display: "flex", gap: 12 }}>
-              <button onClick={() => setSelectedReservation(null)} style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid #444", background: "transparent", color: "#aaa", cursor: "pointer" }}>
-                닫기
+            {/* 상태 */}
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>상태</label>
+              <select
+                value={editForm.status}
+                onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+                style={inputStyle}
+              >
+                <option value="pending">승인대기</option>
+                <option value="approved">승인됨</option>
+                <option value="rejected">거절됨</option>
+                <option value="cancelled">취소됨</option>
+              </select>
+            </div>
+
+            {/* 신청자 정보 */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+              <div>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>신청자 이름</label>
+                <input
+                  type="text"
+                  value={editForm.applicantName}
+                  onChange={(e) => setEditForm({ ...editForm, applicantName: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>연락처</label>
+                <input
+                  type="tel"
+                  value={editForm.applicantPhone}
+                  onChange={(e) => setEditForm({ ...editForm, applicantPhone: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+              <div>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>이메일</label>
+                <input
+                  type="email"
+                  value={editForm.applicantEmail}
+                  onChange={(e) => setEditForm({ ...editForm, applicantEmail: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>소속/부서</label>
+                <input
+                  type="text"
+                  value={editForm.applicantDept}
+                  onChange={(e) => setEditForm({ ...editForm, applicantDept: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+
+            {/* 사용 목적 & 인원 */}
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12, marginBottom: 16 }}>
+              <div>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>사용 목적</label>
+                <input
+                  type="text"
+                  value={editForm.purpose}
+                  onChange={(e) => setEditForm({ ...editForm, purpose: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>인원</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={editForm.attendees}
+                  onChange={(e) => setEditForm({ ...editForm, attendees: parseInt(e.target.value) || 1 })}
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+
+            {/* 비고 */}
+            <div style={{ marginBottom: 20 }}>
+              <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>비고</label>
+              <textarea
+                value={editForm.notes}
+                onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
+                rows={3}
+                style={{ ...inputStyle, resize: "vertical" }}
+              />
+            </div>
+
+            {/* 버튼 */}
+            <div style={{ display: "flex", gap: 12 }}>
+              <button
+                onClick={() => setShowEditModal(false)}
+                style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid #444", background: "transparent", color: "#aaa", cursor: "pointer" }}
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={isSaving}
+                style={{
+                  flex: 1,
+                  padding: 12,
+                  borderRadius: 10,
+                  border: "none",
+                  background: isSaving ? "#444" : "#3b82f6",
+                  color: "white",
+                  cursor: isSaving ? "not-allowed" : "pointer",
+                  fontWeight: 600,
+                }}
+              >
+                {isSaving ? "저장 중..." : "저장"}
               </button>
             </div>
           </div>
@@ -656,3 +862,13 @@ export default function AdminReservationsPage() {
     </div>
   );
 }
+
+const inputStyle: React.CSSProperties = {
+  width: "100%",
+  padding: "10px 12px",
+  borderRadius: 8,
+  border: "1px solid #333",
+  background: "#0f0f0f",
+  color: "white",
+  fontSize: 14,
+};
