@@ -15,6 +15,7 @@ const menuItems: MenuItem[] = [
   { href: "/admin", label: "📊 대시보드", exact: true },
   { href: "/admin/reservations", label: "📅 예약 관리" },
   { href: "/admin/facilities", label: "🏢 시설물 관리", superOnly: true },
+  { href: "/admin/members", label: "👤 회원 관리" },
   { href: "/admin/waitlist", label: "⏰ 대기열 관리" },
   { href: "/admin/reviews", label: "⭐ 리뷰 관리" },
   { href: "/admin/notices", label: "📢 공지사항" },
