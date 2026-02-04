@@ -63,6 +63,7 @@ export default function AdminReservationsPage() {
   // 체크박스 선택 상태
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isBulkProcessing, setIsBulkProcessing] = useState(false);
   
   // 수정 모달 상태
   const [showEditModal, setShowEditModal] = useState(false);
@@ -363,6 +364,109 @@ export default function AdminReservationsPage() {
     }
   };
 
+  // 선택된 예약 중 승인대기 상태인 예약 수
+  const pendingSelectedCount = Array.from(selectedIds).filter((id) => {
+    const r = reservations.find((res) => res.id === id);
+    return r && r.status === "pending" && !isExpired(r);
+  }).length;
+
+  // 일괄 승인
+  const handleBulkApprove = async () => {
+    const pendingIds = Array.from(selectedIds).filter((id) => {
+      const r = reservations.find((res) => res.id === id);
+      return r && r.status === "pending" && !isExpired(r);
+    });
+
+    if (pendingIds.length === 0) {
+      alert("승인할 수 있는 예약이 없습니다. (승인대기 상태인 예약만 승인 가능)");
+      return;
+    }
+
+    if (!confirm(`선택한 ${pendingIds.length}개의 예약을 일괄 승인하시겠습니까?`)) {
+      return;
+    }
+
+    setIsBulkProcessing(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const id of pendingIds) {
+      try {
+        const res = await fetch(`/api/reservations/${id}/status`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "approved" }),
+        });
+        const json = await res.json();
+        if (json.ok) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch {
+        failCount++;
+      }
+    }
+
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    fetchReservations();
+
+    if (failCount === 0) {
+      alert(`${successCount}개의 예약이 승인되었습니다.`);
+    } else {
+      alert(`${successCount}개 승인 성공, ${failCount}개 승인 실패`);
+    }
+  };
+
+  // 일괄 거절
+  const handleBulkReject = async () => {
+    const pendingIds = Array.from(selectedIds).filter((id) => {
+      const r = reservations.find((res) => res.id === id);
+      return r && r.status === "pending" && !isExpired(r);
+    });
+
+    if (pendingIds.length === 0) {
+      alert("거절할 수 있는 예약이 없습니다. (승인대기 상태인 예약만 거절 가능)");
+      return;
+    }
+
+    const reason = prompt(`선택한 ${pendingIds.length}개의 예약을 일괄 거절합니다.\n거절 사유를 입력하세요:`);
+    if (reason === null) return;
+
+    setIsBulkProcessing(true);
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const id of pendingIds) {
+      try {
+        const res = await fetch(`/api/reservations/${id}/status`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "rejected", reason }),
+        });
+        const json = await res.json();
+        if (json.ok) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch {
+        failCount++;
+      }
+    }
+
+    setIsBulkProcessing(false);
+    setSelectedIds(new Set());
+    fetchReservations();
+
+    if (failCount === 0) {
+      alert(`${successCount}개의 예약이 거절되었습니다.`);
+    } else {
+      alert(`${successCount}개 거절 성공, ${failCount}개 거절 실패`);
+    }
+  };
+
   // 엑셀 내보내기
   const handleExportExcel = () => {
     const dataToExport = selectedIds.size > 0
@@ -657,24 +761,62 @@ export default function AdminReservationsPage() {
           <option value="expired">사용완료</option>
         </select>
 
-        {/* 일괄 삭제 버튼 */}
+        {/* 일괄 승인/거절/삭제 버튼 */}
         {selectedIds.size > 0 && (
-          <button
-            onClick={handleBulkDelete}
-            disabled={isDeleting}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 8,
-              border: "none",
-              background: "#dc2626",
-              color: "white",
-              cursor: isDeleting ? "not-allowed" : "pointer",
-              fontWeight: 600,
-              opacity: isDeleting ? 0.6 : 1,
-            }}
-          >
-            {isDeleting ? "삭제 중..." : `🗑️ 선택 삭제 (${selectedIds.size})`}
-          </button>
+          <>
+            {pendingSelectedCount > 0 && (
+              <>
+                <button
+                  onClick={handleBulkApprove}
+                  disabled={isBulkProcessing}
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: 8,
+                    border: "none",
+                    background: "#22c55e",
+                    color: "white",
+                    cursor: isBulkProcessing ? "not-allowed" : "pointer",
+                    fontWeight: 600,
+                    opacity: isBulkProcessing ? 0.6 : 1,
+                  }}
+                >
+                  {isBulkProcessing ? "처리 중..." : `✅ 일괄승인 (${pendingSelectedCount})`}
+                </button>
+                <button
+                  onClick={handleBulkReject}
+                  disabled={isBulkProcessing}
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: 8,
+                    border: "1px solid #ef4444",
+                    background: "#ef444422",
+                    color: "#ef4444",
+                    cursor: isBulkProcessing ? "not-allowed" : "pointer",
+                    fontWeight: 600,
+                    opacity: isBulkProcessing ? 0.6 : 1,
+                  }}
+                >
+                  {isBulkProcessing ? "처리 중..." : `❌ 일괄거절 (${pendingSelectedCount})`}
+                </button>
+              </>
+            )}
+            <button
+              onClick={handleBulkDelete}
+              disabled={isDeleting}
+              style={{
+                padding: "8px 16px",
+                borderRadius: 8,
+                border: "none",
+                background: "#dc2626",
+                color: "white",
+                cursor: isDeleting ? "not-allowed" : "pointer",
+                fontWeight: 600,
+                opacity: isDeleting ? 0.6 : 1,
+              }}
+            >
+              {isDeleting ? "삭제 중..." : `🗑️ 선택삭제 (${selectedIds.size})`}
+            </button>
+          </>
         )}
 
         {/* 엑셀 내보내기 버튼 */}
