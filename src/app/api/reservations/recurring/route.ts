@@ -25,35 +25,59 @@ export async function POST(req: Request) {
       end_date,    // "2024-03-31"
     } = body;
 
-    // 날짜 계산
-    const startD = new Date(start_date);
-    const endD = new Date(end_date);
-    const reservationDates: Date[] = [];
+    // 날짜 계산 (타임존에 의존하지 않도록 문자열 기반으로 처리)
+    // "YYYY-MM-DD" 문자열을 직접 파싱하여 UTC/KST 차이 문제 방지
+    const parseLocalDate = (dateStr: string) => {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      return { year: y, month: m, day: d };
+    };
+
+    const startParsed = parseLocalDate(start_date);
+    const endParsed = parseLocalDate(end_date);
+
+    // 날짜 문자열 배열 생성 (Date 객체 대신 "YYYY-MM-DD" 문자열 사용)
+    const pad = (n: number) => n.toString().padStart(2, "0");
+
+    const toDateStr = (y: number, m: number, d: number) =>
+      `${y}-${pad(m)}-${pad(d)}`;
+
+    // 날짜 연산을 위해 UTC noon(12시)으로 Date 생성하여 시간대 문제 방지
+    const makeSafeDate = (y: number, m: number, d: number) =>
+      new Date(Date.UTC(y, m - 1, d, 12, 0, 0));
+
+    const startD = makeSafeDate(startParsed.year, startParsed.month, startParsed.day);
+    const endD = makeSafeDate(endParsed.year, endParsed.month, endParsed.day);
+
+    type DateEntry = { dateStr: string; dayOfWeek: number };
+    const reservationDates: DateEntry[] = [];
 
     // 최대 예약 개수 제한 (50개)
     const MAX_RESERVATIONS = 50;
 
     let currentDate = new Date(startD);
     while (currentDate <= endD && reservationDates.length < MAX_RESERVATIONS) {
-      const dayOfWeek = currentDate.getDay();
+      const dayOfWeek = currentDate.getUTCDay(); // UTC 기준 요일 (noon이므로 안전)
+      const y = currentDate.getUTCFullYear();
+      const m = currentDate.getUTCMonth() + 1;
+      const d = currentDate.getUTCDate();
 
       if (repeat_type === "weekly" || repeat_type === "biweekly") {
         if (repeat_days.includes(dayOfWeek)) {
-          reservationDates.push(new Date(currentDate));
+          reservationDates.push({ dateStr: toDateStr(y, m, d), dayOfWeek });
         }
       } else if (repeat_type === "monthly") {
         // 매월 같은 날짜
-        if (currentDate.getDate() === startD.getDate()) {
-          reservationDates.push(new Date(currentDate));
+        if (d === startParsed.day) {
+          reservationDates.push({ dateStr: toDateStr(y, m, d), dayOfWeek });
         }
       }
 
       // 다음 날로 이동
-      if (repeat_type === "biweekly" && currentDate.getDay() === 6) {
+      if (repeat_type === "biweekly" && dayOfWeek === 6) {
         // 격주: 토요일이면 1주 건너뛰기
-        currentDate.setDate(currentDate.getDate() + 8);
+        currentDate.setUTCDate(currentDate.getUTCDate() + 8);
       } else {
-        currentDate.setDate(currentDate.getDate() + 1);
+        currentDate.setUTCDate(currentDate.getUTCDate() + 1);
       }
     }
 
@@ -93,12 +117,11 @@ export async function POST(req: Request) {
     const conflicts = [];
     const skipped = [];
 
-    for (const date of reservationDates) {
-      const dateStr = date.toISOString().split("T")[0];
+    for (const entry of reservationDates) {
+      const dateStr = entry.dateStr;
 
       // 휴무일 체크
-      const dayOfWeek = date.getDay();
-      if (facility.closed_days?.includes(dayOfWeek)) {
+      if (facility.closed_days?.includes(entry.dayOfWeek)) {
         skipped.push({ date: dateStr, reason: "휴무일" });
         continue;
       }
@@ -114,28 +137,17 @@ export async function POST(req: Request) {
       const [endH, endM] = end_time.split(":").map(Number);
 
       // "YYYY-MM-DDTHH:mm:00+09:00" 형식으로 저장
-      const pad = (n: number) => n.toString().padStart(2, "0");
-      const year = date.getFullYear();
-      const month = pad(date.getMonth() + 1);
-      const day = pad(date.getDate());
-      
-      const startAtStr = `${year}-${month}-${day}T${pad(startH)}:${pad(startM)}:00+09:00`;
-      const endAtStr = `${year}-${month}-${day}T${pad(endH)}:${pad(endM)}:00+09:00`;
+      const startAtStr = `${dateStr}T${pad(startH)}:${pad(startM)}:00+09:00`;
+      const endAtStr = `${dateStr}T${pad(endH)}:${pad(endM)}:00+09:00`;
 
-      const startAt = new Date(date);
-      startAt.setHours(startH, startM, 0, 0);
-
-      const endAt = new Date(date);
-      endAt.setHours(endH, endM, 0, 0);
-
-      // 중복 체크
+      // 중복 체크 (KST 기준 문자열 사용)
       const { data: existing } = await supabase
         .from("reservations")
         .select("id")
         .eq("facility_id", facility_id)
         .in("status", ["pending", "approved"])
-        .lt("start_at", endAt.toISOString())
-        .gt("end_at", startAt.toISOString());
+        .lt("start_at", endAtStr)
+        .gt("end_at", startAtStr);
 
       if (existing && existing.length > 0) {
         conflicts.push({ date: dateStr, reason: "기존 예약 있음" });
@@ -149,6 +161,8 @@ export async function POST(req: Request) {
         status: "pending",
         purpose,
         attendees,
+        booker_name: applicant_name,
+        booker_phone: applicant_phone.replace(/-/g, ""),
         applicant_name,
         applicant_phone: applicant_phone.replace(/-/g, ""),
         applicant_email: applicant_email || null,

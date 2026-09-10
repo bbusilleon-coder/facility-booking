@@ -182,6 +182,7 @@ export default function HomeClient({ facilities }: HomeClientProps) {
 
                   <Link
                     href={`/facilities/${f.id}`}
+                    prefetch={false}
                     style={{
                       display: "block",
                       marginTop: 16,

@@ -242,8 +242,14 @@ export default function AdminReservationsPage() {
     if (!selectedReservation || !copyDate) return;
 
     try {
-      const startTime = selectedReservation.start_at.split("T")[1];
-      const endTime = selectedReservation.end_at.split("T")[1];
+      // 타임존 정보 제거 후 순수 시간만 추출 (예: "10:00:00+09:00" -> "10:00")
+      const extractTime = (dateStr: string) => {
+        const timePart = dateStr.split("T")[1] || "";
+        // "+09:00" 또는 "Z" 제거 후 HH:mm만 추출
+        return timePart.replace(/[+-]\d{2}:\d{2}$/, "").replace(/Z$/, "").slice(0, 5);
+      };
+      const startTime = extractTime(selectedReservation.start_at);
+      const endTime = extractTime(selectedReservation.end_at);
       const newStartAt = `${copyDate}T${startTime}`;
       const newEndAt = `${copyDate}T${endTime}`;
 

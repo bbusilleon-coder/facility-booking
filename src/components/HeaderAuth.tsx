@@ -47,6 +47,7 @@ export default function HeaderAuth() {
       <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <Link
           href="/reservation"
+          prefetch={false}
           style={{
             padding: "10px 16px",
             borderRadius: 10,
@@ -60,6 +61,7 @@ export default function HeaderAuth() {
         </Link>
         <Link
           href="/checkin"
+          prefetch={false}
           style={{
             padding: "10px 16px",
             borderRadius: 10,
@@ -90,6 +92,7 @@ export default function HeaderAuth() {
         </button>
         <Link
           href="/admin"
+          prefetch={false}
           style={{
             padding: "10px 16px",
             borderRadius: 10,
@@ -109,6 +112,7 @@ export default function HeaderAuth() {
     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
       <Link
         href="/reservation"
+        prefetch={false}
         style={{
           padding: "10px 16px",
           borderRadius: 10,
@@ -122,6 +126,7 @@ export default function HeaderAuth() {
       </Link>
       <Link
         href="/checkin"
+        prefetch={false}
         style={{
           padding: "10px 16px",
           borderRadius: 10,
@@ -135,6 +140,7 @@ export default function HeaderAuth() {
       </Link>
       <Link
         href="/auth"
+        prefetch={false}
         style={{
           padding: "10px 16px",
           borderRadius: 10,
@@ -148,6 +154,7 @@ export default function HeaderAuth() {
       </Link>
       <Link
         href="/admin"
+        prefetch={false}
         style={{
           padding: "10px 16px",
           borderRadius: 10,

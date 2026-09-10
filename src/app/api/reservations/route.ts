@@ -6,11 +6,17 @@ import {
 } from "@/lib/email";
 
 /**
- * datetime-local(예: "2026-01-30T15:00")을
- * "로컬 시간" 기준으로 안전하게 Date로 변환.
+ * datetime-local(예: "2026-01-30T15:00")을 파싱하여
+ * 한국시간(KST) 기준 정보를 반환.
+ * 
+ * 주의: Date 객체는 서버 환경(UTC)에 따라 시간이 달라지므로
+ * 가능한 한 문자열 기반으로 처리하고, Date 비교가 필요한 경우에만 
+ * KST를 명시한 Date를 사용합니다.
  */
-function parseLocalDateTime(value: string): Date {
-  const [datePart, timePart] = value.split("T");
+function parseLocalDateTime(value: string) {
+  // "+09:00" 등 타임존이 이미 포함된 경우 제거하고 로컬 부분만 사용
+  const cleanValue = value.replace(/[+-]\d{2}:\d{2}$/, "").replace(/Z$/, "");
+  const [datePart, timePart] = cleanValue.split("T");
   if (!datePart || !timePart) throw new Error("Invalid datetime format");
 
   const [y, m, d] = datePart.split("-").map(Number);
@@ -26,7 +32,21 @@ function parseLocalDateTime(value: string): Date {
     throw new Error("Invalid datetime numbers");
   }
 
-  return new Date(y, m - 1, d, hh, mm, 0, 0);
+  const pad = (n: number) => n.toString().padStart(2, "0");
+
+  return {
+    year: y, month: m, day: d, hour: hh, minute: mm,
+    // 한국 시간대를 명시한 ISO 문자열 (DB 저장용)
+    kstString: `${y}-${pad(m)}-${pad(d)}T${pad(hh)}:${pad(mm)}:00+09:00`,
+    // Date 비교용 (KST -> UTC 변환: 한국시간에서 9시간 빼기)
+    toDate: () => new Date(Date.UTC(y, m - 1, d, hh - 9, mm, 0, 0)),
+    // 분 단위 (운영시간 비교용)
+    minutesOfDay: hh * 60 + mm,
+    // 요일 (KST 기준, UTC noon으로 안전 계산)
+    dayOfWeek: new Date(Date.UTC(y, m - 1, d, 12, 0, 0)).getUTCDay(),
+    // 날짜 비교용 문자열
+    dateStr: `${y}-${pad(m)}-${pad(d)}`,
+  };
 }
 
 /** "HH:mm" -> minutes */
@@ -34,20 +54,6 @@ function hhmmToMinutes(hhmm: string): number {
   const [h, m] = hhmm.split(":").map(Number);
   if (!Number.isFinite(h) || !Number.isFinite(m)) throw new Error("Invalid HH:mm");
   return h * 60 + m;
-}
-
-/** Date -> minutes of day */
-function dateToMinutesOfDay(d: Date): number {
-  return d.getHours() * 60 + d.getMinutes();
-}
-
-/** 날짜가 같은지(연/월/일) */
-function isSameDate(a: Date, b: Date): boolean {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
 }
 
 // GET: 예약 목록 조회 (관리자/조회용)
@@ -99,17 +105,20 @@ export async function POST(req: Request) {
     const body = await req.json();
     const supabase = createServerClient();
 
-    const startAt = parseLocalDateTime(body.start_at);
-    const endAt = parseLocalDateTime(body.end_at);
+    const start = parseLocalDateTime(body.start_at);
+    const end = parseLocalDateTime(body.end_at);
 
-    if (endAt <= startAt) {
+    const startDate = start.toDate();
+    const endDate = end.toDate();
+
+    if (endDate <= startDate) {
       return NextResponse.json(
         { ok: false, message: "종료 시간은 시작 시간보다 늦어야 합니다." },
         { status: 400 }
       );
     }
 
-    if (!isSameDate(startAt, endAt)) {
+    if (start.dateStr !== end.dateStr) {
       return NextResponse.json(
         { ok: false, message: "시작/종료 일자는 동일해야 합니다." },
         { status: 400 }
@@ -117,7 +126,7 @@ export async function POST(req: Request) {
     }
 
     const now = new Date();
-    if (startAt < now) {
+    if (startDate < now) {
       return NextResponse.json(
         { ok: false, message: "과거 시간에는 예약할 수 없습니다." },
         { status: 400 }
@@ -137,7 +146,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const dayOfWeek = startAt.getDay();
+    const dayOfWeek = start.dayOfWeek;
     if (facility.closed_days && facility.closed_days.includes(dayOfWeek)) {
       const dayNames = ["일", "월", "화", "수", "목", "금", "토"];
       return NextResponse.json(
@@ -147,8 +156,8 @@ export async function POST(req: Request) {
     }
 
     if (facility.open_time && facility.close_time) {
-      const startMin = dateToMinutesOfDay(startAt);
-      const endMin = dateToMinutesOfDay(endAt);
+      const startMin = start.minutesOfDay;
+      const endMin = end.minutesOfDay;
       const openMin = hhmmToMinutes(facility.open_time);
       const closeMin = hhmmToMinutes(facility.close_time);
 
@@ -162,16 +171,14 @@ export async function POST(req: Request) {
       }
     }
 
-    const newStartISO = startAt.toISOString();
-    const newEndISO = endAt.toISOString();
-
+    // 중복 체크 - KST 문자열 기준으로 비교
     const { data: existing, error: overlapError } = await supabase
       .from("reservations")
       .select("id, start_at, end_at, status")
       .eq("facility_id", body.facility_id)
       .in("status", ["pending", "approved"])
-      .lt("start_at", newEndISO)
-      .gt("end_at", newStartISO);
+      .lt("start_at", end.kstString)
+      .gt("end_at", start.kstString);
 
     if (overlapError) throw overlapError;
 
@@ -182,15 +189,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // 예약 데이터 구성 (qr_code 제거)
-    // 로컬 시간에 한국 시간대(+09:00)를 명시적으로 추가하여 저장
-    const startAtWithTz = body.start_at + ":00+09:00";  // "2026-02-24T10:00:00+09:00"
-    const endAtWithTz = body.end_at + ":00+09:00";      // "2026-02-24T17:00:00+09:00"
-
+    // 예약 데이터 구성
+    // parseLocalDateTime에서 이미 KST 문자열을 생성하므로 그대로 사용
     const reservationData: any = {
       facility_id: body.facility_id,
-      start_at: startAtWithTz,
-      end_at: endAtWithTz,
+      start_at: start.kstString,
+      end_at: end.kstString,
       status: "pending",
 
       booker_name: body.applicant_name,

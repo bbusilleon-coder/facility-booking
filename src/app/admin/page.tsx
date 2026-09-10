@@ -42,28 +42,34 @@ async function getStats(): Promise<Stats> {
     .select("*", { count: "exact", head: true })
     .eq("status", "approved");
 
-  // 오늘 예약
-  const today = new Date();
-  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
-  const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
+  // 오늘 예약 (KST 기준)
+  const now = new Date();
+  const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000); // UTC -> KST
+  const kstYear = kstNow.getUTCFullYear();
+  const kstMonth = kstNow.getUTCMonth();
+  const kstDate = kstNow.getUTCDate();
+  
+  // KST 자정을 UTC ISO 문자열로 변환 (KST 00:00 = UTC 전일 15:00)
+  const todayStartKST = new Date(Date.UTC(kstYear, kstMonth, kstDate) - 9 * 60 * 60 * 1000).toISOString();
+  const todayEndKST = new Date(Date.UTC(kstYear, kstMonth, kstDate + 1) - 9 * 60 * 60 * 1000).toISOString();
 
   const { count: todayReservations } = await supabase
     .from("reservations")
     .select("*", { count: "exact", head: true })
-    .gte("start_at", todayStart)
-    .lt("start_at", todayEnd)
+    .gte("start_at", todayStartKST)
+    .lt("start_at", todayEndKST)
     .in("status", ["pending", "approved"]);
 
-  // 이번 주 예약
-  const dayOfWeek = today.getDay();
-  const weekStart = new Date(today.getTime() - dayOfWeek * 24 * 60 * 60 * 1000);
-  const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+  // 이번 주 예약 (KST 기준)
+  const kstDayOfWeek = kstNow.getUTCDay();
+  const weekStartKST = new Date(Date.UTC(kstYear, kstMonth, kstDate - kstDayOfWeek) - 9 * 60 * 60 * 1000).toISOString();
+  const weekEndKST = new Date(Date.UTC(kstYear, kstMonth, kstDate - kstDayOfWeek + 7) - 9 * 60 * 60 * 1000).toISOString();
 
   const { count: weekReservations } = await supabase
     .from("reservations")
     .select("*", { count: "exact", head: true })
-    .gte("start_at", weekStart.toISOString())
-    .lt("start_at", weekEnd.toISOString())
+    .gte("start_at", weekStartKST)
+    .lt("start_at", weekEndKST)
     .in("status", ["pending", "approved"]);
 
   return {
@@ -136,7 +142,7 @@ export default async function AdminDashboard() {
     { label: "전체 예약", value: stats.totalReservations, color: "#6b7280", icon: "📊" },
   ];
 
-  // 로컬 시간 문자열을 올바르게 파싱
+  // 로컬 시간 문자열을 올바르게 파싱 (서버사이드에서도 KST로 표시)
   const formatDate = (dateStr: string) => {
     if (!dateStr) return "-";
     
@@ -150,6 +156,7 @@ export default async function AdminDashboard() {
       
       const d = new Date(year, month - 1, day, hour, minute);
       return d.toLocaleString("ko-KR", {
+        timeZone: "Asia/Seoul",
         month: "short",
         day: "numeric",
         hour: "2-digit",
@@ -159,6 +166,7 @@ export default async function AdminDashboard() {
     
     const d = new Date(dateStr);
     return d.toLocaleString("ko-KR", {
+      timeZone: "Asia/Seoul",
       month: "short",
       day: "numeric",
       hour: "2-digit",

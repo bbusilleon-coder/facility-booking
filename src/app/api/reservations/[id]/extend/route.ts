@@ -36,11 +36,27 @@ export async function POST(req: Request, { params }: RouteParams) {
       );
     }
 
-    const newEndAt = new Date(new_end_at);
-    const currentEndAt = new Date(reservation.end_at);
+    // new_end_at 파싱 (타임존 안전 처리)
+    const cleanEndAt = new_end_at.replace(/[+-]\d{2}:\d{2}$/, "").replace(/Z$/, "");
+    const [endDatePart, endTimePart] = cleanEndAt.split("T");
+    if (!endDatePart || !endTimePart) {
+      return NextResponse.json(
+        { ok: false, message: "유효하지 않은 시간 형식입니다." },
+        { status: 400 }
+      );
+    }
+    const [endHH, endMM] = endTimePart.split(":").map(Number);
+
+    // 기존 종료 시간 파싱
+    const cleanCurrentEnd = reservation.end_at.replace(/[+-]\d{2}:\d{2}$/, "").replace(/Z$/, "");
+    const [, curTimePart] = cleanCurrentEnd.split("T");
+    const [curHH, curMM] = (curTimePart || "").split(":").map(Number);
+
+    const newEndMinutes = endHH * 60 + endMM;
+    const curEndMinutes = curHH * 60 + curMM;
 
     // 연장 시간이 기존 종료 시간보다 늦어야 함
-    if (newEndAt <= currentEndAt) {
+    if (newEndMinutes <= curEndMinutes) {
       return NextResponse.json(
         { ok: false, message: "연장 시간은 기존 종료 시간보다 늦어야 합니다." },
         { status: 400 }
@@ -72,11 +88,10 @@ export async function POST(req: Request, { params }: RouteParams) {
       .single();
 
     if (facility?.close_time) {
-      const endHour = newEndAt.getHours() * 60 + newEndAt.getMinutes();
       const [closeH, closeM] = facility.close_time.split(":").map(Number);
       const closeMinutes = closeH * 60 + closeM;
 
-      if (endHour > closeMinutes) {
+      if (newEndMinutes > closeMinutes) {
         return NextResponse.json(
           { ok: false, message: `운영시간(~${facility.close_time})을 초과할 수 없습니다.` },
           { status: 400 }

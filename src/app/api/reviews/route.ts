@@ -26,7 +26,18 @@ export async function GET(req: Request) {
 
     const { data, error } = await query;
 
-    if (error) throw error;
+    if (error) {
+      // 테이블이 없는 경우 빈 결과 반환 (500 방지)
+      if (error.code === "42P01" || error.message?.includes("does not exist")) {
+        return NextResponse.json({
+          ok: true,
+          reviews: [],
+          avgRating: 0,
+          totalCount: 0,
+        });
+      }
+      throw error;
+    }
 
     // 평균 별점 계산
     let avgRating = 0;
@@ -35,17 +46,25 @@ export async function GET(req: Request) {
       avgRating = Math.round((total / data.length) * 10) / 10;
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       ok: true,
       reviews: data || [],
       avgRating,
       totalCount: data?.length || 0,
     });
+
+    // 리뷰는 2분 캐시
+    response.headers.set("Cache-Control", "public, s-maxage=120, stale-while-revalidate=300");
+    return response;
   } catch (err: any) {
-    return NextResponse.json(
-      { ok: false, message: err.message },
-      { status: 500 }
-    );
+    // 에러 발생 시에도 빈 결과 반환하여 500 반복 방지
+    console.error("Reviews API error:", err.message);
+    return NextResponse.json({
+      ok: true,
+      reviews: [],
+      avgRating: 0,
+      totalCount: 0,
+    });
   }
 }
 

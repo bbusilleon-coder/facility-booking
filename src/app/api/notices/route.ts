@@ -25,10 +25,14 @@ export async function GET(req: Request) {
 
     if (error) throw error;
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       ok: true,
       notices: data || [],
     });
+
+    // 공지사항은 자주 변하지 않으므로 2분 캐시
+    response.headers.set("Cache-Control", "public, s-maxage=120, stale-while-revalidate=300");
+    return response;
   } catch (err: any) {
     return NextResponse.json(
       { ok: false, message: err.message },

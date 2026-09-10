@@ -35,10 +35,11 @@ function parseLocalDateTime(dateStr: string): Date {
   return new Date(dateStr);
 }
 
-// 공통 날짜 포맷 함수
+// 공통 날짜 포맷 함수 (서버사이드 UTC 환경에서도 KST로 표시)
 function formatDateTime(dateStr: string): string {
   const d = parseLocalDateTime(dateStr);
   return d.toLocaleString("ko-KR", {
+    timeZone: "Asia/Seoul",
     year: "numeric",
     month: "long",
     day: "numeric",
