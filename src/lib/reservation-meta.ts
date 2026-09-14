@@ -1,4 +1,4 @@
-import { applySeniorFreeRental } from "@/lib/rental-fee";
+import { applyFreeRental } from "@/lib/rental-fee";
 
 const MARKER = "\n\n[[RESERVATION_META_V1]]";
 
@@ -11,6 +11,7 @@ export type ReservationMeta = {
   baseFee: number;
   overtimeHours: number;
   overtimeHourlyFee: number;
+  isAdminBooking?: boolean;
 };
 
 export function encodeReservationNotes(notes: string | null | undefined, meta: ReservationMeta) {
@@ -44,10 +45,11 @@ export function withDecodedReservation<T extends {
 }>(reservation: T) {
   const decoded = decodeReservationNotes(reservation.notes);
   const facility = Array.isArray(reservation.facility) ? reservation.facility[0] : reservation.facility;
-  const amount = applySeniorFreeRental(decoded.meta?.calculatedAmount ?? 0, {
+  const amount = applyFreeRental(decoded.meta?.calculatedAmount ?? 0, {
     facilityName: facility?.name,
     applicantName: reservation.applicant_name,
     applicantDept: reservation.applicant_dept,
+    isAdminBooking: decoded.meta?.isAdminBooking,
   });
   return {
     ...reservation,

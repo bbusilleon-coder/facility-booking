@@ -1,5 +1,5 @@
 import { createServerClient } from "@/lib/supabase/server";
-import { applySeniorFreeRental } from "@/lib/rental-fee";
+import { applyFreeRental, getFreeRentalReason } from "@/lib/rental-fee";
 import { decodeReservationNotes } from "@/lib/reservation-meta";
 
 interface RouteParams {
@@ -44,11 +44,14 @@ export async function GET(_req: Request, { params }: RouteParams) {
     }
 
     const decoded = decodeReservationNotes(reservation.notes);
-    const amount = applySeniorFreeRental(decoded.meta?.calculatedAmount ?? 0, {
+    const freeRentalSource = {
       facilityName: reservation.facility?.name,
       applicantName: reservation.applicant_name,
       applicantDept: reservation.applicant_dept,
-    });
+      isAdminBooking: decoded.meta?.isAdminBooking,
+    };
+    const amount = applyFreeRental(decoded.meta?.calculatedAmount ?? 0, freeRentalSource);
+    const freeRentalReason = getFreeRentalReason(freeRentalSource);
     const startAt = new Date(reservation.start_at);
     const endAt = new Date(reservation.end_at);
     const applicationDate = new Date(reservation.created_at || Date.now());
@@ -76,7 +79,13 @@ export async function GET(_req: Request, { params }: RouteParams) {
     const applicationNo = `KLE-${applicationDate.getFullYear()}-${reservation.id.slice(0, 8).toUpperCase()}`;
     const titleDate = startAt.toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
     const pageTitle = `대관신청서_${reservation.facility?.name || "시설"}_${reservation.applicant_name || "신청자"}_${titleDate}`;
-    const feeBasis = decoded.meta
+    const feeBasis = freeRentalReason === "admin"
+      ? "관리자 직접 신청 무상 대관"
+      : freeRentalReason === "konyang-university"
+        ? "건양대학교 관련 신청 무상 대관"
+        : freeRentalReason === "senior"
+          ? "계룡시니어 관련 신청 무상 대관"
+          : decoded.meta
       ? `기본 ${decoded.meta.baseHours}시간 ${decoded.meta.baseFee.toLocaleString("ko-KR")}원${decoded.meta.overtimeHours > 0 ? ` + 초과 ${decoded.meta.overtimeHours}시간 × ${decoded.meta.overtimeHourlyFee.toLocaleString("ko-KR")}원` : ""}`
       : "예약 신청 당시 산정 금액";
 

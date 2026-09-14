@@ -4,7 +4,7 @@ import {
   sendReservationConfirmation,
   sendNewReservationNotification,
 } from "@/lib/email";
-import { calculateRentalFee, getRentalPricing } from "@/lib/rental-fee";
+import { applyFreeRental, calculateRentalFee, getRentalPricing } from "@/lib/rental-fee";
 import { encodeReservationNotes, withDecodedReservation } from "@/lib/reservation-meta";
 
 /**
@@ -110,6 +110,19 @@ export async function POST(req: Request) {
     const body = await req.json();
     const supabase = createServerClient();
 
+    const authHeader = req.headers.get("Authorization");
+    const adminToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    let isAdminBooking = false;
+    if (adminToken) {
+      const { data: adminSession } = await supabase
+        .from("admin_sessions")
+        .select("token")
+        .eq("token", adminToken)
+        .gt("expires_at", new Date().toISOString())
+        .maybeSingle();
+      isAdminBooking = Boolean(adminSession);
+    }
+
     if (body.agreed_terms !== true || body.agreed_privacy !== true) {
       return NextResponse.json(
         { ok: false, message: "필수 이용수칙과 개인정보 수집·이용에 동의해야 예약할 수 있습니다." },
@@ -205,6 +218,12 @@ export async function POST(req: Request) {
     // parseLocalDateTime에서 이미 KST 문자열을 생성하므로 그대로 사용
     const pricing = getRentalPricing(facility);
     const fee = calculateRentalFee(start.kstString, end.kstString, pricing);
+    const rentalAmount = applyFreeRental(fee.amount, {
+      facilityName: facility.name,
+      applicantName: body.applicant_name,
+      applicantDept: body.applicant_dept,
+      isAdminBooking,
+    });
     const agreedAt = new Date().toISOString();
 
     const reservationData: any = {
@@ -227,11 +246,12 @@ export async function POST(req: Request) {
         termsAgreed: true,
         privacyAgreed: true,
         agreedAt,
-        calculatedAmount: fee.amount,
+        calculatedAmount: rentalAmount,
         baseHours: pricing.baseHours,
         baseFee: pricing.baseFee,
         overtimeHours: fee.overtimeHours,
         overtimeHourlyFee: pricing.overtimeHourlyFee,
+        isAdminBooking,
       }),
     };
 

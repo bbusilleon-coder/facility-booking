@@ -78,9 +78,13 @@ export default function RecurringReservationModal({
     setResult(null);
 
     try {
+      const adminToken = localStorage.getItem("adminToken");
       const res = await fetch("/api/reservations/recurring", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {}),
+        },
         body: JSON.stringify({
           facility_id: facilityId,
           start_time: formData.startTime,

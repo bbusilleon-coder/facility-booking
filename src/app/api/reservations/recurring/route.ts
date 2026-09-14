@@ -1,11 +1,26 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { applyFreeRental, calculateRentalFee, getRentalPricing } from "@/lib/rental-fee";
+import { encodeReservationNotes } from "@/lib/reservation-meta";
 
 // POST: 정기 예약 생성
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const supabase = createServerClient();
+
+    const authHeader = req.headers.get("Authorization");
+    const adminToken = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    let isAdminBooking = false;
+    if (adminToken) {
+      const { data: adminSession } = await supabase
+        .from("admin_sessions")
+        .select("token")
+        .eq("token", adminToken)
+        .gt("expires_at", new Date().toISOString())
+        .maybeSingle();
+      isAdminBooking = Boolean(adminSession);
+    }
 
     const {
       facility_id,
@@ -91,7 +106,7 @@ export async function POST(req: Request) {
     // 시설물 정보 조회
     const { data: facility } = await supabase
       .from("facilities")
-      .select("open_time, close_time, closed_days, is_active")
+      .select("*")
       .eq("id", facility_id)
       .single();
 
@@ -139,6 +154,14 @@ export async function POST(req: Request) {
       // "YYYY-MM-DDTHH:mm:00+09:00" 형식으로 저장
       const startAtStr = `${dateStr}T${pad(startH)}:${pad(startM)}:00+09:00`;
       const endAtStr = `${dateStr}T${pad(endH)}:${pad(endM)}:00+09:00`;
+      const pricing = getRentalPricing(facility);
+      const fee = calculateRentalFee(startAtStr, endAtStr, pricing);
+      const rentalAmount = applyFreeRental(fee.amount, {
+        facilityName: facility.name,
+        applicantName: applicant_name,
+        applicantDept: applicant_dept,
+        isAdminBooking,
+      });
 
       // 중복 체크 (KST 기준 문자열 사용)
       const { data: existing } = await supabase
@@ -167,7 +190,17 @@ export async function POST(req: Request) {
         applicant_phone: applicant_phone.replace(/-/g, ""),
         applicant_email: applicant_email || null,
         applicant_dept: applicant_dept || null,
-        notes: notes ? `[정기예약] ${notes}` : "[정기예약]",
+        notes: encodeReservationNotes(notes ? `[정기예약] ${notes}` : "[정기예약]", {
+          termsAgreed: false,
+          privacyAgreed: false,
+          agreedAt: new Date().toISOString(),
+          calculatedAmount: rentalAmount,
+          baseHours: pricing.baseHours,
+          baseFee: pricing.baseFee,
+          overtimeHours: fee.overtimeHours,
+          overtimeHourlyFee: pricing.overtimeHourlyFee,
+          isAdminBooking,
+        }),
       });
     }
 

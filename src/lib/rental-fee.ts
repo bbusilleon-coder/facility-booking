@@ -18,6 +18,10 @@ type SeniorFreeRentalSource = {
   applicantDept?: string | null;
 };
 
+export type FreeRentalSource = SeniorFreeRentalSource & {
+  isAdminBooking?: boolean;
+};
+
 const DOCUMENT_RATES: Array<{ pattern: RegExp; pricing: RentalPricing }> = [
   { pattern: /20[23]호/, pricing: { baseHours: 4, baseFee: 99_000, overtimeHourlyFee: 24_750 } },
   { pattern: /204호/, pricing: { baseHours: 4, baseFee: 198_000, overtimeHourlyFee: 49_500 } },
@@ -85,6 +89,35 @@ export function isSeniorFreeRental({
 
 export function applySeniorFreeRental(amount: number, source: SeniorFreeRentalSource) {
   return isSeniorFreeRental(source) ? 0 : Math.max(0, amount);
+}
+
+/**
+ * 신청자명이나 소속에 건양대/건양대학교가 표기된 예약은 무상 대관으로 처리합니다.
+ * 부서명이 함께 입력되는 경우를 포함하기 위해 부분 일치로 판정하고 띄어쓰기는 무시합니다.
+ */
+export function isKonyangUniversityFreeRental({
+  applicantName,
+  applicantDept,
+}: FreeRentalSource) {
+  const applicant = normalizeRentalRuleText(applicantName);
+  const department = normalizeRentalRuleText(applicantDept);
+
+  return applicant.includes("건양대") || department.includes("건양대");
+}
+
+export function getFreeRentalReason(source: FreeRentalSource) {
+  if (source.isAdminBooking) return "admin" as const;
+  if (isKonyangUniversityFreeRental(source)) return "konyang-university" as const;
+  if (isSeniorFreeRental(source)) return "senior" as const;
+  return null;
+}
+
+export function isFreeRental(source: FreeRentalSource) {
+  return getFreeRentalReason(source) !== null;
+}
+
+export function applyFreeRental(amount: number, source: FreeRentalSource) {
+  return isFreeRental(source) ? 0 : Math.max(0, amount);
 }
 
 export function formatWon(amount: number) {
