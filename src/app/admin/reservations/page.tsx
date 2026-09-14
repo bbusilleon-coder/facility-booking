@@ -1000,7 +1000,7 @@ export default function AdminReservationsPage() {
                 {r.status === "approved" && (
                   <>
                     <button onClick={() => { setSelectedReservation(r); setExtendTime(r.end_at.split("T")[1].slice(0, 5)); setShowExtendModal(true); }} style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #3b82f6", background: "transparent", color: "#3b82f6", cursor: "pointer", fontSize: 12 }}>연장</button>
-                    <button onClick={() => window.open(`/api/reservations/${r.id}/receipt`, "_blank", "noopener,noreferrer")} style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #22c55e", background: "#22c55e22", color: "#22c55e", cursor: "pointer", fontSize: 12, fontWeight: 700 }}>🧾 영수증</button>
+                    <a href={`/api/reservations/${r.id}/receipt`} target="_blank" rel="noopener noreferrer" style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #22c55e", background: "#22c55e22", color: "#22c55e", cursor: "pointer", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>🧾 영수증</a>
                   </>
                 )}
                 <button

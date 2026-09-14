@@ -703,7 +703,7 @@ function ReservationCard({
             <button onClick={() => onCancel(reservation.id)} style={{ padding: "8px 16px", borderRadius: 6, border: "1px solid #ef4444", background: "transparent", color: "#ef4444", cursor: "pointer", fontSize: 13 }}>❌ 취소</button>
           </>}
           {reservation.status === "approved" && (
-            <button onClick={() => window.open(`/api/reservations/${reservation.id}/receipt`, "_blank", "noopener,noreferrer")} style={{ padding: "8px 16px", borderRadius: 6, border: "1px solid #22c55e", background: "#22c55e18", color: "#22c55e", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>🧾 영수증 발급</button>
+            <a href={`/api/reservations/${reservation.id}/receipt`} target="_blank" rel="noopener noreferrer" style={{ padding: "8px 16px", borderRadius: 6, border: "1px solid #22c55e", background: "#22c55e18", color: "#22c55e", cursor: "pointer", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>🧾 영수증 발급</a>
           )}
         </div>
       )}
