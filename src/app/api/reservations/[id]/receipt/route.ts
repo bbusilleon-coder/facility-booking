@@ -1,5 +1,5 @@
 import { createServerClient } from "@/lib/supabase/server";
-import { calculateRentalFee, getRentalPricing } from "@/lib/rental-fee";
+import { getRentalPricing } from "@/lib/rental-fee";
 import { decodeReservationNotes } from "@/lib/reservation-meta";
 
 interface RouteParams { params: Promise<{ id: string }> }
@@ -28,8 +28,9 @@ export async function GET(_req: Request, { params }: RouteParams) {
     const endAt = new Date(reservation.end_at);
     const decoded = decodeReservationNotes(reservation.notes);
     const pricing = getRentalPricing(reservation.facility || {});
-    const calculated = calculateRentalFee(startAt, endAt, pricing);
-    const amount = decoded.meta?.calculatedAmount ?? calculated.amount;
+    // Do not retroactively apply today's pricing to legacy reservations.
+    // Only an amount captured when the reservation was created is receiptable.
+    const amount = decoded.meta?.calculatedAmount ?? 0;
     const issueDate = new Date();
     const date = startAt.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Seoul" });
     const time = `${startAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Seoul" })} ~ ${endAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Seoul" })}`;
