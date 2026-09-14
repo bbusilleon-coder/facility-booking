@@ -156,7 +156,7 @@ export default function ReservationModal({ isOpen, onClose, facilityId, facility
             <h2 id="reservation-title" style={{ fontSize: 21, fontWeight: 800, margin: 0 }}>예약 신청</h2>
             <p style={{ color: "var(--text-muted, #999)", margin: "5px 0 0", fontSize: 14 }}>{facilityName}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="닫기" style={{ background: "transparent", border: 0, color: "#aaa", fontSize: 24, cursor: "pointer" }}>×</button>
+          <button type="button" onClick={onClose} aria-label="닫기" style={{ background: "transparent", border: 0, color: "var(--text-secondary, #aaa)", fontSize: 24, cursor: "pointer" }}>×</button>
         </div>
 
         {error && <div role="alert" style={{ background: "#3a1a1a", border: "1px solid #ef4444", borderRadius: 8, padding: 12, marginBottom: 16, color: "#fecaca", fontSize: 14 }}>{error}</div>}
@@ -201,7 +201,7 @@ export default function ReservationModal({ isOpen, onClose, facilityId, facility
             </div>
             <Field label="비고"><textarea name="notes" value={formData.notes} onChange={handleChange} rows={3} placeholder="추가 요청사항" style={{ ...inputStyle, resize: "vertical" }} /></Field>
             <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
-              <button type="button" onClick={() => setStep("agreement")} style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid #444", background: "transparent", color: "#aaa", cursor: "pointer" }}>이전</button>
+              <button type="button" onClick={() => setStep("agreement")} style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid var(--border-strong, #444)", background: "transparent", color: "var(--text-secondary, #aaa)", cursor: "pointer" }}>이전</button>
               <button type="submit" disabled={loading} style={{ flex: 2, padding: 12, borderRadius: 10, border: 0, background: loading ? "#444" : "var(--color-primary, #3b82f6)", color: "white", cursor: loading ? "not-allowed" : "pointer", fontWeight: 700 }}>{loading ? "신청 중..." : "최종 예약 신청"}</button>
             </div>
           </form>

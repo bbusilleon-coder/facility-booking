@@ -253,7 +253,7 @@ export default function MyReservationPage() {
           ← 홈으로 돌아가기
         </Link>
 
-        <h1 style={{ fontSize: 24, fontWeight: 800, marginTop: 16, marginBottom: 8, color: "white" }}>
+        <h1 style={{ fontSize: 24, fontWeight: 800, marginTop: 16, marginBottom: 8, color: "var(--foreground, white)" }}>
           내 예약 조회
         </h1>
 
@@ -292,9 +292,9 @@ export default function MyReservationPage() {
                 style={{
                   padding: "8px 16px",
                   borderRadius: 8,
-                  border: "1px solid #333",
+                  border: "1px solid var(--border-color, #333)",
                   background: searchType === "phone" ? "#3b82f6" : "transparent",
-                  color: searchType === "phone" ? "white" : "#888",
+                  color: searchType === "phone" ? "white" : "var(--text-muted, #888)",
                   cursor: "pointer",
                 }}
               >
@@ -306,9 +306,9 @@ export default function MyReservationPage() {
                 style={{
                   padding: "8px 16px",
                   borderRadius: 8,
-                  border: "1px solid #333",
+                  border: "1px solid var(--border-color, #333)",
                   background: searchType === "email" ? "#3b82f6" : "transparent",
-                  color: searchType === "email" ? "white" : "#888",
+                  color: searchType === "email" ? "white" : "var(--text-muted, #888)",
                   cursor: "pointer",
                 }}
               >
@@ -327,9 +327,9 @@ export default function MyReservationPage() {
                   flex: 1,
                   padding: "12px 14px",
                   borderRadius: 8,
-                  border: "1px solid #333",
-                  background: "#0f0f0f",
-                  color: "white",
+                  border: "1px solid var(--border-color, #333)",
+                  background: "var(--input-bg, #0f0f0f)",
+                  color: "var(--foreground, white)",
                   fontSize: 14,
                 }}
               />
@@ -350,7 +350,7 @@ export default function MyReservationPage() {
               </button>
             </div>
 
-            <p style={{ fontSize: 12, color: "#666", marginTop: 8 }}>
+            <p style={{ fontSize: 12, color: "var(--text-subtle, #666)", marginTop: 8 }}>
               💡 로그인하면 자동으로 예약 현황을 확인할 수 있습니다.{" "}
               <Link href="/auth" style={{ color: "#3b82f6" }}>로그인하기</Link>
             </p>
@@ -366,9 +366,9 @@ export default function MyReservationPage() {
               style={{
                 padding: "8px 16px",
                 borderRadius: 8,
-                border: "1px solid #333",
+                border: "1px solid var(--border-color, #333)",
                 background: "transparent",
-                color: "#888",
+                color: "var(--text-muted, #888)",
                 cursor: "pointer",
                 fontSize: 13,
               }}
@@ -399,27 +399,27 @@ export default function MyReservationPage() {
             gap: 12,
             marginBottom: 24,
           }}>
-            <div style={{ background: "#1a1a1a", borderRadius: 8, padding: 16, textAlign: "center" }}>
+            <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 8, padding: 16, textAlign: "center" }}>
               <div style={{ fontSize: 24, fontWeight: 700, color: "#3b82f6" }}>{reservations.length}</div>
-              <div style={{ fontSize: 12, color: "#888" }}>전체 예약</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>전체 예약</div>
             </div>
-            <div style={{ background: "#1a1a1a", borderRadius: 8, padding: 16, textAlign: "center" }}>
+            <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 8, padding: 16, textAlign: "center" }}>
               <div style={{ fontSize: 24, fontWeight: 700, color: "#eab308" }}>
                 {reservations.filter(r => r.status === "pending").length}
               </div>
-              <div style={{ fontSize: 12, color: "#888" }}>승인대기</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>승인대기</div>
             </div>
-            <div style={{ background: "#1a1a1a", borderRadius: 8, padding: 16, textAlign: "center" }}>
+            <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 8, padding: 16, textAlign: "center" }}>
               <div style={{ fontSize: 24, fontWeight: 700, color: "#22c55e" }}>
                 {reservations.filter(r => r.status === "approved").length}
               </div>
-              <div style={{ fontSize: 12, color: "#888" }}>승인됨</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>승인됨</div>
             </div>
-            <div style={{ background: "#1a1a1a", borderRadius: 8, padding: 16, textAlign: "center" }}>
+            <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 8, padding: 16, textAlign: "center" }}>
               <div style={{ fontSize: 24, fontWeight: 700, color: "#22c55e" }}>
                 {upcomingReservations.length}
               </div>
-              <div style={{ fontSize: 12, color: "#888" }}>예정된 예약</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>예정된 예약</div>
             </div>
           </div>
         )}
@@ -427,7 +427,7 @@ export default function MyReservationPage() {
         {/* 예정된 예약 */}
         {upcomingReservations.length > 0 && (
           <div style={{ marginBottom: 32 }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: "white" }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: "var(--foreground, white)" }}>
               📅 예정된 예약 ({upcomingReservations.length}건)
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -448,7 +448,7 @@ export default function MyReservationPage() {
         {/* 지난 예약 */}
         {pastReservations.length > 0 && (
           <div>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: "#888" }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12, color: "var(--text-muted, #888)" }}>
               📋 지난 예약 ({pastReservations.length}건)
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -471,7 +471,7 @@ export default function MyReservationPage() {
           <div style={{
             textAlign: "center",
             padding: 48,
-            color: "#888",
+            color: "var(--text-muted, #888)",
           }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>📭</div>
             <p>예약 내역이 없습니다.</p>
@@ -482,7 +482,7 @@ export default function MyReservationPage() {
                 marginTop: 16,
                 padding: "10px 20px",
                 background: "#3b82f6",
-                color: "white",
+                color: "var(--foreground, white)",
                 borderRadius: 8,
                 textDecoration: "none",
               }}
@@ -509,7 +509,7 @@ export default function MyReservationPage() {
           >
             <div
               style={{
-                background: "#1a1a1a",
+                background: "var(--card-bg, #1a1a1a)",
                 borderRadius: 16,
                 padding: 24,
                 width: "100%",
@@ -523,20 +523,20 @@ export default function MyReservationPage() {
               </h2>
 
               <div style={{
-                background: "#0f0f0f",
+                background: "var(--input-bg, #0f0f0f)",
                 borderRadius: 8,
                 padding: 12,
                 marginBottom: 16,
                 fontSize: 13,
-                color: "#888",
+                color: "var(--text-muted, #888)",
               }}>
-                <div><strong style={{ color: "#aaa" }}>{editingReservation.facility?.name}</strong></div>
+                <div><strong style={{ color: "var(--text-secondary, #aaa)" }}>{editingReservation.facility?.name}</strong></div>
                 <div>{formatDateTime(editingReservation.start_at)}</div>
               </div>
 
               <form onSubmit={handleEdit}>
                 <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: "block", marginBottom: 6, fontSize: 14, color: "#aaa" }}>
+                  <label style={{ display: "block", marginBottom: 6, fontSize: 14, color: "var(--text-secondary, #aaa)" }}>
                     사용 목적 *
                   </label>
                   <input
@@ -549,7 +549,7 @@ export default function MyReservationPage() {
                 </div>
 
                 <div style={{ marginBottom: 16 }}>
-                  <label style={{ display: "block", marginBottom: 6, fontSize: 14, color: "#aaa" }}>
+                  <label style={{ display: "block", marginBottom: 6, fontSize: 14, color: "var(--text-secondary, #aaa)" }}>
                     참석 인원 *
                   </label>
                   <input
@@ -563,7 +563,7 @@ export default function MyReservationPage() {
                 </div>
 
                 <div style={{ marginBottom: 20 }}>
-                  <label style={{ display: "block", marginBottom: 6, fontSize: 14, color: "#aaa" }}>
+                  <label style={{ display: "block", marginBottom: 6, fontSize: 14, color: "var(--text-secondary, #aaa)" }}>
                     비고
                   </label>
                   <textarea
@@ -582,9 +582,9 @@ export default function MyReservationPage() {
                       flex: 1,
                       padding: "12px 16px",
                       borderRadius: 10,
-                      border: "1px solid #444",
+                      border: "1px solid var(--border-strong, #444)",
                       background: "transparent",
-                      color: "#aaa",
+                      color: "var(--text-secondary, #aaa)",
                       cursor: "pointer",
                     }}
                   >
@@ -635,19 +635,19 @@ function ReservationCard({
   return (
     <div
       style={{
-        background: isUpcoming ? "#1a1a1a" : "#111",
+        background: isUpcoming ? "var(--card-bg, #1a1a1a)" : "var(--card-bg, #111)",
         borderRadius: 12,
         padding: 16,
-        border: isUpcoming ? "1px solid #333" : "1px solid #222",
+        border: isUpcoming ? "1px solid var(--border-color, #333)" : "1px solid var(--border-color, #222)",
         opacity: isUpcoming ? 1 : 0.7,
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
         <div>
-          <div style={{ fontWeight: 700, fontSize: 16, color: "white", marginBottom: 4 }}>
+          <div style={{ fontWeight: 700, fontSize: 16, color: "var(--foreground, white)", marginBottom: 4 }}>
             {reservation.facility?.name || "시설"}
           </div>
-          <div style={{ fontSize: 13, color: "#888" }}>
+          <div style={{ fontSize: 13, color: "var(--text-muted, #888)" }}>
             {reservation.facility?.location}
           </div>
         </div>
@@ -667,31 +667,31 @@ function ReservationCard({
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, fontSize: 13, marginBottom: 12 }}>
         <div>
-          <span style={{ color: "#666" }}>시작: </span>
-          <span style={{ color: "#aaa" }}>{formatDateTime(reservation.start_at)}</span>
+          <span style={{ color: "var(--text-subtle, #666)" }}>시작: </span>
+          <span style={{ color: "var(--text-secondary, #aaa)" }}>{formatDateTime(reservation.start_at)}</span>
         </div>
         <div>
-          <span style={{ color: "#666" }}>종료: </span>
-          <span style={{ color: "#aaa" }}>{formatDateTime(reservation.end_at)}</span>
+          <span style={{ color: "var(--text-subtle, #666)" }}>종료: </span>
+          <span style={{ color: "var(--text-secondary, #aaa)" }}>{formatDateTime(reservation.end_at)}</span>
         </div>
         <div>
-          <span style={{ color: "#666" }}>목적: </span>
-          <span style={{ color: "#aaa" }}>{reservation.purpose}</span>
+          <span style={{ color: "var(--text-subtle, #666)" }}>목적: </span>
+          <span style={{ color: "var(--text-secondary, #aaa)" }}>{reservation.purpose}</span>
         </div>
         <div>
-          <span style={{ color: "#666" }}>인원: </span>
-          <span style={{ color: "#aaa" }}>{reservation.attendees}명</span>
+          <span style={{ color: "var(--text-subtle, #666)" }}>인원: </span>
+          <span style={{ color: "var(--text-secondary, #aaa)" }}>{reservation.attendees}명</span>
         </div>
         <div>
-          <span style={{ color: "#666" }}>사용료: </span>
-          <span style={{ color: "#aaa", fontWeight: 600 }}>
+          <span style={{ color: "var(--text-subtle, #666)" }}>사용료: </span>
+          <span style={{ color: "var(--text-secondary, #aaa)", fontWeight: 600 }}>
             {(reservation.rental_amount || 0).toLocaleString("ko-KR")}원
           </span>
         </div>
       </div>
 
       {reservation.notes && (
-        <div style={{ fontSize: 12, color: "#666", marginBottom: 12 }}>
+        <div style={{ fontSize: 12, color: "var(--text-subtle, #666)", marginBottom: 12 }}>
           📝 {reservation.notes}
         </div>
       )}
@@ -715,8 +715,8 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: 8,
-  border: "1px solid #333",
-  background: "#0f0f0f",
-  color: "white",
+  border: "1px solid var(--border-color, #333)",
+  background: "var(--input-bg, #0f0f0f)",
+  color: "var(--foreground, white)",
   fontSize: 14,
 };

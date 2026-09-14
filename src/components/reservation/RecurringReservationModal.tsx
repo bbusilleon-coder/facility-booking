@@ -149,21 +149,21 @@ export default function RecurringReservationModal({
     >
       <div
         style={{
-          background: "#1a1a1a",
+          background: "var(--card-bg, #1a1a1a)",
           borderRadius: 16,
           padding: 24,
           width: "100%",
           maxWidth: 500,
           maxHeight: "90vh",
           overflowY: "auto",
-          color: "white",
+          color: "var(--foreground, white)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         <h2 style={{ fontSize: 20, fontWeight: 700, marginBottom: 8 }}>
           🔄 정기 예약 신청
         </h2>
-        <p style={{ color: "#888", marginBottom: 16 }}>{facilityName}</p>
+        <p style={{ color: "var(--text-muted, #888)", marginBottom: 16 }}>{facilityName}</p>
 
         {/* 결과 표시 */}
         {result && (
@@ -186,7 +186,7 @@ export default function RecurringReservationModal({
               </div>
             )}
             {result.skipped.length > 0 && (
-              <div style={{ fontSize: 13, color: "#aaa", marginTop: 4 }}>
+              <div style={{ fontSize: 13, color: "var(--text-secondary, #aaa)", marginTop: 4 }}>
                 휴무/휴일로 건너뛴 날짜: {result.skipped.map(s => s.date).join(", ")}
               </div>
             )}
@@ -252,9 +252,9 @@ export default function RecurringReservationModal({
                         style={{
                           padding: "8px 12px",
                           borderRadius: 8,
-                          border: "1px solid #333",
-                          background: formData.repeatDays.includes(idx) ? "#3b82f6" : "#0f0f0f",
-                          color: formData.repeatDays.includes(idx) ? "white" : "#888",
+                          border: "1px solid var(--border-color, #333)",
+                          background: formData.repeatDays.includes(idx) ? "#3b82f6" : "var(--input-bg, #0f0f0f)",
+                          color: formData.repeatDays.includes(idx) ? "white" : "var(--text-muted, #888)",
                           cursor: "pointer",
                           fontSize: 13,
                         }}
@@ -417,9 +417,9 @@ export default function RecurringReservationModal({
                     flex: 1,
                     padding: "12px 16px",
                     borderRadius: 10,
-                    border: "1px solid #444",
+                    border: "1px solid var(--border-strong, #444)",
                     background: "transparent",
-                    color: "#aaa",
+                    color: "var(--text-secondary, #aaa)",
                     cursor: "pointer",
                     fontSize: 14,
                   }}
@@ -456,15 +456,15 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   marginBottom: 6,
   fontSize: 14,
-  color: "#aaa",
+  color: "var(--text-secondary, #aaa)",
 };
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: 8,
-  border: "1px solid #333",
-  background: "#0f0f0f",
-  color: "white",
+  border: "1px solid var(--border-color, #333)",
+  background: "var(--input-bg, #0f0f0f)",
+  color: "var(--foreground, white)",
   fontSize: 14,
 };

@@ -311,7 +311,7 @@ export default function EditFacilityPage() {
               <div><label style={labelStyle}>초과 시간당(원)</label><input type="number" name="rentalOvertimeHourlyFee" min={0} step={1000} value={formData.rentalOvertimeHourlyFee} onChange={handleChange} style={inputStyle} /></div>
             </div>
           )}
-          {formData.rentalType === "free" && <p style={{ margin: "10px 0 0", color: "#777", fontSize: 13 }}>예약 금액과 대관수입 통계에 0원으로 반영됩니다.</p>}
+          {formData.rentalType === "free" && <p style={{ margin: "10px 0 0", color: "var(--text-subtle, #777)", fontSize: 13 }}>예약 금액과 대관수입 통계에 0원으로 반영됩니다.</p>}
         </div>
 
         <div style={{ marginBottom: 20 }}>

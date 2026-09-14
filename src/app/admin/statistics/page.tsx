@@ -145,7 +145,7 @@ export default function StatisticsPage() {
                     {m.revenue > 0 && <div style={{ color: "#94a3b8", fontSize: 10, marginBottom: 5 }}>{Math.round(m.revenue / 10000).toLocaleString("ko-KR")}만</div>}
                     <div title={`${m.revenue.toLocaleString("ko-KR")}원`} style={{ height: Math.max(2, (m.revenue / maxMonthlyRevenue) * 135), background: "linear-gradient(180deg,#38bdf8,#2563eb)", borderRadius: "5px 5px 0 0" }} />
                   </div>
-                  <div style={{ fontSize: 11, color: "#777", marginTop: 8 }}>{monthLabels[idx]}</div>
+                  <div style={{ fontSize: 11, color: "var(--text-subtle, #777)", marginTop: 8 }}>{monthLabels[idx]}</div>
                 </div>
               ))}
             </div>

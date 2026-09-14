@@ -61,16 +61,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     
     // 라이트/다크 모드 적용
     if (mode === "light") {
-      document.documentElement.style.setProperty("--background", "#f5f5f5");
-      document.documentElement.style.setProperty("--foreground", "#1a1a1a");
+      document.documentElement.style.setProperty("--background", "#eef2f7");
+      document.documentElement.style.setProperty("--foreground", "#0f172a");
       document.documentElement.style.setProperty("--card-bg", "#ffffff");
-      document.documentElement.style.setProperty("--border-color", "#e5e5e5");
-      document.documentElement.style.setProperty("--border-strong", "#cbd5e1");
-      document.documentElement.style.setProperty("--text-muted", "#666666");
-      document.documentElement.style.setProperty("--text-secondary", "#475569");
+      document.documentElement.style.setProperty("--border-color", "#cbd5e1");
+      document.documentElement.style.setProperty("--border-strong", "#94a3b8");
+      document.documentElement.style.setProperty("--text-muted", "#475569");
+      document.documentElement.style.setProperty("--text-secondary", "#334155");
       document.documentElement.style.setProperty("--text-subtle", "#64748b");
       document.documentElement.style.setProperty("--input-bg", "#ffffff");
-      document.documentElement.style.setProperty("--surface-strong", "#e2e8f0");
+      document.documentElement.style.setProperty("--surface-strong", "#dbe3ee");
+      document.documentElement.style.setProperty("--panel-shadow", "0 2px 10px rgba(15, 23, 42, 0.09)");
       document.documentElement.style.setProperty("--selection-bg", "#eff6ff");
       document.documentElement.style.setProperty("--skeleton-base", "#e2e8f0");
       document.documentElement.style.setProperty("--skeleton-highlight", "#f8fafc");
@@ -87,6 +88,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       document.documentElement.style.setProperty("--text-subtle", "#777777");
       document.documentElement.style.setProperty("--input-bg", "#0f0f0f");
       document.documentElement.style.setProperty("--surface-strong", "#333333");
+      document.documentElement.style.setProperty("--panel-shadow", "none");
       document.documentElement.style.setProperty("--selection-bg", "#1f2937");
       document.documentElement.style.setProperty("--skeleton-base", "#1a1a1a");
       document.documentElement.style.setProperty("--skeleton-highlight", "#2a2a2a");

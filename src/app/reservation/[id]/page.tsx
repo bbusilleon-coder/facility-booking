@@ -146,15 +146,15 @@ export default function EditReservationPage() {
 
   if (fetching) {
     return (
-      <main style={{ padding: 24, color: "white", maxWidth: 600, margin: "0 auto" }}>
-        <div style={{ color: "#888" }}>로딩 중...</div>
+      <main style={{ padding: 24, color: "var(--foreground, white)", maxWidth: 600, margin: "0 auto" }}>
+        <div style={{ color: "var(--text-muted, #888)" }}>로딩 중...</div>
       </main>
     );
   }
 
   if (!reservation) {
     return (
-      <main style={{ padding: 24, color: "white", maxWidth: 600, margin: "0 auto" }}>
+      <main style={{ padding: 24, color: "var(--foreground, white)", maxWidth: 600, margin: "0 auto" }}>
         <div style={{ color: "#f44" }}>{error || "예약을 찾을 수 없습니다."}</div>
         <Link href="/reservation" style={{ color: "#3b82f6", marginTop: 16, display: "inline-block" }}>
           ← 돌아가기
@@ -166,15 +166,15 @@ export default function EditReservationPage() {
   // 수정 불가능한 상태
   if (reservation.status !== "pending") {
     return (
-      <main style={{ padding: 24, color: "white", maxWidth: 600, margin: "0 auto" }}>
+      <main style={{ padding: 24, color: "var(--foreground, white)", maxWidth: 600, margin: "0 auto" }}>
         <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 16 }}>예약 수정</h1>
         <div style={{
           padding: 24,
-          background: "#1a1a1a",
+          background: "var(--card-bg, #1a1a1a)",
           borderRadius: 12,
           textAlign: "center",
         }}>
-          <p style={{ color: "#888", marginBottom: 16 }}>
+          <p style={{ color: "var(--text-muted, #888)", marginBottom: 16 }}>
             {reservation.status === "approved" && "승인된 예약은 수정할 수 없습니다."}
             {reservation.status === "rejected" && "거절된 예약은 수정할 수 없습니다."}
             {reservation.status === "cancelled" && "취소된 예약은 수정할 수 없습니다."}
@@ -190,7 +190,7 @@ export default function EditReservationPage() {
   // 본인 확인 전
   if (!verified) {
     return (
-      <main style={{ padding: 24, color: "white", maxWidth: 400, margin: "0 auto" }}>
+      <main style={{ padding: 24, color: "var(--foreground, white)", maxWidth: 400, margin: "0 auto" }}>
         <Link href="/reservation" style={{ color: "#3b82f6", fontSize: 14 }}>
           ← 돌아가기
         </Link>
@@ -199,8 +199,8 @@ export default function EditReservationPage() {
           본인 확인
         </h1>
 
-        <div style={{ background: "#1a1a1a", borderRadius: 12, padding: 24 }}>
-          <p style={{ color: "#888", marginBottom: 16, fontSize: 14 }}>
+        <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 24 }}>
+          <p style={{ color: "var(--text-muted, #888)", marginBottom: 16, fontSize: 14 }}>
             예약 시 입력한 연락처를 입력해주세요.
           </p>
           
@@ -213,9 +213,9 @@ export default function EditReservationPage() {
               width: "100%",
               padding: "12px 16px",
               borderRadius: 10,
-              border: "1px solid #333",
-              background: "#0f0f0f",
-              color: "white",
+              border: "1px solid var(--border-color, #333)",
+              background: "var(--input-bg, #0f0f0f)",
+              color: "var(--foreground, white)",
               fontSize: 16,
               marginBottom: 16,
             }}
@@ -244,7 +244,7 @@ export default function EditReservationPage() {
 
   // 수정 폼
   return (
-    <main style={{ padding: 24, color: "white", maxWidth: 600, margin: "0 auto" }}>
+    <main style={{ padding: 24, color: "var(--foreground, white)", maxWidth: 600, margin: "0 auto" }}>
       <Link href="/reservation" style={{ color: "#3b82f6", fontSize: 14 }}>
         ← 내 예약 조회
       </Link>
@@ -252,7 +252,7 @@ export default function EditReservationPage() {
       <h1 style={{ fontSize: 24, fontWeight: 800, marginTop: 12, marginBottom: 8 }}>
         예약 수정
       </h1>
-      <p style={{ color: "#888", marginBottom: 24 }}>
+      <p style={{ color: "var(--text-muted, #888)", marginBottom: 24 }}>
         {reservation.facility?.name}
       </p>
 
@@ -386,9 +386,9 @@ export default function EditReservationPage() {
               flex: 1,
               padding: "12px 16px",
               borderRadius: 10,
-              border: "1px solid #444",
+              border: "1px solid var(--border-strong, #444)",
               background: "transparent",
-              color: "#aaa",
+              color: "var(--text-secondary, #aaa)",
               textDecoration: "none",
               textAlign: "center",
               fontSize: 14,
@@ -423,15 +423,15 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   marginBottom: 6,
   fontSize: 14,
-  color: "#aaa",
+  color: "var(--text-secondary, #aaa)",
 };
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: 8,
-  border: "1px solid #333",
-  background: "#0f0f0f",
-  color: "white",
+  border: "1px solid var(--border-color, #333)",
+  background: "var(--input-bg, #0f0f0f)",
+  color: "var(--foreground, white)",
   fontSize: 14,
 };

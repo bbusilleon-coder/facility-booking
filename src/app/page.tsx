@@ -39,7 +39,7 @@ export default async function Home() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <main style={{ flex: 1, maxWidth: 1200, margin: "0 auto", padding: 24, color: "white", width: "100%" }}>
+      <main style={{ flex: 1, maxWidth: 1200, margin: "0 auto", padding: 24, color: "var(--foreground, white)", width: "100%" }}>
         {/* 헤더 */}
         <header style={{ 
           display: "flex", 
