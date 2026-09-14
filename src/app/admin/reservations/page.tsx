@@ -976,6 +976,15 @@ export default function AdminReservationsPage() {
               </div>
 
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <a
+                  href={`/api/reservations/${r.id}/print`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="총무팀 전자계산서 발행 협조전 붙임용 대관신청서"
+                  style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #a855f7", background: "#a855f722", color: "#c084fc", cursor: "pointer", fontSize: 12, fontWeight: 700, textDecoration: "none" }}
+                >
+                  📄 신청서
+                </a>
                 {r.status === "pending" && displayStatus !== "expired" && (
                   <>
                     <button
