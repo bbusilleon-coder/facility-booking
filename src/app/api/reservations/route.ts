@@ -4,6 +4,8 @@ import {
   sendReservationConfirmation,
   sendNewReservationNotification,
 } from "@/lib/email";
+import { calculateRentalFee, getRentalPricing } from "@/lib/rental-fee";
+import { encodeReservationNotes, withDecodedReservation } from "@/lib/reservation-meta";
 
 /**
  * datetime-local(예: "2026-01-30T15:00")을 파싱하여
@@ -93,7 +95,10 @@ export async function GET(req: Request) {
     const { data, error } = await query;
     if (error) throw error;
 
-    return NextResponse.json({ ok: true, reservations: data });
+    return NextResponse.json({
+      ok: true,
+      reservations: (data || []).map(withDecodedReservation),
+    });
   } catch (err: any) {
     return NextResponse.json({ ok: false, message: err?.message ?? "Server error" }, { status: 500 });
   }
@@ -104,6 +109,13 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const supabase = createServerClient();
+
+    if (body.agreed_terms !== true || body.agreed_privacy !== true) {
+      return NextResponse.json(
+        { ok: false, message: "필수 이용수칙과 개인정보 수집·이용에 동의해야 예약할 수 있습니다." },
+        { status: 400 }
+      );
+    }
 
     const start = parseLocalDateTime(body.start_at);
     const end = parseLocalDateTime(body.end_at);
@@ -135,7 +147,7 @@ export async function POST(req: Request) {
 
     const { data: facility, error: facilityError } = await supabase
       .from("facilities")
-      .select("id, name, open_time, close_time, closed_days, is_active")
+      .select("*")
       .eq("id", body.facility_id)
       .single();
 
@@ -191,6 +203,10 @@ export async function POST(req: Request) {
 
     // 예약 데이터 구성
     // parseLocalDateTime에서 이미 KST 문자열을 생성하므로 그대로 사용
+    const pricing = getRentalPricing(facility);
+    const fee = calculateRentalFee(start.kstString, end.kstString, pricing);
+    const agreedAt = new Date().toISOString();
+
     const reservationData: any = {
       facility_id: body.facility_id,
       start_at: start.kstString,
@@ -207,7 +223,16 @@ export async function POST(req: Request) {
 
       purpose: body.purpose,
       attendees: body.attendees || 1,
-      notes: body.notes || null,
+      notes: encodeReservationNotes(body.notes, {
+        termsAgreed: true,
+        privacyAgreed: true,
+        agreedAt,
+        calculatedAmount: fee.amount,
+        baseHours: pricing.baseHours,
+        baseFee: pricing.baseFee,
+        overtimeHours: fee.overtimeHours,
+        overtimeHourlyFee: pricing.overtimeHourlyFee,
+      }),
     };
 
     const { data, error } = await supabase
@@ -244,7 +269,7 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json({ ok: true, reservation: data });
+    return NextResponse.json({ ok: true, reservation: withDecodedReservation(data) });
   } catch (err: any) {
     return NextResponse.json(
       { ok: false, message: err?.message ?? "Server error" },

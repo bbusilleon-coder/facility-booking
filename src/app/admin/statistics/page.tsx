@@ -9,6 +9,7 @@ type MonthlyStats = {
   rejected: number;
   cancelled: number;
   pending: number;
+  revenue: number;
 };
 
 type FacilityStats = {
@@ -18,6 +19,7 @@ type FacilityStats = {
   approved: number;
   totalHours: number;
   totalAttendees: number;
+  revenue: number;
 };
 
 type StatusSummary = {
@@ -26,6 +28,7 @@ type StatusSummary = {
   pending: number;
   rejected: number;
   cancelled: number;
+  approvedRevenue: number;
 };
 
 type StatsData = {
@@ -63,6 +66,7 @@ export default function StatisticsPage() {
 
   // 차트용 최대값 계산
   const maxMonthlyTotal = data ? Math.max(...data.monthlyStats.map(m => m.total), 1) : 1;
+  const maxMonthlyRevenue = data ? Math.max(...data.monthlyStats.map(m => m.revenue), 1) : 1;
 
   return (
     <div style={{ padding: 24 }}>
@@ -108,8 +112,9 @@ export default function StatisticsPage() {
       ) : data ? (
         <>
           {/* 요약 카드 */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 32 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12, marginBottom: 32 }}>
             {[
+              { label: "대관수입", value: `${data.statusSummary.approvedRevenue.toLocaleString("ko-KR")}원`, color: "#38bdf8" },
               { label: "전체", value: data.statusSummary.total, color: "#3b82f6" },
               { label: "승인", value: data.statusSummary.approved, color: "#22c55e" },
               { label: "대기", value: data.statusSummary.pending, color: "#eab308" },
@@ -129,6 +134,21 @@ export default function StatisticsPage() {
                 <div style={{ fontSize: 28, fontWeight: 700, color: item.color }}>{item.value}</div>
               </div>
             ))}
+          </div>
+
+          <div style={{ background: "#1a1a1a", borderRadius: 12, padding: 20, marginBottom: 24, overflowX: "auto" }}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>월별 대관수입</h2>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 210, minWidth: 620 }}>
+              {data.monthlyStats.map((m, idx) => (
+                <div key={idx} style={{ flex: 1, textAlign: "center" }}>
+                  <div style={{ height: 160, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+                    {m.revenue > 0 && <div style={{ color: "#94a3b8", fontSize: 10, marginBottom: 5 }}>{Math.round(m.revenue / 10000).toLocaleString("ko-KR")}만</div>}
+                    <div title={`${m.revenue.toLocaleString("ko-KR")}원`} style={{ height: Math.max(2, (m.revenue / maxMonthlyRevenue) * 135), background: "linear-gradient(180deg,#38bdf8,#2563eb)", borderRadius: "5px 5px 0 0" }} />
+                  </div>
+                  <div style={{ fontSize: 11, color: "#777", marginTop: 8 }}>{monthLabels[idx]}</div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* 월별 예약 차트 */}
@@ -217,6 +237,7 @@ export default function StatisticsPage() {
                     <th style={{ textAlign: "right", padding: "10px 12px", color: "#888", fontSize: 13 }}>승인율</th>
                     <th style={{ textAlign: "right", padding: "10px 12px", color: "#888", fontSize: 13 }}>총 이용시간</th>
                     <th style={{ textAlign: "right", padding: "10px 12px", color: "#888", fontSize: 13 }}>총 이용인원</th>
+                    <th style={{ textAlign: "right", padding: "10px 12px", color: "#888", fontSize: 13 }}>대관수입</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -244,6 +265,9 @@ export default function StatisticsPage() {
                         </td>
                         <td style={{ padding: "12px", textAlign: "right", color: "#888" }}>
                           {f.totalAttendees}명
+                        </td>
+                        <td style={{ padding: "12px", textAlign: "right", color: "#38bdf8", fontWeight: 700 }}>
+                          {f.revenue.toLocaleString("ko-KR")}원
                         </td>
                       </tr>
                     );

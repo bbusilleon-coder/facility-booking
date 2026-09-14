@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { decodeReservationNotes, encodeReservationNotes, withDecodedReservation } from "@/lib/reservation-meta";
 
 // PATCH: 예약 수정
 export async function PATCH(
@@ -50,7 +51,10 @@ export async function PATCH(
 
     if (purpose !== undefined) updateData.purpose = purpose;
     if (attendees !== undefined) updateData.attendees = attendees;
-    if (notes !== undefined) updateData.notes = notes;
+    if (notes !== undefined) {
+      const current = decodeReservationNotes(reservation.notes);
+      updateData.notes = current.meta ? encodeReservationNotes(notes, current.meta) : notes;
+    }
 
     const { data: updated, error: updateError } = await supabase
       .from("reservations")
@@ -63,7 +67,7 @@ export async function PATCH(
 
     return NextResponse.json({
       ok: true,
-      reservation: updated,
+      reservation: withDecodedReservation(updated),
     });
   } catch (err: any) {
     return NextResponse.json(
@@ -100,7 +104,7 @@ export async function GET(
 
     return NextResponse.json({
       ok: true,
-      reservation: data,
+      reservation: withDecodedReservation(data),
     });
   } catch (err: any) {
     return NextResponse.json(

@@ -16,6 +16,7 @@ type Reservation = {
   applicant_email: string | null;
   applicant_dept: string | null;
   notes: string | null;
+  rental_amount?: number;
   created_at: string;
   facility?: {
     id: string;
@@ -681,6 +682,12 @@ function ReservationCard({
           <span style={{ color: "#666" }}>인원: </span>
           <span style={{ color: "#aaa" }}>{reservation.attendees}명</span>
         </div>
+        <div>
+          <span style={{ color: "#666" }}>사용료: </span>
+          <span style={{ color: "#aaa", fontWeight: 600 }}>
+            {(reservation.rental_amount || 0).toLocaleString("ko-KR")}원
+          </span>
+        </div>
       </div>
 
       {reservation.notes && (
@@ -689,36 +696,15 @@ function ReservationCard({
         </div>
       )}
 
-      {canModify && (
+      {(canModify || reservation.status === "approved") && (
         <div style={{ display: "flex", gap: 8 }}>
-          <button
-            onClick={() => onEdit(reservation)}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 6,
-              border: "1px solid #3b82f6",
-              background: "transparent",
-              color: "#3b82f6",
-              cursor: "pointer",
-              fontSize: 13,
-            }}
-          >
-            ✏️ 수정
-          </button>
-          <button
-            onClick={() => onCancel(reservation.id)}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 6,
-              border: "1px solid #ef4444",
-              background: "transparent",
-              color: "#ef4444",
-              cursor: "pointer",
-              fontSize: 13,
-            }}
-          >
-            ❌ 취소
-          </button>
+          {canModify && <>
+            <button onClick={() => onEdit(reservation)} style={{ padding: "8px 16px", borderRadius: 6, border: "1px solid #3b82f6", background: "transparent", color: "#3b82f6", cursor: "pointer", fontSize: 13 }}>✏️ 수정</button>
+            <button onClick={() => onCancel(reservation.id)} style={{ padding: "8px 16px", borderRadius: 6, border: "1px solid #ef4444", background: "transparent", color: "#ef4444", cursor: "pointer", fontSize: 13 }}>❌ 취소</button>
+          </>}
+          {reservation.status === "approved" && (
+            <button onClick={() => window.open(`/api/reservations/${reservation.id}/receipt`, "_blank", "noopener,noreferrer")} style={{ padding: "8px 16px", borderRadius: 6, border: "1px solid #22c55e", background: "#22c55e18", color: "#22c55e", cursor: "pointer", fontSize: 13, fontWeight: 700 }}>🧾 영수증 발급</button>
+          )}
         </div>
       )}
     </div>

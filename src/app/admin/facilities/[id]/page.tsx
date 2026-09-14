@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import ImageUpload from "@/components/ui/ImageUpload";
+import { getRentalPricing } from "@/lib/rental-fee";
 
 const featureOptions = [
   { key: "wifi", label: "무선인터넷" },
@@ -35,6 +36,10 @@ export default function EditFacilityPage() {
     openTime: "09:00",
     closeTime: "22:00",
     closedDays: [] as number[],
+    rentalType: "free" as "free" | "paid",
+    rentalBaseHours: 4,
+    rentalBaseFee: 0,
+    rentalOvertimeHourlyFee: 0,
   });
 
   useEffect(() => {
@@ -48,6 +53,7 @@ export default function EditFacilityPage() {
         }
 
         const f = json.facility;
+        const rentalPricing = getRentalPricing(f);
         setFormData({
           name: f.name || "",
           location: f.location || "",
@@ -60,6 +66,10 @@ export default function EditFacilityPage() {
           openTime: f.open_time || "09:00",
           closeTime: f.close_time || "22:00",
           closedDays: f.closed_days || [],
+          rentalType: f.features?.rental_type || (rentalPricing.baseFee > 0 ? "paid" : "free"),
+          rentalBaseHours: rentalPricing.baseHours,
+          rentalBaseFee: rentalPricing.baseFee,
+          rentalOvertimeHourlyFee: rentalPricing.overtimeHourlyFee,
         });
       } catch (err: any) {
         setError(err.message);
@@ -101,6 +111,10 @@ export default function EditFacilityPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.rentalType === "paid" && formData.rentalBaseFee <= 0) {
+      setError("유료 대관의 기본 요금을 입력해주세요.");
+      return;
+    }
     setLoading(true);
     setError(null);
 
@@ -116,7 +130,13 @@ export default function EditFacilityPage() {
           min_people: formData.minPeople,
           max_people: formData.maxPeople,
           is_active: formData.isActive,
-          features: formData.features,
+          features: {
+            ...formData.features,
+            rental_type: formData.rentalType,
+            rental_base_hours: formData.rentalBaseHours,
+            rental_base_fee: formData.rentalType === "paid" ? formData.rentalBaseFee : 0,
+            rental_overtime_hourly_fee: formData.rentalType === "paid" ? formData.rentalOvertimeHourlyFee : 0,
+          },
           open_time: formData.openTime,
           close_time: formData.closeTime,
           closed_days: formData.closedDays,
@@ -272,6 +292,26 @@ export default function EditFacilityPage() {
               </label>
             ))}
           </div>
+        </div>
+
+        <div style={{ marginBottom: 24, padding: 16, border: "1px solid #333", borderRadius: 10, background: "#111" }}>
+          <label style={{ ...labelStyle, marginBottom: 10 }}>대관 요금 구분</label>
+          <div style={{ display: "flex", gap: 10, marginBottom: formData.rentalType === "paid" ? 16 : 0 }}>
+            {(["free", "paid"] as const).map((type) => (
+              <label key={type} style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "11px 12px", border: `1px solid ${formData.rentalType === type ? "#3b82f6" : "#333"}`, borderRadius: 8, cursor: "pointer", color: formData.rentalType === type ? "#60a5fa" : "#aaa" }}>
+                <input type="radio" name="rentalType" value={type} checked={formData.rentalType === type} onChange={() => setFormData((prev) => ({ ...prev, rentalType: type }))} />
+                {type === "free" ? "무료 대관" : "유료 대관"}
+              </label>
+            ))}
+          </div>
+          {formData.rentalType === "paid" && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10 }}>
+              <div><label style={labelStyle}>기본 시간</label><input type="number" name="rentalBaseHours" min={1} value={formData.rentalBaseHours} onChange={handleChange} style={inputStyle} /></div>
+              <div><label style={labelStyle}>기본 요금(원)</label><input type="number" name="rentalBaseFee" min={0} step={1000} value={formData.rentalBaseFee} onChange={handleChange} style={inputStyle} /></div>
+              <div><label style={labelStyle}>초과 시간당(원)</label><input type="number" name="rentalOvertimeHourlyFee" min={0} step={1000} value={formData.rentalOvertimeHourlyFee} onChange={handleChange} style={inputStyle} /></div>
+            </div>
+          )}
+          {formData.rentalType === "free" && <p style={{ margin: "10px 0 0", color: "#777", fontSize: 13 }}>예약 금액과 대관수입 통계에 0원으로 반영됩니다.</p>}
         </div>
 
         <div style={{ marginBottom: 20 }}>

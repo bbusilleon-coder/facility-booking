@@ -80,7 +80,7 @@ export async function POST(req: Request) {
 }
 
 // 부서 권한 체크 함수 (예약 시 사용)
-export async function checkDepartmentPermission(
+async function checkDepartmentPermission(
   supabase: any,
   facilityId: string,
   department: string | null

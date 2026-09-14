@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { calculateRentalFee, getRentalPricing } from "@/lib/rental-fee";
+import { decodeReservationNotes } from "@/lib/reservation-meta";
 
 export async function GET(req: Request) {
   try {
@@ -15,8 +17,8 @@ export async function GET(req: Request) {
     const { data: reservations, error: resError } = await supabase
       .from("reservations")
       .select(`
-        id, status, start_at, end_at, facility_id, attendees,
-        facility:facilities(id, name)
+        id, status, start_at, end_at, facility_id, attendees, notes,
+        facility:facilities(id, name, features)
       `)
       .gte("start_at", startOfYear)
       .lt("start_at", endOfYear);
@@ -38,6 +40,7 @@ export async function GET(req: Request) {
       rejected: 0,
       cancelled: 0,
       pending: 0,
+      revenue: 0,
     }));
 
     // 시설물별 통계
@@ -48,6 +51,7 @@ export async function GET(req: Request) {
       approved: number;
       totalHours: number;
       totalAttendees: number;
+      revenue: number;
     }> = {};
 
     facilities?.forEach((f) => {
@@ -58,6 +62,7 @@ export async function GET(req: Request) {
         approved: 0,
         totalHours: 0,
         totalAttendees: 0,
+        revenue: 0,
       };
     });
 
@@ -80,6 +85,13 @@ export async function GET(req: Request) {
           const hours = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60);
           facilityStats[r.facility_id].totalHours += hours;
           facilityStats[r.facility_id].totalAttendees += r.attendees || 0;
+
+          const decoded = decodeReservationNotes(r.notes);
+          const facility = Array.isArray(r.facility) ? r.facility[0] : r.facility;
+          const fallback = calculateRentalFee(startDate, endDate, getRentalPricing(facility || {})).amount;
+          const revenue = decoded.meta?.calculatedAmount ?? fallback;
+          facilityStats[r.facility_id].revenue += revenue;
+          monthlyStats[month].revenue += revenue;
         }
       }
     });
@@ -91,6 +103,7 @@ export async function GET(req: Request) {
       pending: reservations?.filter(r => r.status === "pending").length || 0,
       rejected: reservations?.filter(r => r.status === "rejected").length || 0,
       cancelled: reservations?.filter(r => r.status === "cancelled").length || 0,
+      approvedRevenue: Object.values(facilityStats).reduce((sum, facility) => sum + facility.revenue, 0),
     };
 
     return NextResponse.json({

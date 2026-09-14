@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { decodeReservationNotes } from "@/lib/reservation-meta";
 
 export async function GET(req: Request) {
   try {
@@ -61,6 +62,7 @@ export async function GET(req: Request) {
       "소속",
       "비고",
       "관리자메모",
+      "대관수입",
       "신청일",
     ];
 
@@ -78,6 +80,7 @@ export async function GET(req: Request) {
       r.applicant_dept || "",
       r.notes || "",
       r.admin_memo || "",
+      decodeReservationNotes(r.notes).meta?.calculatedAmount || 0,
       new Date(r.created_at).toLocaleString("ko-KR"),
     ]) || [];
 

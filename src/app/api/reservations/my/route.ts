@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { withDecodedReservation } from "@/lib/reservation-meta";
 
 // GET: 내 예약 조회 (전화번호 또는 이메일로)
 export async function GET(req: Request) {
@@ -43,7 +44,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       ok: true,
-      reservations: data,
+      reservations: (data || []).map(withDecodedReservation),
     });
   } catch (err: any) {
     return NextResponse.json(

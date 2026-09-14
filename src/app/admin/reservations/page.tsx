@@ -20,6 +20,7 @@ type Reservation = {
   admin_memo: string | null;
   checked_in_at: string | null;
   created_at: string;
+  rental_amount?: number;
   facility?: {
     id: string;
     name: string;
@@ -969,6 +970,9 @@ export default function AdminReservationsPage() {
                 <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>
                   {getName(r)} · {getPhone(r)} · {r.purpose || "-"}
                 </div>
+                <div style={{ fontSize: 13, color: "#38bdf8", marginTop: 4, fontWeight: 700 }}>
+                  사용료 {(r.rental_amount || 0).toLocaleString("ko-KR")}원
+                </div>
               </div>
 
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -994,16 +998,10 @@ export default function AdminReservationsPage() {
                   </>
                 )}
                 {r.status === "approved" && (
-                  <button
-                    onClick={() => {
-                      setSelectedReservation(r);
-                      setExtendTime(r.end_at.split("T")[1].slice(0, 5));
-                      setShowExtendModal(true);
-                    }}
-                    style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #3b82f6", background: "transparent", color: "#3b82f6", cursor: "pointer", fontSize: 12 }}
-                  >
-                    연장
-                  </button>
+                  <>
+                    <button onClick={() => { setSelectedReservation(r); setExtendTime(r.end_at.split("T")[1].slice(0, 5)); setShowExtendModal(true); }} style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #3b82f6", background: "transparent", color: "#3b82f6", cursor: "pointer", fontSize: 12 }}>연장</button>
+                    <button onClick={() => window.open(`/api/reservations/${r.id}/receipt`, "_blank", "noopener,noreferrer")} style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #22c55e", background: "#22c55e22", color: "#22c55e", cursor: "pointer", fontSize: 12, fontWeight: 700 }}>🧾 영수증</button>
+                  </>
                 )}
                 <button
                   onClick={() => {
