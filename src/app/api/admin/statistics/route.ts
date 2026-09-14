@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
-import { calculateRentalFee, getRentalPricing } from "@/lib/rental-fee";
+import { applySeniorFreeRental, calculateRentalFee, getRentalPricing } from "@/lib/rental-fee";
 import { decodeReservationNotes } from "@/lib/reservation-meta";
 
 export async function GET(req: Request) {
@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     const { data: reservations, error: resError } = await supabase
       .from("reservations")
       .select(`
-        id, status, start_at, end_at, facility_id, attendees, notes,
+        id, status, start_at, end_at, facility_id, attendees, notes, applicant_name, applicant_dept,
         facility:facilities(id, name, features)
       `)
       .gte("start_at", startOfYear)
@@ -89,7 +89,11 @@ export async function GET(req: Request) {
           const decoded = decodeReservationNotes(r.notes);
           const facility = Array.isArray(r.facility) ? r.facility[0] : r.facility;
           const fallback = calculateRentalFee(startDate, endDate, getRentalPricing(facility || {})).amount;
-          const revenue = decoded.meta?.calculatedAmount ?? fallback;
+          const revenue = applySeniorFreeRental(decoded.meta?.calculatedAmount ?? fallback, {
+            facilityName: facility?.name,
+            applicantName: r.applicant_name,
+            applicantDept: r.applicant_dept,
+          });
           facilityStats[r.facility_id].revenue += revenue;
           monthlyStats[month].revenue += revenue;
         }

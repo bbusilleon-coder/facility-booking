@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
 import { decodeReservationNotes } from "@/lib/reservation-meta";
+import { applySeniorFreeRental } from "@/lib/rental-fee";
 
 export async function GET(req: Request) {
   try {
@@ -80,7 +81,11 @@ export async function GET(req: Request) {
       r.applicant_dept || "",
       r.notes || "",
       r.admin_memo || "",
-      decodeReservationNotes(r.notes).meta?.calculatedAmount || 0,
+      applySeniorFreeRental(decodeReservationNotes(r.notes).meta?.calculatedAmount || 0, {
+        facilityName: r.facility?.name,
+        applicantName: r.applicant_name,
+        applicantDept: r.applicant_dept,
+      }),
       new Date(r.created_at).toLocaleString("ko-KR"),
     ]) || [];
 

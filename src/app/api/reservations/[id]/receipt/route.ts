@@ -1,5 +1,5 @@
 import { createServerClient } from "@/lib/supabase/server";
-import { getRentalPricing } from "@/lib/rental-fee";
+import { applySeniorFreeRental, getRentalPricing, isSeniorFreeRental } from "@/lib/rental-fee";
 import { decodeReservationNotes } from "@/lib/reservation-meta";
 
 interface RouteParams { params: Promise<{ id: string }> }
@@ -28,9 +28,18 @@ export async function GET(_req: Request, { params }: RouteParams) {
     const endAt = new Date(reservation.end_at);
     const decoded = decodeReservationNotes(reservation.notes);
     const pricing = getRentalPricing(reservation.facility || {});
+    const seniorFreeRental = isSeniorFreeRental({
+      facilityName: reservation.facility?.name,
+      applicantName: reservation.applicant_name,
+      applicantDept: reservation.applicant_dept,
+    });
     // Do not retroactively apply today's pricing to legacy reservations.
     // Only an amount captured when the reservation was created is receiptable.
-    const amount = decoded.meta?.calculatedAmount ?? 0;
+    const amount = applySeniorFreeRental(decoded.meta?.calculatedAmount ?? 0, {
+      facilityName: reservation.facility?.name,
+      applicantName: reservation.applicant_name,
+      applicantDept: reservation.applicant_dept,
+    });
     const issueDate = new Date();
     const date = startAt.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Seoul" });
     const time = `${startAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Seoul" })} ~ ${endAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Seoul" })}`;
@@ -49,7 +58,7 @@ export async function GET(_req: Request, { params }: RouteParams) {
 <tr><th>사용목적</th><td colspan="3">${escapeHtml(reservation.purpose)}</td></tr>
 <tr><th>사용금액</th><td colspan="3" class="amount">금 ${amount.toLocaleString("ko-KR")}원정 (₩${amount.toLocaleString("ko-KR")})</td></tr>
 </tbody></table>
-<p class="note">위 금액을 계룡대학습관 시설 사용료로 확인합니다.<br>기본 ${pricing.baseHours}시간 요금 및 초과 사용시간을 기준으로 자동 산정되었습니다.</p>
+<p class="note">위 금액을 계룡대학습관 시설 사용료로 확인합니다.<br>${seniorFreeRental ? "계룡시니어 관련 신청으로 무상 대관이 적용되었습니다." : `기본 ${pricing.baseHours}시간 요금 및 초과 사용시간을 기준으로 자동 산정되었습니다.`}</p>
 <div class="issuer"><span>건양대학교 평생교육원장</span><img src="/director-stamp.png" alt="건양대학교 평생교육원장 직인"></div>
 <div class="footer">계룡대학습관 · 충남 계룡시 신도안3길 72 · 042-551-1543</div>
 </main></body></html>`;

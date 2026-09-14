@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { calculateRentalFee, formatWon, getRentalPricing, RentalPricing } from "@/lib/rental-fee";
+import { calculateRentalFee, formatWon, getRentalPricing, isSeniorFreeRental, RentalPricing } from "@/lib/rental-fee";
 
 type Props = {
   isOpen: boolean;
@@ -77,6 +77,12 @@ export default function ReservationModal({ isOpen, onClose, facilityId, facility
     if (!formData.startAt || !formData.endAt) return { amount: 0, overtimeHours: 0, minutes: 0 };
     return calculateRentalFee(formData.startAt, formData.endAt, pricing);
   }, [formData.startAt, formData.endAt, pricing]);
+  const seniorFreeRental = isSeniorFreeRental({
+    facilityName,
+    applicantName: formData.applicantName,
+    applicantDept: formData.applicantDept,
+  });
+  const displayedAmount = seniorFreeRental ? 0 : fee.amount;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -113,7 +119,7 @@ export default function ReservationModal({ isOpen, onClose, facilityId, facility
       });
       const json = await res.json();
       if (!json.ok) throw new Error(json.message || "예약 신청 실패");
-      alert(`예약 신청이 완료되었습니다.\n예상 사용료: ${formatWon(json.reservation?.rental_amount ?? fee.amount)}`);
+      alert(`예약 신청이 완료되었습니다.\n예상 사용료: ${formatWon(json.reservation?.rental_amount ?? displayedAmount)}`);
       onSuccess();
       onClose();
     } catch (err) {
@@ -161,9 +167,9 @@ export default function ReservationModal({ isOpen, onClose, facilityId, facility
         ) : (
           <form onSubmit={handleSubmit}>
             <div style={{ background: "var(--background, #101010)", border: "1px solid var(--border-color, #333)", borderRadius: 10, padding: 14, marginBottom: 18 }}>
-              <div style={{ fontSize: 13, color: "var(--text-muted, #888)" }}>{pricing.baseFee === 0 ? "대관 구분" : "자동 산정 사용료"}</div>
-              <div style={{ fontSize: 23, fontWeight: 800, marginTop: 3 }}>{pricing.baseFee === 0 ? "무료 대관" : formatWon(fee.amount)}</div>
-              <div style={{ fontSize: 12, color: "var(--text-muted, #777)", marginTop: 4 }}>{pricing.baseFee === 0 ? "이 시설은 사용료가 부과되지 않습니다." : `기본 ${pricing.baseHours}시간 ${formatWon(pricing.baseFee)}${fee.overtimeHours > 0 ? ` + 초과 ${fee.overtimeHours}시간` : ""} · 최종 금액은 승인 시 확인`}</div>
+              <div style={{ fontSize: 13, color: "var(--text-muted, #888)" }}>{pricing.baseFee === 0 || seniorFreeRental ? "대관 구분" : "자동 산정 사용료"}</div>
+              <div style={{ fontSize: 23, fontWeight: 800, marginTop: 3 }}>{pricing.baseFee === 0 || seniorFreeRental ? "무료 대관" : formatWon(displayedAmount)}</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted, #777)", marginTop: 4 }}>{seniorFreeRental ? "계룡시니어 관련 신청으로 무상 대관이 적용됩니다." : pricing.baseFee === 0 ? "이 시설은 사용료가 부과되지 않습니다." : `기본 ${pricing.baseHours}시간 ${formatWon(pricing.baseFee)}${fee.overtimeHours > 0 ? ` + 초과 ${fee.overtimeHours}시간` : ""} · 최종 금액은 승인 시 확인`}</div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12, marginBottom: 16 }}>
               <Field label="시작 일시 *"><input type="datetime-local" name="startAt" value={formData.startAt} onChange={handleChange} required style={inputStyle} /></Field>

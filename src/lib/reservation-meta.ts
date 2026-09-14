@@ -1,3 +1,5 @@
+import { applySeniorFreeRental } from "@/lib/rental-fee";
+
 const MARKER = "\n\n[[RESERVATION_META_V1]]";
 
 export type ReservationMeta = {
@@ -34,12 +36,23 @@ export function decodeReservationNotes(value: string | null | undefined): {
   }
 }
 
-export function withDecodedReservation<T extends { notes?: string | null }>(reservation: T) {
+export function withDecodedReservation<T extends {
+  notes?: string | null;
+  applicant_name?: string | null;
+  applicant_dept?: string | null;
+  facility?: { name?: string | null } | Array<{ name?: string | null }> | null;
+}>(reservation: T) {
   const decoded = decodeReservationNotes(reservation.notes);
+  const facility = Array.isArray(reservation.facility) ? reservation.facility[0] : reservation.facility;
+  const amount = applySeniorFreeRental(decoded.meta?.calculatedAmount ?? 0, {
+    facilityName: facility?.name,
+    applicantName: reservation.applicant_name,
+    applicantDept: reservation.applicant_dept,
+  });
   return {
     ...reservation,
     notes: decoded.notes,
-    rental_amount: decoded.meta?.calculatedAmount ?? 0,
+    rental_amount: amount,
     agreement: decoded.meta,
   };
 }

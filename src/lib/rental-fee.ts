@@ -12,6 +12,12 @@ type FacilityPricingSource = {
   features?: Record<string, unknown> | null;
 };
 
+type SeniorFreeRentalSource = {
+  facilityName?: string | null;
+  applicantName?: string | null;
+  applicantDept?: string | null;
+};
+
 const DOCUMENT_RATES: Array<{ pattern: RegExp; pricing: RentalPricing }> = [
   { pattern: /20[23]호/, pricing: { baseHours: 4, baseFee: 99_000, overtimeHourlyFee: 24_750 } },
   { pattern: /204호/, pricing: { baseHours: 4, baseFee: 198_000, overtimeHourlyFee: 49_500 } },
@@ -54,6 +60,31 @@ export function calculateRentalFee(startAt: string | Date, endAt: string | Date,
   const amount = minutes > 0 ? pricing.baseFee + overtimeHours * pricing.overtimeHourlyFee : 0;
 
   return { minutes, overtimeHours, amount };
+}
+
+const normalizeRentalRuleText = (value: string | null | undefined) =>
+  (value || "").replace(/\s+/g, "");
+
+/**
+ * 계룡시니어 관련 신청은 202·203·204호에 한해 무상 대관으로 처리합니다.
+ * 신청자명 또는 소속 중 한 곳에만 표기되어도 적용하며 띄어쓰기는 무시합니다.
+ */
+export function isSeniorFreeRental({
+  facilityName,
+  applicantName,
+  applicantDept,
+}: SeniorFreeRentalSource) {
+  const room = normalizeRentalRuleText(facilityName);
+  const applicant = normalizeRentalRuleText(applicantName);
+  const department = normalizeRentalRuleText(applicantDept);
+
+  return /20[234]호/.test(room) && (
+    applicant.includes("계룡시니어") || department.includes("계룡시니어")
+  );
+}
+
+export function applySeniorFreeRental(amount: number, source: SeniorFreeRentalSource) {
+  return isSeniorFreeRental(source) ? 0 : Math.max(0, amount);
 }
 
 export function formatWon(amount: number) {
