@@ -655,8 +655,8 @@ export default function AdminReservationsPage() {
             padding: "10px 20px",
             borderRadius: 8,
             border: "none",
-            background: viewMode === "active" ? "#3b82f6" : "#1a1a1a",
-            color: viewMode === "active" ? "white" : "#888",
+            background: viewMode === "active" ? "#3b82f6" : "var(--card-bg, #1a1a1a)",
+            color: viewMode === "active" ? "white" : "var(--text-muted, #888)",
             cursor: "pointer",
             fontWeight: 600,
             fontSize: 14,
@@ -670,8 +670,8 @@ export default function AdminReservationsPage() {
             padding: "10px 20px",
             borderRadius: 8,
             border: "none",
-            background: viewMode === "archive" ? "#8b5cf6" : "#1a1a1a",
-            color: viewMode === "archive" ? "white" : "#888",
+            background: viewMode === "archive" ? "#8b5cf6" : "var(--card-bg, #1a1a1a)",
+            color: viewMode === "archive" ? "white" : "var(--text-muted, #888)",
             cursor: "pointer",
             fontWeight: 600,
             fontSize: 14,
@@ -690,7 +690,7 @@ export default function AdminReservationsPage() {
         alignItems: "flex-end",
       }}>
         <div>
-          <label style={{ display: "block", fontSize: 12, color: "#888", marginBottom: 4 }}>검색</label>
+          <label style={{ display: "block", fontSize: 12, color: "var(--text-muted, #888)", marginBottom: 4 }}>검색</label>
           <input
             type="text"
             value={search}
@@ -699,15 +699,15 @@ export default function AdminReservationsPage() {
             style={{
               padding: "8px 12px",
               borderRadius: 8,
-              border: "1px solid #333",
-              background: "#1a1a1a",
+              border: "1px solid var(--border-color, #333)",
+              background: "var(--card-bg, #1a1a1a)",
               color: "white",
               width: 160,
             }}
           />
         </div>
         <div>
-          <label style={{ display: "block", fontSize: 12, color: "#888", marginBottom: 4 }}>시작일</label>
+          <label style={{ display: "block", fontSize: 12, color: "var(--text-muted, #888)", marginBottom: 4 }}>시작일</label>
           <input
             type="date"
             value={dateFrom}
@@ -715,14 +715,14 @@ export default function AdminReservationsPage() {
             style={{
               padding: "8px 12px",
               borderRadius: 8,
-              border: "1px solid #333",
-              background: "#1a1a1a",
+              border: "1px solid var(--border-color, #333)",
+              background: "var(--card-bg, #1a1a1a)",
               color: "white",
             }}
           />
         </div>
         <div>
-          <label style={{ display: "block", fontSize: 12, color: "#888", marginBottom: 4 }}>종료일</label>
+          <label style={{ display: "block", fontSize: 12, color: "var(--text-muted, #888)", marginBottom: 4 }}>종료일</label>
           <input
             type="date"
             value={dateTo}
@@ -730,8 +730,8 @@ export default function AdminReservationsPage() {
             style={{
               padding: "8px 12px",
               borderRadius: 8,
-              border: "1px solid #333",
-              background: "#1a1a1a",
+              border: "1px solid var(--border-color, #333)",
+              background: "var(--card-bg, #1a1a1a)",
               color: "white",
             }}
           />
@@ -755,8 +755,8 @@ export default function AdminReservationsPage() {
           style={{
             padding: "8px 12px",
             borderRadius: 8,
-            border: "1px solid #333",
-            background: "#1a1a1a",
+            border: "1px solid var(--border-color, #333)",
+            background: "var(--card-bg, #1a1a1a)",
             color: "white",
           }}
         >
@@ -856,9 +856,9 @@ export default function AdminReservationsPage() {
             style={{
               padding: "8px 12px",
               borderRadius: "8px 0 0 8px",
-              border: sortBy === "date" ? "1px solid #3b82f6" : "1px solid #333",
-              background: sortBy === "date" ? "#3b82f622" : "#1a1a1a",
-              color: sortBy === "date" ? "#3b82f6" : "#888",
+              border: sortBy === "date" ? "1px solid #3b82f6" : "1px solid var(--border-color, #333)",
+              background: sortBy === "date" ? "#3b82f622" : "var(--card-bg, #1a1a1a)",
+              color: sortBy === "date" ? "#3b82f6" : "var(--text-muted, #888)",
               cursor: "pointer",
               fontSize: 13,
             }}
@@ -877,9 +877,9 @@ export default function AdminReservationsPage() {
             style={{
               padding: "8px 12px",
               borderRadius: "0 8px 8px 0",
-              border: sortBy === "facility" ? "1px solid #3b82f6" : "1px solid #333",
-              background: sortBy === "facility" ? "#3b82f622" : "#1a1a1a",
-              color: sortBy === "facility" ? "#3b82f6" : "#888",
+              border: sortBy === "facility" ? "1px solid #3b82f6" : "1px solid var(--border-color, #333)",
+              background: sortBy === "facility" ? "#3b82f622" : "var(--card-bg, #1a1a1a)",
+              color: sortBy === "facility" ? "#3b82f6" : "var(--text-muted, #888)",
               cursor: "pointer",
               fontSize: 13,
             }}
@@ -891,9 +891,9 @@ export default function AdminReservationsPage() {
 
       {/* 예약 목록 */}
       {loading ? (
-        <div style={{ color: "#888", padding: 40, textAlign: "center" }}>로딩 중...</div>
+        <div style={{ color: "var(--text-muted, #888)", padding: 40, textAlign: "center" }}>로딩 중...</div>
       ) : sortedReservations.length === 0 ? (
-        <div style={{ padding: 40, background: "#1a1a1a", borderRadius: 12, textAlign: "center", color: "#888" }}>
+        <div style={{ padding: 40, background: "var(--card-bg, #1a1a1a)", borderRadius: 12, textAlign: "center", color: "var(--text-muted, #888)" }}>
           {viewMode === "archive" ? "보관함이 비어있습니다." : "진행중인 예약이 없습니다."}
         </div>
       ) : (
@@ -904,7 +904,7 @@ export default function AdminReservationsPage() {
             alignItems: "center",
             gap: 12,
             padding: "8px 16px",
-            background: "#111",
+            background: "var(--card-bg, #111)",
             borderRadius: 8,
           }}>
             <input
@@ -913,7 +913,7 @@ export default function AdminReservationsPage() {
               onChange={toggleSelectAll}
               style={{ width: 18, height: 18, cursor: "pointer" }}
             />
-            <span style={{ color: "#888", fontSize: 13 }}>
+            <span style={{ color: "var(--text-muted, #888)", fontSize: 13 }}>
               전체 선택 ({selectedIds.size}/{sortedReservations.length})
             </span>
           </div>
@@ -924,7 +924,7 @@ export default function AdminReservationsPage() {
             <div
               key={r.id}
               style={{
-                background: selectedIds.has(r.id) ? "#1f2937" : "#1a1a1a",
+                background: selectedIds.has(r.id) ? "var(--selection-bg, #1f2937)" : "var(--card-bg, #1a1a1a)",
                 borderRadius: 12,
                 padding: 16,
                 display: "flex",
@@ -964,10 +964,10 @@ export default function AdminReservationsPage() {
                     </span>
                   )}
                 </div>
-                <div style={{ fontSize: 13, color: "#888" }}>
+                <div style={{ fontSize: 13, color: "var(--text-muted, #888)" }}>
                   {formatDate(r.start_at)} ~ {formatDate(r.end_at)}
                 </div>
-                <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>
+                <div style={{ fontSize: 13, color: "var(--text-muted, #888)", marginTop: 4 }}>
                   {getName(r)} · {getPhone(r)} · {r.purpose || "-"}
                 </div>
                 <div style={{ fontSize: 13, color: "#38bdf8", marginTop: 4, fontWeight: 700 }}>
@@ -1018,7 +1018,7 @@ export default function AdminReservationsPage() {
                     setCopyDate(r.start_at.split("T")[0]);
                     setShowCopyModal(true);
                   }}
-                  style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #888", background: "transparent", color: "#888", cursor: "pointer", fontSize: 12 }}
+                  style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #888", background: "transparent", color: "var(--text-muted, #888)", cursor: "pointer", fontSize: 12 }}
                 >
                   복사
                 </button>
@@ -1048,18 +1048,18 @@ export default function AdminReservationsPage() {
           onClick={() => setShowEditModal(false)}
         >
           <div
-            style={{ background: "#1a1a1a", borderRadius: 16, padding: 24, width: "100%", maxWidth: 500, maxHeight: "90vh", overflow: "auto" }}
+            style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 16, padding: 24, width: "100%", maxWidth: 500, maxHeight: "90vh", overflow: "auto" }}
             onClick={(e) => e.stopPropagation()}
           >
             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>예약 수정</h2>
-            <p style={{ color: "#888", fontSize: 13, marginBottom: 16 }}>
+            <p style={{ color: "var(--text-muted, #888)", fontSize: 13, marginBottom: 16 }}>
               {selectedReservation.facility?.name} · 예약번호: {selectedReservation.id.slice(0, 8).toUpperCase()}
             </p>
             
             {/* 시작/종료 시간 */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>시작 일시</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "var(--text-secondary, #aaa)" }}>시작 일시</label>
                 <input
                   type="datetime-local"
                   value={editForm.startAt}
@@ -1068,7 +1068,7 @@ export default function AdminReservationsPage() {
                 />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>종료 일시</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "var(--text-secondary, #aaa)" }}>종료 일시</label>
                 <input
                   type="datetime-local"
                   value={editForm.endAt}
@@ -1080,7 +1080,7 @@ export default function AdminReservationsPage() {
 
             {/* 상태 */}
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>상태</label>
+              <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "var(--text-secondary, #aaa)" }}>상태</label>
               <select
                 value={editForm.status}
                 onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
@@ -1096,7 +1096,7 @@ export default function AdminReservationsPage() {
             {/* 신청자 정보 */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>신청자 이름</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "var(--text-secondary, #aaa)" }}>신청자 이름</label>
                 <input
                   type="text"
                   value={editForm.applicantName}
@@ -1105,7 +1105,7 @@ export default function AdminReservationsPage() {
                 />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>연락처</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "var(--text-secondary, #aaa)" }}>연락처</label>
                 <input
                   type="tel"
                   value={editForm.applicantPhone}
@@ -1117,7 +1117,7 @@ export default function AdminReservationsPage() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>이메일</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "var(--text-secondary, #aaa)" }}>이메일</label>
                 <input
                   type="email"
                   value={editForm.applicantEmail}
@@ -1126,7 +1126,7 @@ export default function AdminReservationsPage() {
                 />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>소속/부서</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "var(--text-secondary, #aaa)" }}>소속/부서</label>
                 <input
                   type="text"
                   value={editForm.applicantDept}
@@ -1139,7 +1139,7 @@ export default function AdminReservationsPage() {
             {/* 사용 목적 & 인원 */}
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 12, marginBottom: 16 }}>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>사용 목적</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "var(--text-secondary, #aaa)" }}>사용 목적</label>
                 <input
                   type="text"
                   value={editForm.purpose}
@@ -1148,7 +1148,7 @@ export default function AdminReservationsPage() {
                 />
               </div>
               <div>
-                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>인원</label>
+                <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "var(--text-secondary, #aaa)" }}>인원</label>
                 <input
                   type="number"
                   min={1}
@@ -1161,7 +1161,7 @@ export default function AdminReservationsPage() {
 
             {/* 비고 */}
             <div style={{ marginBottom: 20 }}>
-              <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#aaa" }}>비고</label>
+              <label style={{ display: "block", marginBottom: 6, fontSize: 13, color: "var(--text-secondary, #aaa)" }}>비고</label>
               <textarea
                 value={editForm.notes}
                 onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })}
@@ -1174,7 +1174,7 @@ export default function AdminReservationsPage() {
             <div style={{ display: "flex", gap: 12 }}>
               <button
                 onClick={() => setShowEditModal(false)}
-                style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid #444", background: "transparent", color: "#aaa", cursor: "pointer" }}
+                style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid var(--border-strong, #444)", background: "transparent", color: "var(--text-secondary, #aaa)", cursor: "pointer" }}
               >
                 취소
               </button>
@@ -1206,27 +1206,27 @@ export default function AdminReservationsPage() {
           onClick={() => setShowExtendModal(false)}
         >
           <div
-            style={{ background: "#1a1a1a", borderRadius: 16, padding: 24, width: "100%", maxWidth: 400 }}
+            style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 16, padding: 24, width: "100%", maxWidth: 400 }}
             onClick={(e) => e.stopPropagation()}
           >
             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>예약 연장</h2>
-            <p style={{ color: "#888", fontSize: 14, marginBottom: 16 }}>
+            <p style={{ color: "var(--text-muted, #888)", fontSize: 14, marginBottom: 16 }}>
               {selectedReservation.facility?.name}<br />
               현재 종료: {formatDate(selectedReservation.end_at)}
             </p>
             
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: "block", marginBottom: 6, fontSize: 14, color: "#aaa" }}>새 종료 시간</label>
+              <label style={{ display: "block", marginBottom: 6, fontSize: 14, color: "var(--text-secondary, #aaa)" }}>새 종료 시간</label>
               <input
                 type="time"
                 value={extendTime}
                 onChange={(e) => setExtendTime(e.target.value)}
-                style={{ width: "100%", padding: "12px", borderRadius: 8, border: "1px solid #333", background: "#0f0f0f", color: "white" }}
+                style={{ width: "100%", padding: "12px", borderRadius: 8, border: "1px solid var(--border-color, #333)", background: "var(--input-bg, #0f0f0f)", color: "var(--foreground, white)" }}
               />
             </div>
 
             <div style={{ display: "flex", gap: 12 }}>
-              <button onClick={() => setShowExtendModal(false)} style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid #444", background: "transparent", color: "#aaa", cursor: "pointer" }}>
+              <button onClick={() => setShowExtendModal(false)} style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid var(--border-strong, #444)", background: "transparent", color: "var(--text-secondary, #aaa)", cursor: "pointer" }}>
                 취소
               </button>
               <button onClick={handleExtend} style={{ flex: 1, padding: 12, borderRadius: 10, border: "none", background: "var(--color-primary, #3b82f6)", color: "white", cursor: "pointer", fontWeight: 600 }}>
@@ -1244,27 +1244,27 @@ export default function AdminReservationsPage() {
           onClick={() => setShowCopyModal(false)}
         >
           <div
-            style={{ background: "#1a1a1a", borderRadius: 16, padding: 24, width: "100%", maxWidth: 400 }}
+            style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 16, padding: 24, width: "100%", maxWidth: 400 }}
             onClick={(e) => e.stopPropagation()}
           >
             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>예약 복사</h2>
-            <p style={{ color: "#888", fontSize: 14, marginBottom: 16 }}>
+            <p style={{ color: "var(--text-muted, #888)", fontSize: 14, marginBottom: 16 }}>
               {selectedReservation.facility?.name}<br />
               원본: {formatDate(selectedReservation.start_at)} ~ {formatDate(selectedReservation.end_at)}
             </p>
             
             <div style={{ marginBottom: 16 }}>
-              <label style={{ display: "block", marginBottom: 6, fontSize: 14, color: "#aaa" }}>새 예약 날짜</label>
+              <label style={{ display: "block", marginBottom: 6, fontSize: 14, color: "var(--text-secondary, #aaa)" }}>새 예약 날짜</label>
               <input
                 type="date"
                 value={copyDate}
                 onChange={(e) => setCopyDate(e.target.value)}
-                style={{ width: "100%", padding: "12px", borderRadius: 8, border: "1px solid #333", background: "#0f0f0f", color: "white" }}
+                style={{ width: "100%", padding: "12px", borderRadius: 8, border: "1px solid var(--border-color, #333)", background: "var(--input-bg, #0f0f0f)", color: "var(--foreground, white)" }}
               />
             </div>
 
             <div style={{ display: "flex", gap: 12 }}>
-              <button onClick={() => setShowCopyModal(false)} style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid #444", background: "transparent", color: "#aaa", cursor: "pointer" }}>
+              <button onClick={() => setShowCopyModal(false)} style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid var(--border-strong, #444)", background: "transparent", color: "var(--text-secondary, #aaa)", cursor: "pointer" }}>
                 취소
               </button>
               <button onClick={handleCopy} style={{ flex: 1, padding: 12, borderRadius: 10, border: "none", background: "var(--color-primary, #3b82f6)", color: "white", cursor: "pointer", fontWeight: 600 }}>
@@ -1282,8 +1282,8 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: 8,
-  border: "1px solid #333",
-  background: "#0f0f0f",
-  color: "white",
+  border: "1px solid var(--border-color, #333)",
+  background: "var(--input-bg, #0f0f0f)",
+  color: "var(--foreground, white)",
   fontSize: 14,
 };

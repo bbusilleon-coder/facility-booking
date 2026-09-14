@@ -54,7 +54,7 @@ export default function ImageUpload({ value, onChange, label = "이미지" }: Pr
 
   return (
     <div>
-      <label style={{ display: "block", marginBottom: 8, fontSize: 14, color: "#aaa" }}>
+      <label style={{ display: "block", marginBottom: 8, fontSize: 14, color: "var(--text-secondary, #aaa)" }}>
         {label}
       </label>
 
@@ -68,7 +68,7 @@ export default function ImageUpload({ value, onChange, label = "이미지" }: Pr
               height: 150,
               objectFit: "cover",
               borderRadius: 8,
-              border: "1px solid #333",
+              border: "1px solid var(--border-color, #333)",
             }}
           />
           <button
@@ -100,15 +100,15 @@ export default function ImageUpload({ value, onChange, label = "이미지" }: Pr
           style={{
             width: 200,
             height: 150,
-            border: "2px dashed #333",
+            border: "2px dashed var(--border-color, #333)",
             borderRadius: 8,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             cursor: uploading ? "not-allowed" : "pointer",
-            background: "#0f0f0f",
-            color: "#666",
+            background: "var(--input-bg, #0f0f0f)",
+            color: "var(--text-subtle, #666)",
             fontSize: 13,
           }}
         >

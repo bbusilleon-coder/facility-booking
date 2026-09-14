@@ -145,7 +145,7 @@ export default function AdminUsersPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800 }}>관리자 계정</h1>
-          <p style={{ color: "#888", fontSize: 14, marginTop: 4 }}>시스템 관리자를 등록하고 관리합니다.</p>
+          <p style={{ color: "var(--text-muted, #888)", fontSize: 14, marginTop: 4 }}>시스템 관리자를 등록하고 관리합니다.</p>
         </div>
         <button onClick={openAddModal} style={{ padding: "10px 20px", borderRadius: 10, background: "#3b82f6", color: "white", border: "none", cursor: "pointer", fontWeight: 600 }}>
           + 관리자 추가
@@ -153,15 +153,15 @@ export default function AdminUsersPage() {
       </div>
 
       {loading ? (
-        <div style={{ color: "#888", padding: 40, textAlign: "center" }}>로딩 중...</div>
+        <div style={{ color: "var(--text-muted, #888)", padding: 40, textAlign: "center" }}>로딩 중...</div>
       ) : admins.length === 0 ? (
-        <div style={{ padding: 40, background: "#1a1a1a", borderRadius: 12, textAlign: "center", color: "#888" }}>
+        <div style={{ padding: 40, background: "var(--card-bg, #1a1a1a)", borderRadius: 12, textAlign: "center", color: "var(--text-muted, #888)" }}>
           등록된 관리자가 없습니다.
         </div>
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
           {admins.map((a) => (
-            <div key={a.id} style={{ background: "#1a1a1a", borderRadius: 12, padding: 16, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+            <div key={a.id} style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 16, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{ width: 44, height: 44, borderRadius: "50%", background: a.is_active ? "#3b82f622" : "#33333366", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>
                   👤
@@ -176,13 +176,13 @@ export default function AdminUsersPage() {
                       <span style={{ padding: "2px 8px", borderRadius: 999, fontSize: 11, background: "#6b728022", color: "#6b7280" }}>비활성</span>
                     )}
                   </div>
-                  <div style={{ fontSize: 13, color: "#888", marginTop: 2 }}>
+                  <div style={{ fontSize: 13, color: "var(--text-muted, #888)", marginTop: 2 }}>
                     @{a.username} · 최근 로그인: {formatDate(a.last_login_at)}
                   </div>
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
-                <button onClick={() => openEditModal(a)} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #444", background: "transparent", color: "#aaa", cursor: "pointer", fontSize: 13 }}>수정</button>
+                <button onClick={() => openEditModal(a)} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid var(--border-strong, #444)", background: "transparent", color: "var(--text-secondary, #aaa)", cursor: "pointer", fontSize: 13 }}>수정</button>
                 <button onClick={() => handleDelete(a)} style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid #ef4444", background: "transparent", color: "#ef4444", cursor: "pointer", fontSize: 13 }}>삭제</button>
               </div>
             </div>
@@ -192,7 +192,7 @@ export default function AdminUsersPage() {
 
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onClick={() => setShowModal(false)}>
-          <div style={{ background: "#1a1a1a", borderRadius: 16, padding: 24, width: "100%", maxWidth: 400 }} onClick={(e) => e.stopPropagation()}>
+          <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 16, padding: 24, width: "100%", maxWidth: 400 }} onClick={(e) => e.stopPropagation()}>
             <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 20 }}>{editing ? "관리자 수정" : "관리자 추가"}</h2>
             
             {error && <div style={{ background: "#3a1a1a", border: "1px solid #f44", borderRadius: 8, padding: 12, marginBottom: 16, color: "#faa", fontSize: 14 }}>{error}</div>}
@@ -232,7 +232,7 @@ export default function AdminUsersPage() {
               )}
 
               <div style={{ display: "flex", gap: 12 }}>
-                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid #444", background: "transparent", color: "#aaa", cursor: "pointer" }}>취소</button>
+                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: 12, borderRadius: 10, border: "1px solid var(--border-strong, #444)", background: "transparent", color: "var(--text-secondary, #aaa)", cursor: "pointer" }}>취소</button>
                 <button type="submit" disabled={saving} style={{ flex: 1, padding: 12, borderRadius: 10, border: "none", background: saving ? "#444" : "#3b82f6", color: "white", cursor: saving ? "not-allowed" : "pointer", fontWeight: 600 }}>{saving ? "저장 중..." : "저장"}</button>
               </div>
             </form>
@@ -243,5 +243,5 @@ export default function AdminUsersPage() {
   );
 }
 
-const labelStyle: React.CSSProperties = { display: "block", marginBottom: 6, fontSize: 14, color: "#aaa" };
-const inputStyle: React.CSSProperties = { width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #333", background: "#0f0f0f", color: "white", fontSize: 14 };
+const labelStyle: React.CSSProperties = { display: "block", marginBottom: 6, fontSize: 14, color: "var(--text-secondary, #aaa)" };
+const inputStyle: React.CSSProperties = { width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--border-color, #333)", background: "var(--input-bg, #0f0f0f)", color: "var(--foreground, white)", fontSize: 14 };

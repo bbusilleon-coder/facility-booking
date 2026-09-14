@@ -148,7 +148,7 @@ export default function AdminHolidaysPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800 }}>휴일 관리</h1>
-          <p style={{ color: "#888", fontSize: 14, marginTop: 4 }}>
+          <p style={{ color: "var(--text-muted, #888)", fontSize: 14, marginTop: 4 }}>
             공휴일 및 특별 휴무일을 관리합니다.
           </p>
         </div>
@@ -191,9 +191,9 @@ export default function AdminHolidaysPage() {
           style={{
             padding: "10px 20px",
             borderRadius: 10,
-            background: "#1a1a1a",
-            color: "#aaa",
-            border: "1px solid #333",
+            background: "var(--card-bg, #1a1a1a)",
+            color: "var(--text-secondary, #aaa)",
+            border: "1px solid var(--border-color, #333)",
             cursor: "pointer",
             fontSize: 14,
           }}
@@ -204,14 +204,14 @@ export default function AdminHolidaysPage() {
 
       {/* 휴일 목록 */}
       {loading ? (
-        <div style={{ color: "#888", padding: 40, textAlign: "center" }}>로딩 중...</div>
+        <div style={{ color: "var(--text-muted, #888)", padding: 40, textAlign: "center" }}>로딩 중...</div>
       ) : holidays.length === 0 ? (
         <div style={{
           padding: 40,
-          background: "#1a1a1a",
+          background: "var(--card-bg, #1a1a1a)",
           borderRadius: 12,
           textAlign: "center",
-          color: "#888",
+          color: "var(--text-muted, #888)",
         }}>
           {year}년에 등록된 휴일이 없습니다.
         </div>
@@ -221,7 +221,7 @@ export default function AdminHolidaysPage() {
             <div
               key={h.id}
               style={{
-                background: "#1a1a1a",
+                background: "var(--card-bg, #1a1a1a)",
                 borderRadius: 10,
                 padding: 16,
                 display: "flex",
@@ -231,7 +231,7 @@ export default function AdminHolidaysPage() {
             >
               <div>
                 <div style={{ fontSize: 15, fontWeight: 600 }}>{h.name}</div>
-                <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>
+                <div style={{ fontSize: 13, color: "var(--text-muted, #888)", marginTop: 4 }}>
                   {formatDate(h.date)}
                 </div>
                 {h.facility ? (
@@ -279,7 +279,7 @@ export default function AdminHolidaysPage() {
         >
           <div
             style={{
-              background: "#1a1a1a",
+              background: "var(--card-bg, #1a1a1a)",
               borderRadius: 16,
               padding: 24,
               width: "100%",
@@ -342,9 +342,9 @@ export default function AdminHolidaysPage() {
                   flex: 1,
                   padding: "12px",
                   borderRadius: 10,
-                  border: "1px solid #444",
+                  border: "1px solid var(--border-strong, #444)",
                   background: "transparent",
-                  color: "#aaa",
+                  color: "var(--text-secondary, #aaa)",
                   cursor: "pointer",
                 }}
               >
@@ -376,9 +376,9 @@ export default function AdminHolidaysPage() {
 const navBtnStyle: React.CSSProperties = {
   padding: "8px 12px",
   borderRadius: 8,
-  border: "1px solid #333",
+  border: "1px solid var(--border-color, #333)",
   background: "transparent",
-  color: "#aaa",
+  color: "var(--text-secondary, #aaa)",
   cursor: "pointer",
 };
 
@@ -386,15 +386,15 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   marginBottom: 6,
   fontSize: 14,
-  color: "#aaa",
+  color: "var(--text-secondary, #aaa)",
 };
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: 8,
-  border: "1px solid #333",
-  background: "#0f0f0f",
+  border: "1px solid var(--border-color, #333)",
+  background: "var(--input-bg, #0f0f0f)",
   color: "white",
   fontSize: 14,
 };

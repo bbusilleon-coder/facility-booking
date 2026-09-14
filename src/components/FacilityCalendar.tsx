@@ -154,7 +154,7 @@ export default function FacilityCalendar({
     <div>
       <style>{`
         .fc-day-closed {
-          background: #1a1a1a !important;
+          background: var(--surface-strong, #1a1a1a) !important;
           opacity: 0.5;
         }
         .fc-highlight {
@@ -203,10 +203,10 @@ export default function FacilityCalendar({
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0 }}>📅 예약 달력</h2>
             {loading && (
-              <span style={{ fontSize: 12, color: "#888" }}>로딩 중...</span>
+              <span style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>로딩 중...</span>
             )}
           </div>
-          <p style={{ color: "#777", fontSize: 12, margin: "4px 0 0" }}>
+          <p style={{ color: "var(--text-subtle, #777)", fontSize: 12, margin: "4px 0 0" }}>
             날짜/시간을 클릭하거나 드래그하여 예약
           </p>
         </div>
@@ -251,7 +251,7 @@ export default function FacilityCalendar({
       </div>
 
       <div style={{ 
-        background: "#1a1a1a", 
+        background: "var(--card-bg, #1a1a1a)",
         borderRadius: 12, 
         padding: 12,
         overflow: "hidden",

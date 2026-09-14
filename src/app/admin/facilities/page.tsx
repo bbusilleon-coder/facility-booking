@@ -39,7 +39,7 @@ export default async function AdminFacilitiesPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800 }}>시설물 관리</h1>
-          <p style={{ color: "#888", fontSize: 14, marginTop: 4 }}>
+          <p style={{ color: "var(--text-muted, #888)", fontSize: 14, marginTop: 4 }}>
             총 {facilities.length}개의 시설물
           </p>
         </div>
@@ -62,12 +62,12 @@ export default async function AdminFacilitiesPage() {
       {facilities.length === 0 ? (
         <div style={{
           padding: 40,
-          background: "#1a1a1a",
+          background: "var(--card-bg, #1a1a1a)",
           borderRadius: 12,
           textAlign: "center",
         }}>
           <div style={{ fontSize: 48, marginBottom: 16 }}>🏢</div>
-          <div style={{ color: "#888", marginBottom: 16 }}>등록된 시설물이 없습니다.</div>
+          <div style={{ color: "var(--text-muted, #888)", marginBottom: 16 }}>등록된 시설물이 없습니다.</div>
           <Link
             href="/admin/facilities/new"
             style={{
@@ -89,10 +89,10 @@ export default async function AdminFacilitiesPage() {
             <div
               key={f.id}
               style={{
-                background: "#1a1a1a",
+                background: "var(--card-bg, #1a1a1a)",
                 borderRadius: 12,
                 overflow: "hidden",
-                border: "1px solid #222",
+                border: "1px solid var(--border-color, #222)",
               }}
             >
               {/* 이미지 */}
@@ -110,7 +110,7 @@ export default async function AdminFacilitiesPage() {
                 <div style={{
                   width: "100%",
                   height: 120,
-                  background: "#111",
+                  background: "var(--card-bg, #111)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -137,7 +137,7 @@ export default async function AdminFacilitiesPage() {
                   </span>
                 </div>
 
-                <div style={{ fontSize: 13, color: "#888", marginBottom: 12 }}>
+                <div style={{ fontSize: 13, color: "var(--text-muted, #888)", marginBottom: 12 }}>
                   <div>📍 {f.location || "위치 미입력"}</div>
                   <div>👥 {f.min_people}~{f.max_people}명</div>
                   <div>⏰ {f.open_time || "09:00"} ~ {f.close_time || "22:00"}</div>
@@ -150,8 +150,8 @@ export default async function AdminFacilitiesPage() {
                       flex: 1,
                       padding: "8px 12px",
                       borderRadius: 8,
-                      border: "1px solid #444",
-                      color: "#aaa",
+                      border: "1px solid var(--border-strong, #444)",
+                      color: "var(--text-secondary, #aaa)",
                       textDecoration: "none",
                       fontSize: 13,
                       textAlign: "center",

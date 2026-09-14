@@ -188,7 +188,7 @@ export default async function AdminDashboard() {
             key={card.label}
             href={card.link || "#"}
             style={{
-              background: "#1a1a1a",
+              background: "var(--card-bg, #1a1a1a)",
               borderRadius: 12,
               padding: 16,
               borderLeft: `4px solid ${card.color}`,
@@ -199,7 +199,7 @@ export default async function AdminDashboard() {
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
               <div>
-                <div style={{ color: "#888", fontSize: 12, marginBottom: 4 }}>{card.label}</div>
+                <div style={{ color: "var(--text-muted, #888)", fontSize: 12, marginBottom: 4 }}>{card.label}</div>
                 <div style={{ fontSize: 28, fontWeight: 700 }}>{card.value}</div>
               </div>
               <span style={{ fontSize: 20 }}>{card.icon}</span>
@@ -217,17 +217,17 @@ export default async function AdminDashboard() {
             alignItems: "center",
             gap: 12,
             padding: 16,
-            background: "#1a1a1a",
+            background: "var(--card-bg, #1a1a1a)",
             borderRadius: 12,
             textDecoration: "none",
-            color: "white",
-            border: "1px dashed #333",
+            color: "var(--foreground, white)",
+            border: "1px dashed var(--border-color, #333)",
           }}
         >
           <span style={{ fontSize: 24 }}>➕</span>
           <div>
             <div style={{ fontWeight: 600 }}>시설물 등록</div>
-            <div style={{ fontSize: 12, color: "#888" }}>새 시설물 추가</div>
+            <div style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>새 시설물 추가</div>
           </div>
         </Link>
         
@@ -238,17 +238,17 @@ export default async function AdminDashboard() {
             alignItems: "center",
             gap: 12,
             padding: 16,
-            background: "#1a1a1a",
+            background: "var(--card-bg, #1a1a1a)",
             borderRadius: 12,
             textDecoration: "none",
-            color: "white",
-            border: "1px dashed #333",
+            color: "var(--foreground, white)",
+            border: "1px dashed var(--border-color, #333)",
           }}
         >
           <span style={{ fontSize: 24 }}>📋</span>
           <div>
             <div style={{ fontWeight: 600 }}>예약 관리</div>
-            <div style={{ fontSize: 12, color: "#888" }}>승인/거절 처리</div>
+            <div style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>승인/거절 처리</div>
           </div>
         </Link>
         
@@ -259,23 +259,23 @@ export default async function AdminDashboard() {
             alignItems: "center",
             gap: 12,
             padding: 16,
-            background: "#1a1a1a",
+            background: "var(--card-bg, #1a1a1a)",
             borderRadius: 12,
             textDecoration: "none",
-            color: "white",
-            border: "1px dashed #333",
+            color: "var(--foreground, white)",
+            border: "1px dashed var(--border-color, #333)",
           }}
         >
           <span style={{ fontSize: 24 }}>📆</span>
           <div>
             <div style={{ fontWeight: 600 }}>전체 현황</div>
-            <div style={{ fontSize: 12, color: "#888" }}>캘린더 보기</div>
+            <div style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>캘린더 보기</div>
           </div>
         </Link>
       </div>
 
       {/* 최근 예약 */}
-      <div style={{ background: "#1a1a1a", borderRadius: 12, padding: 20 }}>
+      <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <h2 style={{ fontSize: 16, fontWeight: 700 }}>최근 예약 신청</h2>
           <Link href="/admin/reservations" style={{ color: "#3b82f6", fontSize: 13 }}>
@@ -284,31 +284,31 @@ export default async function AdminDashboard() {
         </div>
         
         {recentReservations.length === 0 ? (
-          <div style={{ color: "#888", padding: 20, textAlign: "center" }}>
+          <div style={{ color: "var(--text-muted, #888)", padding: 20, textAlign: "center" }}>
             예약 내역이 없습니다.
           </div>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid #333" }}>
-                  <th style={{ textAlign: "left", padding: "10px 12px", color: "#888", fontSize: 13 }}>시설물</th>
-                  <th style={{ textAlign: "left", padding: "10px 12px", color: "#888", fontSize: 13 }}>목적</th>
-                  <th style={{ textAlign: "left", padding: "10px 12px", color: "#888", fontSize: 13 }}>신청자</th>
-                  <th style={{ textAlign: "left", padding: "10px 12px", color: "#888", fontSize: 13 }}>예약일시</th>
-                  <th style={{ textAlign: "left", padding: "10px 12px", color: "#888", fontSize: 13 }}>상태</th>
+                <tr style={{ borderBottom: "1px solid var(--border-color, #333)" }}>
+                  <th style={{ textAlign: "left", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>시설물</th>
+                  <th style={{ textAlign: "left", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>목적</th>
+                  <th style={{ textAlign: "left", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>신청자</th>
+                  <th style={{ textAlign: "left", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>예약일시</th>
+                  <th style={{ textAlign: "left", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>상태</th>
                 </tr>
               </thead>
               <tbody>
                 {recentReservations.map((r) => (
-                  <tr key={r.id} style={{ borderBottom: "1px solid #222" }}>
+                  <tr key={r.id} style={{ borderBottom: "1px solid var(--border-color, #222)" }}>
                     <td style={{ padding: "12px", fontWeight: 500 }}>{r.facility?.name || "-"}</td>
-                    <td style={{ padding: "12px", color: "#ccc" }}>{r.purpose}</td>
+                    <td style={{ padding: "12px", color: "var(--text-secondary, #ccc)" }}>{r.purpose}</td>
                     <td style={{ padding: "12px" }}>
                       <div>{r.applicant_name}</div>
-                      <div style={{ fontSize: 12, color: "#888" }}>{r.applicant_phone}</div>
+                      <div style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>{r.applicant_phone}</div>
                     </td>
-                    <td style={{ padding: "12px", color: "#888", fontSize: 13 }}>
+                    <td style={{ padding: "12px", color: "var(--text-muted, #888)", fontSize: 13 }}>
                       {formatDate(r.start_at)}
                     </td>
                     <td style={{ padding: "12px" }}>

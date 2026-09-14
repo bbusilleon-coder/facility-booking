@@ -186,7 +186,7 @@ export default function AdminMembersPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800 }}>회원 관리</h1>
-          <p style={{ color: "#888", fontSize: 14, marginTop: 4 }}>등록된 회원을 관리합니다.</p>
+          <p style={{ color: "var(--text-muted, #888)", fontSize: 14, marginTop: 4 }}>등록된 회원을 관리합니다.</p>
         </div>
         <button
           onClick={openAddModal}
@@ -215,8 +215,8 @@ export default function AdminMembersPage() {
           style={{
             padding: "10px 14px",
             borderRadius: 8,
-            border: "1px solid #333",
-            background: "#1a1a1a",
+            border: "1px solid var(--border-color, #333)",
+            background: "var(--card-bg, #1a1a1a)",
             color: "white",
             width: 280,
           }}
@@ -234,23 +234,23 @@ export default function AdminMembersPage() {
         >
           검색
         </button>
-        <span style={{ color: "#888", fontSize: 14, alignSelf: "center" }}>
+        <span style={{ color: "var(--text-muted, #888)", fontSize: 14, alignSelf: "center" }}>
           총 {members.length}명
         </span>
       </div>
 
       {/* 회원 목록 */}
       {loading ? (
-        <div style={{ color: "#888", padding: 40, textAlign: "center" }}>로딩 중...</div>
+        <div style={{ color: "var(--text-muted, #888)", padding: 40, textAlign: "center" }}>로딩 중...</div>
       ) : members.length === 0 ? (
-        <div style={{ padding: 40, background: "#1a1a1a", borderRadius: 12, textAlign: "center", color: "#888" }}>
+        <div style={{ padding: 40, background: "var(--card-bg, #1a1a1a)", borderRadius: 12, textAlign: "center", color: "var(--text-muted, #888)" }}>
           {search ? "검색 결과가 없습니다." : "등록된 회원이 없습니다."}
         </div>
       ) : (
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 800 }}>
             <thead>
-              <tr style={{ background: "#1a1a1a", borderBottom: "1px solid #333" }}>
+              <tr style={{ background: "var(--card-bg, #1a1a1a)", borderBottom: "1px solid var(--border-color, #333)" }}>
                 <th style={thStyle}>이름</th>
                 <th style={thStyle}>이메일</th>
                 <th style={thStyle}>연락처</th>
@@ -263,7 +263,7 @@ export default function AdminMembersPage() {
             </thead>
             <tbody>
               {members.map((m) => (
-                <tr key={m.id} style={{ borderBottom: "1px solid #222" }}>
+                <tr key={m.id} style={{ borderBottom: "1px solid var(--border-color, #222)" }}>
                   <td style={tdStyle}>
                     <span style={{ fontWeight: 600 }}>{m.name}</span>
                   </td>
@@ -327,7 +327,7 @@ export default function AdminMembersPage() {
         >
           <div
             style={{
-              background: "#1a1a1a",
+              background: "var(--card-bg, #1a1a1a)",
               borderRadius: 16,
               padding: 24,
               width: "100%",
@@ -436,9 +436,9 @@ export default function AdminMembersPage() {
                     flex: 1,
                     padding: 12,
                     borderRadius: 10,
-                    border: "1px solid #444",
+                    border: "1px solid var(--border-strong, #444)",
                     background: "transparent",
-                    color: "#aaa",
+                    color: "var(--text-secondary, #aaa)",
                     cursor: "pointer",
                   }}
                 >
@@ -474,7 +474,7 @@ const thStyle: React.CSSProperties = {
   textAlign: "left",
   fontSize: 13,
   fontWeight: 600,
-  color: "#888",
+  color: "var(--text-muted, #888)",
 };
 
 const tdStyle: React.CSSProperties = {
@@ -485,9 +485,9 @@ const tdStyle: React.CSSProperties = {
 const btnStyle: React.CSSProperties = {
   padding: "6px 12px",
   borderRadius: 6,
-  border: "1px solid #444",
+  border: "1px solid var(--border-strong, #444)",
   background: "transparent",
-  color: "#aaa",
+  color: "var(--text-secondary, #aaa)",
   cursor: "pointer",
   fontSize: 12,
 };
@@ -496,15 +496,15 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   marginBottom: 6,
   fontSize: 14,
-  color: "#aaa",
+  color: "var(--text-secondary, #aaa)",
 };
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: 8,
-  border: "1px solid #333",
-  background: "#0f0f0f",
+  border: "1px solid var(--border-color, #333)",
+  background: "var(--input-bg, #0f0f0f)",
   color: "white",
   fontSize: 14,
 };

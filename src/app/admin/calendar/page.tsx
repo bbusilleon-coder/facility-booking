@@ -130,9 +130,9 @@ export default function AdminCalendarPage() {
           style={{
             padding: "10px 16px",
             borderRadius: 8,
-            border: "1px solid #333",
-            background: "#1a1a1a",
-            color: "white",
+            border: "1px solid var(--border-color, #333)",
+            background: "var(--card-bg, #1a1a1a)",
+            color: "var(--foreground, white)",
             fontSize: 14,
           }}
         >
@@ -163,7 +163,7 @@ export default function AdminCalendarPage() {
       </div>
 
       {/* 캘린더 */}
-      <div style={{ background: "#1a1a1a", borderRadius: 12, padding: 16 }}>
+      <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 16 }}>
         {loading && (
           <div style={{
             position: "absolute",
@@ -215,12 +215,12 @@ export default function AdminCalendarPage() {
         >
           <div
             style={{
-              background: "#1a1a1a",
+              background: "var(--card-bg, #1a1a1a)",
               borderRadius: 16,
               padding: 24,
               width: "100%",
               maxWidth: 400,
-              color: "white",
+              color: "var(--foreground, white)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -230,28 +230,28 @@ export default function AdminCalendarPage() {
 
             <div style={{ display: "grid", gap: 12, fontSize: 14 }}>
               <div>
-                <span style={{ color: "#888" }}>시설물:</span>{" "}
+                <span style={{ color: "var(--text-muted, #888)" }}>시설물:</span>{" "}
                 <span style={{ fontWeight: 600 }}>{selectedEvent.facility?.name}</span>
               </div>
               <div>
-                <span style={{ color: "#888" }}>일시:</span>{" "}
+                <span style={{ color: "var(--text-muted, #888)" }}>일시:</span>{" "}
                 {formatDate(selectedEvent.start_at)} ~ {formatDate(selectedEvent.end_at)}
               </div>
               <div>
-                <span style={{ color: "#888" }}>목적:</span> {selectedEvent.purpose}
+                <span style={{ color: "var(--text-muted, #888)" }}>목적:</span> {selectedEvent.purpose}
               </div>
               <div>
-                <span style={{ color: "#888" }}>인원:</span> {selectedEvent.attendees}명
+                <span style={{ color: "var(--text-muted, #888)" }}>인원:</span> {selectedEvent.attendees}명
               </div>
               <div>
-                <span style={{ color: "#888" }}>신청자:</span> {selectedEvent.applicant_name}
+                <span style={{ color: "var(--text-muted, #888)" }}>신청자:</span> {selectedEvent.applicant_name}
                 {selectedEvent.applicant_dept && ` (${selectedEvent.applicant_dept})`}
               </div>
               <div>
-                <span style={{ color: "#888" }}>연락처:</span> {selectedEvent.applicant_phone}
+                <span style={{ color: "var(--text-muted, #888)" }}>연락처:</span> {selectedEvent.applicant_phone}
               </div>
               <div>
-                <span style={{ color: "#888" }}>상태:</span>{" "}
+                <span style={{ color: "var(--text-muted, #888)" }}>상태:</span>{" "}
                 <span style={{
                   padding: "2px 8px",
                   borderRadius: 999,
@@ -271,9 +271,9 @@ export default function AdminCalendarPage() {
                 marginTop: 20,
                 padding: "12px 16px",
                 borderRadius: 10,
-                border: "1px solid #444",
+                border: "1px solid var(--border-strong, #444)",
                 background: "transparent",
-                color: "#aaa",
+                color: "var(--text-secondary, #aaa)",
                 cursor: "pointer",
                 fontSize: 14,
               }}

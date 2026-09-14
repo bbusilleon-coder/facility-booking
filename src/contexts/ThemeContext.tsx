@@ -65,7 +65,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       document.documentElement.style.setProperty("--foreground", "#1a1a1a");
       document.documentElement.style.setProperty("--card-bg", "#ffffff");
       document.documentElement.style.setProperty("--border-color", "#e5e5e5");
+      document.documentElement.style.setProperty("--border-strong", "#cbd5e1");
       document.documentElement.style.setProperty("--text-muted", "#666666");
+      document.documentElement.style.setProperty("--text-secondary", "#475569");
+      document.documentElement.style.setProperty("--text-subtle", "#64748b");
+      document.documentElement.style.setProperty("--input-bg", "#ffffff");
+      document.documentElement.style.setProperty("--surface-strong", "#e2e8f0");
+      document.documentElement.style.setProperty("--selection-bg", "#eff6ff");
+      document.documentElement.style.setProperty("--skeleton-base", "#e2e8f0");
+      document.documentElement.style.setProperty("--skeleton-highlight", "#f8fafc");
       document.body.classList.add("light-mode");
       document.body.classList.remove("dark-mode");
     } else {
@@ -73,7 +81,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       document.documentElement.style.setProperty("--foreground", "#ededed");
       document.documentElement.style.setProperty("--card-bg", "#1a1a1a");
       document.documentElement.style.setProperty("--border-color", "#333333");
+      document.documentElement.style.setProperty("--border-strong", "#444444");
       document.documentElement.style.setProperty("--text-muted", "#888888");
+      document.documentElement.style.setProperty("--text-secondary", "#aaaaaa");
+      document.documentElement.style.setProperty("--text-subtle", "#777777");
+      document.documentElement.style.setProperty("--input-bg", "#0f0f0f");
+      document.documentElement.style.setProperty("--surface-strong", "#333333");
+      document.documentElement.style.setProperty("--selection-bg", "#1f2937");
+      document.documentElement.style.setProperty("--skeleton-base", "#1a1a1a");
+      document.documentElement.style.setProperty("--skeleton-highlight", "#2a2a2a");
       document.body.classList.add("dark-mode");
       document.body.classList.remove("light-mode");
     }

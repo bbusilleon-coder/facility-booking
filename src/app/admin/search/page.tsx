@@ -75,10 +75,10 @@ export default function AdminSearchPage() {
   return (
     <div style={{ padding: 24 }}>
       <h1 style={{ fontSize: 24, fontWeight: 800, marginBottom: 8 }}>예약 검색</h1>
-      <p style={{ color: "#888", marginBottom: 24, fontSize: 14 }}>이름, 연락처, 날짜로 예약을 검색합니다.</p>
+      <p style={{ color: "var(--text-muted, #888)", marginBottom: 24, fontSize: 14 }}>이름, 연락처, 날짜로 예약을 검색합니다.</p>
 
       {/* 검색 폼 */}
-      <div style={{ background: "#1a1a1a", borderRadius: 16, padding: 24, marginBottom: 24 }}>
+      <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 16, padding: 24, marginBottom: 24 }}>
         <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
           {(["name", "phone", "date"] as const).map((type) => (
             <button
@@ -86,7 +86,7 @@ export default function AdminSearchPage() {
               onClick={() => { setSearchType(type); setSearchValue(""); setResults([]); setSearched(false); }}
               style={{
                 padding: "10px 20px", borderRadius: 10,
-                border: searchType === type ? "2px solid var(--color-primary, #3b82f6)" : "2px solid #333",
+                border: searchType === type ? "2px solid var(--color-primary, #3b82f6)" : "2px solid var(--border-color, #333)",
                 background: searchType === type ? "var(--color-primary, #3b82f6)15" : "transparent",
                 color: searchType === type ? "var(--color-primary, #3b82f6)" : "#888",
                 cursor: "pointer", fontWeight: 600,
@@ -105,15 +105,15 @@ export default function AdminSearchPage() {
               onChange={(e) => setSearchValue(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               placeholder={searchType === "name" ? "예약자 이름 입력" : "연락처 입력 (- 없이)"}
-              style={{ flex: 1, minWidth: 200, padding: "12px 14px", borderRadius: 10, border: "1px solid #333", background: "#0f0f0f", color: "white", fontSize: 14 }}
+              style={{ flex: 1, minWidth: 200, padding: "12px 14px", borderRadius: 10, border: "1px solid var(--border-color, #333)", background: "var(--input-bg, #0f0f0f)", color: "var(--foreground, white)", fontSize: 14 }}
             />
           ) : (
             <>
               <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)}
-                style={{ padding: "12px 14px", borderRadius: 10, border: "1px solid #333", background: "#0f0f0f", color: "white", fontSize: 14 }} />
-              <span style={{ color: "#888", alignSelf: "center" }}>~</span>
+                style={{ padding: "12px 14px", borderRadius: 10, border: "1px solid var(--border-color, #333)", background: "var(--input-bg, #0f0f0f)", color: "var(--foreground, white)", fontSize: 14 }} />
+              <span style={{ color: "var(--text-muted, #888)", alignSelf: "center" }}>~</span>
               <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)}
-                style={{ padding: "12px 14px", borderRadius: 10, border: "1px solid #333", background: "#0f0f0f", color: "white", fontSize: 14 }} />
+                style={{ padding: "12px 14px", borderRadius: 10, border: "1px solid var(--border-color, #333)", background: "var(--input-bg, #0f0f0f)", color: "var(--foreground, white)", fontSize: 14 }} />
             </>
           )}
           <button
@@ -129,18 +129,18 @@ export default function AdminSearchPage() {
       {/* 검색 결과 */}
       {searched && (
         <div>
-          <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: "#888" }}>
+          <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: "var(--text-muted, #888)" }}>
             검색 결과: {results.length}건
           </h2>
 
           {results.length === 0 ? (
-            <div style={{ padding: 40, background: "#1a1a1a", borderRadius: 12, textAlign: "center", color: "#888" }}>
+            <div style={{ padding: 40, background: "var(--card-bg, #1a1a1a)", borderRadius: 12, textAlign: "center", color: "var(--text-muted, #888)" }}>
               검색 결과가 없습니다.
             </div>
           ) : (
             <div style={{ display: "grid", gap: 12 }}>
               {results.map((r) => (
-                <div key={r.id} style={{ background: "#1a1a1a", borderRadius: 12, padding: 16 }}>
+                <div key={r.id} style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 16 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12 }}>
                     <div>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
@@ -153,16 +153,16 @@ export default function AdminSearchPage() {
                           {statusLabels[r.status]?.label || r.status}
                         </span>
                       </div>
-                      <div style={{ fontSize: 14, color: "#aaa", marginBottom: 4 }}>
+                      <div style={{ fontSize: 14, color: "var(--text-secondary, #aaa)", marginBottom: 4 }}>
                         📅 {formatDateTime(r.start_at)} ~ {new Date(r.end_at).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}
                       </div>
-                      <div style={{ fontSize: 14, color: "#888" }}>
+                      <div style={{ fontSize: 14, color: "var(--text-muted, #888)" }}>
                         👤 {r.applicant_name || r.booker_name || "-"} · 📞 {r.applicant_phone || r.booker_phone || "-"}
                       </div>
-                      {r.purpose && <div style={{ fontSize: 13, color: "#666", marginTop: 4 }}>목적: {r.purpose}</div>}
+                      {r.purpose && <div style={{ fontSize: 13, color: "var(--text-subtle, #666)", marginTop: 4 }}>목적: {r.purpose}</div>}
                     </div>
                     <Link href={`/admin/reservations?id=${r.id}`}
-                      style={{ padding: "8px 16px", borderRadius: 8, background: "#333", color: "#aaa", textDecoration: "none", fontSize: 13 }}>
+                      style={{ padding: "8px 16px", borderRadius: 8, background: "var(--surface-strong, #333)", color: "var(--text-secondary, #aaa)", textDecoration: "none", fontSize: 13 }}>
                       상세보기
                     </Link>
                   </div>

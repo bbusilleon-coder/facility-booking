@@ -66,7 +66,7 @@ export default function EditNoticePage() {
   };
 
   if (fetching) {
-    return <div style={{ padding: 24, color: "#888" }}>로딩 중...</div>;
+    return <div style={{ padding: 24, color: "var(--text-muted, #888)" }}>로딩 중...</div>;
   }
 
   return (
@@ -141,9 +141,9 @@ export default function EditNoticePage() {
               flex: 1,
               padding: "12px 16px",
               borderRadius: 10,
-              border: "1px solid #444",
+              border: "1px solid var(--border-strong, #444)",
               background: "transparent",
-              color: "#aaa",
+              color: "var(--text-secondary, #aaa)",
               textDecoration: "none",
               textAlign: "center",
               fontSize: 14,
@@ -178,15 +178,15 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   marginBottom: 6,
   fontSize: 14,
-  color: "#aaa",
+  color: "var(--text-secondary, #aaa)",
 };
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: 8,
-  border: "1px solid #333",
-  background: "#0f0f0f",
+  border: "1px solid var(--border-color, #333)",
+  background: "var(--input-bg, #0f0f0f)",
   color: "white",
   fontSize: 14,
 };

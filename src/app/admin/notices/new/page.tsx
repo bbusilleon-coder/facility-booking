@@ -111,9 +111,9 @@ export default function NewNoticePage() {
               flex: 1,
               padding: "12px 16px",
               borderRadius: 10,
-              border: "1px solid #444",
+              border: "1px solid var(--border-strong, #444)",
               background: "transparent",
-              color: "#aaa",
+              color: "var(--text-secondary, #aaa)",
               textDecoration: "none",
               textAlign: "center",
               fontSize: 14,
@@ -148,15 +148,15 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   marginBottom: 6,
   fontSize: 14,
-  color: "#aaa",
+  color: "var(--text-secondary, #aaa)",
 };
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: 8,
-  border: "1px solid #333",
-  background: "#0f0f0f",
+  border: "1px solid var(--border-color, #333)",
+  background: "var(--input-bg, #0f0f0f)",
   color: "white",
   fontSize: 14,
 };

@@ -112,8 +112,8 @@ export default function AdminAuthGuard({ children }: Props) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0a0a0a",
-        color: "#888",
+        background: "var(--background, #0a0a0a)",
+        color: "var(--text-muted, #888)",
       }}>
         <div style={{ textAlign: "center" }}>
           <div className="skeleton" style={{ width: 40, height: 40, borderRadius: "50%", margin: "0 auto 12px" }} />

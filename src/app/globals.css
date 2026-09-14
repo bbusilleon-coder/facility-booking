@@ -6,7 +6,15 @@
   --foreground: #1a1a1a;
   --card-bg: #ffffff;
   --border-color: #e5e5e5;
+  --border-strong: #cbd5e1;
   --text-muted: #666666;
+  --text-secondary: #475569;
+  --text-subtle: #64748b;
+  --input-bg: #ffffff;
+  --surface-strong: #e2e8f0;
+  --selection-bg: #eff6ff;
+  --skeleton-base: #e2e8f0;
+  --skeleton-highlight: #f8fafc;
 }
 
 * { box-sizing: border-box; }
@@ -40,20 +48,59 @@ body.light-mode {
   --foreground: #1a1a1a;
   --card-bg: #ffffff;
   --border-color: #e5e5e5;
+  --border-strong: #cbd5e1;
   --text-muted: #666666;
+  --text-secondary: #475569;
+  --text-subtle: #64748b;
+  --input-bg: #ffffff;
+  --surface-strong: #e2e8f0;
+  --selection-bg: #eff6ff;
+  --skeleton-base: #e2e8f0;
+  --skeleton-highlight: #f8fafc;
 }
 
 body.light-mode input,
 body.light-mode select,
 body.light-mode textarea {
-  background: #ffffff;
-  border-color: #e5e5e5;
-  color: #1a1a1a;
+  background: var(--input-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--foreground) !important;
 }
 
 body.light-mode input::placeholder,
 body.light-mode textarea::placeholder {
   color: #999999;
+}
+
+/* FullCalendar는 자체 다크 기본값을 사용하므로 관리자 테마와 명시적으로 동기화한다. */
+.admin-shell .fc {
+  --fc-page-bg-color: var(--card-bg);
+  --fc-neutral-bg-color: var(--background);
+  --fc-neutral-text-color: var(--text-muted);
+  --fc-border-color: var(--border-color);
+  --fc-button-bg-color: var(--card-bg);
+  --fc-button-border-color: var(--border-color);
+  --fc-button-text-color: var(--foreground);
+  --fc-button-hover-bg-color: var(--color-primary-light);
+  --fc-button-hover-border-color: var(--color-primary);
+  --fc-button-active-bg-color: var(--color-primary);
+  --fc-button-active-border-color: var(--color-primary);
+  color: var(--foreground);
+}
+
+.admin-shell .fc .fc-col-header-cell,
+.admin-shell .fc .fc-timegrid-axis,
+.admin-shell .fc .fc-timegrid-slot-label {
+  background: var(--card-bg);
+  color: var(--text-secondary);
+}
+
+.admin-shell .fc .fc-day-today {
+  background: var(--color-primary-light) !important;
+}
+
+.admin-shell .fc .fc-button-primary:not(:disabled).fc-button-active {
+  color: #ffffff;
 }
 
 /* 다크 모드 */
@@ -62,5 +109,13 @@ body.dark-mode {
   --foreground: #ededed;
   --card-bg: #1a1a1a;
   --border-color: #333333;
+  --border-strong: #444444;
   --text-muted: #888888;
+  --text-secondary: #aaaaaa;
+  --text-subtle: #777777;
+  --input-bg: #0f0f0f;
+  --surface-strong: #333333;
+  --selection-bg: #1f2937;
+  --skeleton-base: #1a1a1a;
+  --skeleton-highlight: #2a2a2a;
 }

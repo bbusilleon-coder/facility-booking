@@ -73,35 +73,35 @@ export default function AdminNoticesPage() {
       </div>
 
       {loading ? (
-        <div style={{ color: "#888", padding: 40, textAlign: "center" }}>로딩 중...</div>
+        <div style={{ color: "var(--text-muted, #888)", padding: 40, textAlign: "center" }}>로딩 중...</div>
       ) : notices.length === 0 ? (
         <div style={{
           padding: 40,
-          background: "#1a1a1a",
+          background: "var(--card-bg, #1a1a1a)",
           borderRadius: 12,
           textAlign: "center",
-          color: "#888",
+          color: "var(--text-muted, #888)",
         }}>
           등록된 공지사항이 없습니다.
         </div>
       ) : (
-        <div style={{ background: "#1a1a1a", borderRadius: 12, overflow: "hidden" }}>
+        <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, overflow: "hidden" }}>
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ borderBottom: "1px solid #333" }}>
-                <th style={{ textAlign: "left", padding: "12px 16px", color: "#888", fontSize: 13 }}>제목</th>
-                <th style={{ textAlign: "center", padding: "12px 16px", color: "#888", fontSize: 13, width: 80 }}>상태</th>
-                <th style={{ textAlign: "center", padding: "12px 16px", color: "#888", fontSize: 13, width: 80 }}>고정</th>
-                <th style={{ textAlign: "center", padding: "12px 16px", color: "#888", fontSize: 13, width: 100 }}>등록일</th>
-                <th style={{ textAlign: "center", padding: "12px 16px", color: "#888", fontSize: 13, width: 120 }}>관리</th>
+              <tr style={{ borderBottom: "1px solid var(--border-color, #333)" }}>
+                <th style={{ textAlign: "left", padding: "12px 16px", color: "var(--text-muted, #888)", fontSize: 13 }}>제목</th>
+                <th style={{ textAlign: "center", padding: "12px 16px", color: "var(--text-muted, #888)", fontSize: 13, width: 80 }}>상태</th>
+                <th style={{ textAlign: "center", padding: "12px 16px", color: "var(--text-muted, #888)", fontSize: 13, width: 80 }}>고정</th>
+                <th style={{ textAlign: "center", padding: "12px 16px", color: "var(--text-muted, #888)", fontSize: 13, width: 100 }}>등록일</th>
+                <th style={{ textAlign: "center", padding: "12px 16px", color: "var(--text-muted, #888)", fontSize: 13, width: 120 }}>관리</th>
               </tr>
             </thead>
             <tbody>
               {notices.map((notice) => (
-                <tr key={notice.id} style={{ borderBottom: "1px solid #222" }}>
+                <tr key={notice.id} style={{ borderBottom: "1px solid var(--border-color, #222)" }}>
                   <td style={{ padding: "14px 16px" }}>
                     <div style={{ fontWeight: 600 }}>{notice.title}</div>
-                    <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>
+                    <div style={{ fontSize: 13, color: "var(--text-muted, #888)", marginTop: 4 }}>
                       {notice.content.substring(0, 50)}...
                     </div>
                   </td>
@@ -119,7 +119,7 @@ export default function AdminNoticesPage() {
                   <td style={{ textAlign: "center", padding: "14px 16px" }}>
                     {notice.is_pinned && <span style={{ color: "#eab308" }}>📌</span>}
                   </td>
-                  <td style={{ textAlign: "center", padding: "14px 16px", fontSize: 13, color: "#888" }}>
+                  <td style={{ textAlign: "center", padding: "14px 16px", fontSize: 13, color: "var(--text-muted, #888)" }}>
                     {formatDate(notice.created_at)}
                   </td>
                   <td style={{ textAlign: "center", padding: "14px 16px" }}>
@@ -129,8 +129,8 @@ export default function AdminNoticesPage() {
                         style={{
                           padding: "6px 12px",
                           borderRadius: 6,
-                          border: "1px solid #444",
-                          color: "#aaa",
+                          border: "1px solid var(--border-strong, #444)",
+                          color: "var(--text-secondary, #aaa)",
                           textDecoration: "none",
                           fontSize: 12,
                         }}

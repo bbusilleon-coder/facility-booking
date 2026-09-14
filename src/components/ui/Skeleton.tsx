@@ -19,7 +19,7 @@ export default function Skeleton({
         width,
         height,
         borderRadius,
-        background: "linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%)",
+        background: "linear-gradient(90deg, var(--skeleton-base, #1a1a1a) 25%, var(--skeleton-highlight, #2a2a2a) 50%, var(--skeleton-base, #1a1a1a) 75%)",
         backgroundSize: "200% 100%",
         animation: "skeleton-pulse 1.5s ease-in-out infinite",
         ...style,
@@ -32,10 +32,10 @@ export default function Skeleton({
 export function CardSkeleton() {
   return (
     <div style={{
-      border: "1px solid #222",
+      border: "1px solid var(--border-color, #222)",
       borderRadius: 14,
       padding: 16,
-      background: "#0f0f0f",
+      background: "var(--input-bg, #0f0f0f)",
     }}>
       <Skeleton height={24} width="60%" style={{ marginBottom: 12 }} />
       <Skeleton height={16} width="40%" style={{ marginBottom: 8 }} />
@@ -47,7 +47,7 @@ export function CardSkeleton() {
 // 테이블 행 스켈레톤
 export function TableRowSkeleton({ columns = 5 }: { columns?: number }) {
   return (
-    <tr style={{ borderBottom: "1px solid #222" }}>
+    <tr style={{ borderBottom: "1px solid var(--border-color, #222)" }}>
       {Array.from({ length: columns }).map((_, i) => (
         <td key={i} style={{ padding: "14px 16px" }}>
           <Skeleton height={16} width={i === 0 ? "80%" : "60%"} />
@@ -61,10 +61,10 @@ export function TableRowSkeleton({ columns = 5 }: { columns?: number }) {
 export function StatCardSkeleton() {
   return (
     <div style={{
-      background: "#1a1a1a",
+      background: "var(--card-bg, #1a1a1a)",
       borderRadius: 12,
       padding: 20,
-      borderLeft: "4px solid #333",
+      borderLeft: "4px solid var(--border-color, #333)",
     }}>
       <Skeleton height={14} width="50%" style={{ marginBottom: 12 }} />
       <Skeleton height={32} width="40%" />
@@ -91,10 +91,10 @@ export function ReservationListSkeleton({ count = 5 }: { count?: number }) {
         <div
           key={i}
           style={{
-            background: "#1a1a1a",
+            background: "var(--card-bg, #1a1a1a)",
             borderRadius: 12,
             padding: 16,
-            border: "1px solid #222",
+            border: "1px solid var(--border-color, #222)",
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>

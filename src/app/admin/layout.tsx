@@ -176,7 +176,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "var(--background, #0a0a0a)" }}>
+    <div className="admin-shell" style={{ display: "flex", minHeight: "100vh", background: "var(--background, #0a0a0a)" }}>
       {/* 사이드바 */}
       <aside
         style={{
@@ -270,7 +270,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </aside>
 
       {/* 메인 콘텐츠 */}
-      <main style={{ flex: 1, overflow: "auto" }}>
+      <main className="admin-main" style={{ flex: 1, overflow: "auto" }}>
         {children}
       </main>
     </div>

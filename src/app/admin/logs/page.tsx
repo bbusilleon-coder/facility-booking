@@ -65,7 +65,7 @@ export default function AdminLogsPage() {
   };
 
   const getActionInfo = (action: string) => {
-    return actionLabels[action] || { label: action, color: "#888", icon: "📝" };
+    return actionLabels[action] || { label: action, color: "var(--text-muted, #888)", icon: "📝" };
   };
 
   const formatDetails = (details: Record<string, any>) => {
@@ -86,7 +86,7 @@ export default function AdminLogsPage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: 24, fontWeight: 800 }}>활동 로그</h1>
-          <p style={{ color: "#888", fontSize: 14, marginTop: 4 }}>
+          <p style={{ color: "var(--text-muted, #888)", fontSize: 14, marginTop: 4 }}>
             관리자 활동 이력을 조회합니다.
           </p>
         </div>
@@ -96,8 +96,8 @@ export default function AdminLogsPage() {
           style={{
             padding: "10px 16px",
             borderRadius: 8,
-            border: "1px solid #333",
-            background: "#1a1a1a",
+            border: "1px solid var(--border-color, #333)",
+            background: "var(--card-bg, #1a1a1a)",
             color: "white",
             fontSize: 14,
           }}
@@ -112,19 +112,19 @@ export default function AdminLogsPage() {
       </div>
 
       {loading ? (
-        <div style={{ color: "#888", padding: 40, textAlign: "center" }}>로딩 중...</div>
+        <div style={{ color: "var(--text-muted, #888)", padding: 40, textAlign: "center" }}>로딩 중...</div>
       ) : logs.length === 0 ? (
         <div style={{
           padding: 40,
-          background: "#1a1a1a",
+          background: "var(--card-bg, #1a1a1a)",
           borderRadius: 12,
           textAlign: "center",
-          color: "#888",
+          color: "var(--text-muted, #888)",
         }}>
           기록된 활동 로그가 없습니다.
         </div>
       ) : (
-        <div style={{ background: "#1a1a1a", borderRadius: 12, overflow: "hidden" }}>
+        <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, overflow: "hidden" }}>
           {logs.map((log, idx) => {
             const actionInfo = getActionInfo(log.action);
             return (
@@ -132,7 +132,7 @@ export default function AdminLogsPage() {
                 key={log.id}
                 style={{
                   padding: "14px 20px",
-                  borderBottom: idx < logs.length - 1 ? "1px solid #222" : "none",
+                  borderBottom: idx < logs.length - 1 ? "1px solid var(--border-color, #222)" : "none",
                   display: "flex",
                   alignItems: "flex-start",
                   gap: 12,
@@ -152,12 +152,12 @@ export default function AdminLogsPage() {
                     >
                       {actionInfo.label}
                     </span>
-                    <span style={{ fontSize: 12, color: "#666" }}>
+                    <span style={{ fontSize: 12, color: "var(--text-subtle, #666)" }}>
                       {formatDate(log.created_at)}
                     </span>
                   </div>
                   {log.details && Object.keys(log.details).length > 0 && (
-                    <div style={{ fontSize: 13, color: "#888", marginTop: 6 }}>
+                    <div style={{ fontSize: 13, color: "var(--text-muted, #888)", marginTop: 6 }}>
                       {formatDetails(log.details)}
                     </div>
                   )}

@@ -80,9 +80,9 @@ export default function StatisticsPage() {
             style={{
               padding: "8px 12px",
               borderRadius: 8,
-              border: "1px solid #333",
+              border: "1px solid var(--border-color, #333)",
               background: "transparent",
-              color: "#aaa",
+              color: "var(--text-secondary, #aaa)",
               cursor: "pointer",
             }}
           >
@@ -96,9 +96,9 @@ export default function StatisticsPage() {
             style={{
               padding: "8px 12px",
               borderRadius: 8,
-              border: "1px solid #333",
+              border: "1px solid var(--border-color, #333)",
               background: "transparent",
-              color: "#aaa",
+              color: "var(--text-secondary, #aaa)",
               cursor: "pointer",
             }}
           >
@@ -108,7 +108,7 @@ export default function StatisticsPage() {
       </div>
 
       {loading ? (
-        <div style={{ color: "#888", padding: 40, textAlign: "center" }}>로딩 중...</div>
+        <div style={{ color: "var(--text-muted, #888)", padding: 40, textAlign: "center" }}>로딩 중...</div>
       ) : data ? (
         <>
           {/* 요약 카드 */}
@@ -124,19 +124,19 @@ export default function StatisticsPage() {
               <div
                 key={item.label}
                 style={{
-                  background: "#1a1a1a",
+                  background: "var(--card-bg, #1a1a1a)",
                   borderRadius: 12,
                   padding: 16,
                   textAlign: "center",
                 }}
               >
-                <div style={{ color: "#888", fontSize: 13, marginBottom: 4 }}>{item.label}</div>
+                <div style={{ color: "var(--text-muted, #888)", fontSize: 13, marginBottom: 4 }}>{item.label}</div>
                 <div style={{ fontSize: 28, fontWeight: 700, color: item.color }}>{item.value}</div>
               </div>
             ))}
           </div>
 
-          <div style={{ background: "#1a1a1a", borderRadius: 12, padding: 20, marginBottom: 24, overflowX: "auto" }}>
+          <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 20, marginBottom: 24, overflowX: "auto" }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>월별 대관수입</h2>
             <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 210, minWidth: 620 }}>
               {data.monthlyStats.map((m, idx) => (
@@ -152,7 +152,7 @@ export default function StatisticsPage() {
           </div>
 
           {/* 월별 예약 차트 */}
-          <div style={{ background: "#1a1a1a", borderRadius: 12, padding: 20, marginBottom: 24 }}>
+          <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 20, marginBottom: 24 }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 20 }}>월별 예약 현황</h2>
             
             <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 200 }}>
@@ -167,7 +167,7 @@ export default function StatisticsPage() {
                       <div
                         style={{
                           height: height || 2,
-                          background: "#333",
+                          background: "var(--surface-strong, #333)",
                           borderRadius: "4px 4px 0 0",
                           position: "relative",
                         }}
@@ -194,13 +194,13 @@ export default function StatisticsPage() {
                           left: 0,
                           right: 0,
                           fontSize: 11,
-                          color: "#888",
+                          color: "var(--text-muted, #888)",
                         }}>
                           {m.total}
                         </div>
                       )}
                     </div>
-                    <div style={{ fontSize: 11, color: "#666", marginTop: 8 }}>{monthLabels[idx]}</div>
+                    <div style={{ fontSize: 11, color: "var(--text-subtle, #666)", marginTop: 8 }}>{monthLabels[idx]}</div>
                   </div>
                 );
               })}
@@ -213,31 +213,31 @@ export default function StatisticsPage() {
                 승인
               </span>
               <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <span style={{ width: 12, height: 12, background: "#333", borderRadius: 2 }} />
+                <span style={{ width: 12, height: 12, background: "var(--surface-strong, #333)", borderRadius: 2 }} />
                 기타
               </span>
             </div>
           </div>
 
           {/* 시설물별 이용률 */}
-          <div style={{ background: "#1a1a1a", borderRadius: 12, padding: 20 }}>
+          <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 20 }}>
             <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 16 }}>시설물별 이용 현황</h2>
             
             {data.facilityStats.length === 0 ? (
-              <div style={{ color: "#888", padding: 20, textAlign: "center" }}>
+              <div style={{ color: "var(--text-muted, #888)", padding: 20, textAlign: "center" }}>
                 시설물 데이터가 없습니다.
               </div>
             ) : (
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
-                  <tr style={{ borderBottom: "1px solid #333" }}>
-                    <th style={{ textAlign: "left", padding: "10px 12px", color: "#888", fontSize: 13 }}>시설물</th>
-                    <th style={{ textAlign: "right", padding: "10px 12px", color: "#888", fontSize: 13 }}>총 예약</th>
-                    <th style={{ textAlign: "right", padding: "10px 12px", color: "#888", fontSize: 13 }}>승인</th>
-                    <th style={{ textAlign: "right", padding: "10px 12px", color: "#888", fontSize: 13 }}>승인율</th>
-                    <th style={{ textAlign: "right", padding: "10px 12px", color: "#888", fontSize: 13 }}>총 이용시간</th>
-                    <th style={{ textAlign: "right", padding: "10px 12px", color: "#888", fontSize: 13 }}>총 이용인원</th>
-                    <th style={{ textAlign: "right", padding: "10px 12px", color: "#888", fontSize: 13 }}>대관수입</th>
+                  <tr style={{ borderBottom: "1px solid var(--border-color, #333)" }}>
+                    <th style={{ textAlign: "left", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>시설물</th>
+                    <th style={{ textAlign: "right", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>총 예약</th>
+                    <th style={{ textAlign: "right", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>승인</th>
+                    <th style={{ textAlign: "right", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>승인율</th>
+                    <th style={{ textAlign: "right", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>총 이용시간</th>
+                    <th style={{ textAlign: "right", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>총 이용인원</th>
+                    <th style={{ textAlign: "right", padding: "10px 12px", color: "var(--text-muted, #888)", fontSize: 13 }}>대관수입</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -245,7 +245,7 @@ export default function StatisticsPage() {
                     const approvalRate = f.total > 0 ? Math.round((f.approved / f.total) * 100) : 0;
                     
                     return (
-                      <tr key={f.id} style={{ borderBottom: "1px solid #222" }}>
+                      <tr key={f.id} style={{ borderBottom: "1px solid var(--border-color, #222)" }}>
                         <td style={{ padding: "12px", fontWeight: 600 }}>{f.name}</td>
                         <td style={{ padding: "12px", textAlign: "right" }}>{f.total}건</td>
                         <td style={{ padding: "12px", textAlign: "right", color: "#22c55e" }}>{f.approved}건</td>
@@ -260,10 +260,10 @@ export default function StatisticsPage() {
                             {approvalRate}%
                           </span>
                         </td>
-                        <td style={{ padding: "12px", textAlign: "right", color: "#888" }}>
+                        <td style={{ padding: "12px", textAlign: "right", color: "var(--text-muted, #888)" }}>
                           {f.totalHours.toFixed(1)}시간
                         </td>
-                        <td style={{ padding: "12px", textAlign: "right", color: "#888" }}>
+                        <td style={{ padding: "12px", textAlign: "right", color: "var(--text-muted, #888)" }}>
                           {f.totalAttendees}명
                         </td>
                         <td style={{ padding: "12px", textAlign: "right", color: "#38bdf8", fontWeight: 700 }}>
@@ -278,7 +278,7 @@ export default function StatisticsPage() {
           </div>
         </>
       ) : (
-        <div style={{ color: "#888", padding: 40, textAlign: "center" }}>
+        <div style={{ color: "var(--text-muted, #888)", padding: 40, textAlign: "center" }}>
           데이터를 불러올 수 없습니다.
         </div>
       )}

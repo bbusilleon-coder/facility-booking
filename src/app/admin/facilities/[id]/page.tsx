@@ -161,7 +161,7 @@ export default function EditFacilityPage() {
   const dayLabels = ["일", "월", "화", "수", "목", "금", "토"];
 
   if (fetching) {
-    return <div style={{ padding: 24, color: "#888" }}>로딩 중...</div>;
+    return <div style={{ padding: 24, color: "var(--text-muted, #888)" }}>로딩 중...</div>;
   }
 
   return (
@@ -266,7 +266,7 @@ export default function EditFacilityPage() {
               onChange={handleChange}
               style={{ ...inputStyle, width: "auto" }}
             />
-            <span style={{ color: "#888" }}>~</span>
+            <span style={{ color: "var(--text-muted, #888)" }}>~</span>
             <input
               type="time"
               name="closeTime"
@@ -294,11 +294,11 @@ export default function EditFacilityPage() {
           </div>
         </div>
 
-        <div style={{ marginBottom: 24, padding: 16, border: "1px solid #333", borderRadius: 10, background: "#111" }}>
+        <div style={{ marginBottom: 24, padding: 16, border: "1px solid var(--border-color, #333)", borderRadius: 10, background: "var(--card-bg, #111)" }}>
           <label style={{ ...labelStyle, marginBottom: 10 }}>대관 요금 구분</label>
           <div style={{ display: "flex", gap: 10, marginBottom: formData.rentalType === "paid" ? 16 : 0 }}>
             {(["free", "paid"] as const).map((type) => (
-              <label key={type} style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "11px 12px", border: `1px solid ${formData.rentalType === type ? "#3b82f6" : "#333"}`, borderRadius: 8, cursor: "pointer", color: formData.rentalType === type ? "#60a5fa" : "#aaa" }}>
+              <label key={type} style={{ flex: 1, display: "flex", alignItems: "center", gap: 8, padding: "11px 12px", border: `1px solid ${formData.rentalType === type ? "#3b82f6" : "var(--border-color, #333)"}`, borderRadius: 8, cursor: "pointer", color: formData.rentalType === type ? "#60a5fa" : "var(--text-secondary, #aaa)" }}>
                 <input type="radio" name="rentalType" value={type} checked={formData.rentalType === type} onChange={() => setFormData((prev) => ({ ...prev, rentalType: type }))} />
                 {type === "free" ? "무료 대관" : "유료 대관"}
               </label>
@@ -350,9 +350,9 @@ export default function EditFacilityPage() {
               flex: 1,
               padding: "12px 16px",
               borderRadius: 10,
-              border: "1px solid #444",
+              border: "1px solid var(--border-strong, #444)",
               background: "transparent",
-              color: "#aaa",
+              color: "var(--text-secondary, #aaa)",
               textDecoration: "none",
               textAlign: "center",
               fontSize: 14,
@@ -387,15 +387,15 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   marginBottom: 6,
   fontSize: 14,
-  color: "#aaa",
+  color: "var(--text-secondary, #aaa)",
 };
 
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   borderRadius: 8,
-  border: "1px solid #333",
-  background: "#0f0f0f",
-  color: "white",
+  border: "1px solid var(--border-color, #333)",
+  background: "var(--input-bg, #0f0f0f)",
+  color: "var(--foreground, white)",
   fontSize: 14,
 };
