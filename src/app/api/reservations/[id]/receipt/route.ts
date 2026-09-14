@@ -31,8 +31,8 @@ export async function GET(_req: Request, { params }: RouteParams) {
     const calculated = calculateRentalFee(startAt, endAt, pricing);
     const amount = decoded.meta?.calculatedAmount ?? calculated.amount;
     const issueDate = new Date();
-    const date = startAt.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
-    const time = `${startAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })} ~ ${endAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" })}`;
+    const date = startAt.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric", timeZone: "Asia/Seoul" });
+    const time = `${startAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Seoul" })} ~ ${endAt.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Seoul" })}`;
     const receiptNo = `KLE-${issueDate.getFullYear()}-${reservation.id.slice(0, 8).toUpperCase()}`;
 
     const html = `<!doctype html>
