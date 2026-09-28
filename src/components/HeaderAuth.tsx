@@ -10,162 +10,28 @@ export default function HeaderAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 사용자 로그인 확인
-    const token = localStorage.getItem("userToken");
-    const expiresAt = localStorage.getItem("userExpiresAt");
-    const userName = localStorage.getItem("userName");
-    const userEmail = localStorage.getItem("userEmail");
-
-    if (token && expiresAt && new Date(expiresAt) > new Date()) {
-      setUser({ name: userName || "사용자", email: userEmail || "" });
-    }
-    setLoading(false);
+    const timer = window.setTimeout(() => {
+      const token = localStorage.getItem("userToken");
+      const expiresAt = localStorage.getItem("userExpiresAt");
+      const userName = localStorage.getItem("userName");
+      const userEmail = localStorage.getItem("userEmail");
+      if (token && expiresAt && new Date(expiresAt) > new Date()) setUser({ name: userName || "사용자", email: userEmail || "" });
+      setLoading(false);
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, []);
 
   const handleLogout = () => {
-    // 모든 사용자 정보 삭제
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("userExpiresAt");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userPhone");
-    localStorage.removeItem("userDept");
+    ["userToken", "userExpiresAt", "userName", "userEmail", "userPhone", "userDept"].forEach((key) => localStorage.removeItem(key));
     setUser(null);
     router.refresh();
   };
 
-  if (loading) {
-    return (
-      <div style={{ display: "flex", gap: 12 }}>
-        <span style={{ padding: "10px 16px", color: "var(--text-muted, #888)" }}>...</span>
-      </div>
-    );
-  }
+  if (loading) return <div className="ky-auth-links"><span className="ky-auth-loading">확인 중</span></div>;
 
-  if (user) {
-    return (
-      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-        <Link
-          href="/reservation"
-          prefetch={false}
-          style={{
-            padding: "10px 16px",
-            borderRadius: 10,
-            border: "1px solid var(--border-color, #333)",
-            color: "var(--text-muted, #ccc)",
-            textDecoration: "none",
-            fontSize: 14,
-          }}
-        >
-          내 예약 조회
-        </Link>
-        <Link
-          href="/checkin"
-          prefetch={false}
-          style={{
-            padding: "10px 16px",
-            borderRadius: 10,
-            border: "1px solid var(--border-color, #333)",
-            color: "var(--text-muted, #ccc)",
-            textDecoration: "none",
-            fontSize: 14,
-          }}
-        >
-          QR 체크인
-        </Link>
-        <span style={{ color: "var(--color-primary, #3b82f6)", fontSize: 14, fontWeight: 600 }}>
-          👤 {user.name}
-        </span>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "10px 16px",
-            borderRadius: 10,
-            border: "1px solid var(--border-color, #333)",
-            background: "transparent",
-            color: "var(--text-muted, #888)",
-            cursor: "pointer",
-            fontSize: 14,
-          }}
-        >
-          로그아웃
-        </button>
-        <Link
-          href="/admin"
-          prefetch={false}
-          style={{
-            padding: "10px 16px",
-            borderRadius: 10,
-            background: "var(--card-bg, #1a1a1a)",
-            color: "var(--text-muted, #888)",
-            textDecoration: "none",
-            fontSize: 14,
-          }}
-        >
-          관리자
-        </Link>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-      <Link
-        href="/reservation"
-        prefetch={false}
-        style={{
-          padding: "10px 16px",
-          borderRadius: 10,
-          border: "1px solid var(--border-color, #333)",
-          color: "var(--text-muted, #ccc)",
-          textDecoration: "none",
-          fontSize: 14,
-        }}
-      >
-        내 예약 조회
-      </Link>
-      <Link
-        href="/checkin"
-        prefetch={false}
-        style={{
-          padding: "10px 16px",
-          borderRadius: 10,
-          border: "1px solid var(--border-color, #333)",
-          color: "var(--text-muted, #ccc)",
-          textDecoration: "none",
-          fontSize: 14,
-        }}
-      >
-        QR 체크인
-      </Link>
-      <Link
-        href="/auth"
-        prefetch={false}
-        style={{
-          padding: "10px 16px",
-          borderRadius: 10,
-          background: "var(--color-primary, #3b82f6)",
-          color: "white",
-          textDecoration: "none",
-          fontSize: 14,
-        }}
-      >
-        로그인
-      </Link>
-      <Link
-        href="/admin"
-        prefetch={false}
-        style={{
-          padding: "10px 16px",
-          borderRadius: 10,
-          background: "var(--card-bg, #1a1a1a)",
-          color: "var(--text-muted, #888)",
-          textDecoration: "none",
-          fontSize: 14,
-        }}
-      >
-        관리자
-      </Link>
-    </div>
-  );
+  return <div className="ky-auth-links">
+    <Link href="/reservation" prefetch={false}>내 예약 조회</Link><Link href="/checkin" prefetch={false}>QR 체크인</Link>
+    {user ? <><span className="ky-user-name">{user.name}님</span><button type="button" onClick={handleLogout}>로그아웃</button></> : <Link className="ky-auth-accent" href="/auth" prefetch={false}>로그인</Link>}
+    <Link className="ky-auth-admin" href="/admin" prefetch={false}>관리자</Link>
+  </div>;
 }

@@ -2,13 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type Notice = {
-  id: string;
-  title: string;
-  content: string;
-  is_pinned: boolean;
-  created_at: string;
-};
+type Notice = { id: string; title: string; content: string; is_pinned: boolean; created_at: string; };
 
 export default function NoticeList() {
   const [notices, setNotices] = useState<Notice[]>([]);
@@ -17,85 +11,22 @@ export default function NoticeList() {
 
   useEffect(() => {
     const fetchNotices = async () => {
-      try {
-        const res = await fetch("/api/notices?active=true&limit=5");
-        const json = await res.json();
-        if (json.ok) {
-          setNotices(json.notices || []);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+      try { const res = await fetch("/api/notices?active=true&limit=5"); const json = await res.json(); if (json.ok) setNotices(json.notices || []); }
+      catch (err) { console.error(err); } finally { setLoading(false); }
     };
-
     fetchNotices();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="skeleton" style={{ height: 60, borderRadius: 12, marginBottom: 16 }} />
-    );
-  }
+  const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\. /g, ".").replace(/\.$/, "");
 
-  if (notices.length === 0) {
-    return null;
-  }
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("ko-KR");
-  };
-
-  return (
-    <div style={{ marginBottom: 24 }}>
-      <h3 style={{ fontSize: 14, fontWeight: 700, marginBottom: 12, color: "var(--text-muted, #888)" }}>
-        📢 공지사항
-      </h3>
-      <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, overflow: "hidden" }}>
-        {notices.map((notice, idx) => (
-          <div
-            key={notice.id}
-            style={{
-              borderBottom: idx < notices.length - 1 ? "1px solid var(--border-color, #222)" : "none",
-            }}
-          >
-            <div
-              onClick={() => setExpanded(expanded === notice.id ? null : notice.id)}
-              style={{
-                padding: "12px 16px",
-                cursor: "pointer",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                {notice.is_pinned && <span style={{ color: "#eab308" }}>📌</span>}
-                <span style={{ fontSize: 14, color: "var(--foreground, white)" }}>{notice.title}</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <span style={{ fontSize: 12, color: "var(--text-muted, #666)" }}>{formatDate(notice.created_at)}</span>
-                <span style={{ color: "var(--text-muted, #666)", fontSize: 12 }}>
-                  {expanded === notice.id ? "▲" : "▼"}
-                </span>
-              </div>
-            </div>
-            
-            {expanded === notice.id && (
-              <div style={{
-                padding: "0 16px 16px",
-                fontSize: 14,
-                color: "var(--text-muted, #aaa)",
-                lineHeight: 1.6,
-                whiteSpace: "pre-wrap",
-              }}>
-                {notice.content}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+  return <article className="ky-notice-panel" id="notices">
+    <div className="ky-section-heading ky-section-heading-compact"><div><p className="ky-eyebrow ky-dark">NOTICE</p><h2>공지사항</h2></div><span className="ky-more" aria-hidden="true">＋</span></div>
+    {loading ? <div className="ky-loading-block" /> : notices.length === 0 ? <p className="ky-empty-message">등록된 공지사항이 없습니다.</p> : <div className="ky-notice-list">
+      {notices.map((notice) => { const isOpen = expanded === notice.id; return <div className="ky-notice-entry" key={notice.id}>
+        <button type="button" className="ky-notice-item" aria-expanded={isOpen} onClick={() => setExpanded(isOpen ? null : notice.id)}>
+          <span className={`ky-notice-tag${notice.is_pinned ? "" : " ky-muted"}`}>{notice.is_pinned ? "중요" : "안내"}</span><span className="ky-notice-title">{notice.title}</span><time dateTime={notice.created_at}>{formatDate(notice.created_at)}</time><span className="ky-chevron" aria-hidden="true">⌄</span>
+        </button>{isOpen && <div className="ky-notice-detail">{notice.content}</div>}
+      </div>; })}
+    </div>}
+  </article>;
 }

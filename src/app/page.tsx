@@ -19,7 +19,6 @@ type Facility = {
 
 async function getFacilities(): Promise<Facility[]> {
   const supabase = createServerClient();
-  
   const { data, error } = await supabase
     .from("facilities")
     .select("*")
@@ -38,67 +37,74 @@ export default async function Home() {
   const facilities = await getFacilities();
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <main style={{ flex: 1, maxWidth: 1200, margin: "0 auto", padding: 24, color: "var(--foreground, white)", width: "100%" }}>
-        {/* 헤더 */}
-        <header style={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center",
-          marginBottom: 24,
-          paddingBottom: 16,
-          borderBottom: "1px solid var(--border-color, #222)",
-          flexWrap: "wrap",
-          gap: 12,
-        }}>
-          <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800 }}>계룡대 학습관 강의실 예약 시스템</h1>
-            <p style={{ color: "var(--text-muted, #888)", marginTop: 4, fontSize: 14 }}>
-              강의실을 선택하고 예약을 진행합니다.
-            </p>
+    <div className="home-page">
+      <a className="ky-skip" href="#main-content">본문 바로가기</a>
+      <header className="ky-header">
+        <div className="ky-utility-bar">
+          <div className="ky-shell ky-utility-inner">
+            <a className="ky-university-logo" href="https://www.konyang.ac.kr" target="_blank" rel="noopener noreferrer">
+              <img src="/konyang/logo.png" alt="건양대학교" />
+            </a>
+            <HeaderAuth />
           </div>
-          <HeaderAuth />
-        </header>
+        </div>
+        <div className="ky-nav-bar">
+          <div className="ky-shell ky-nav-inner">
+            <Link className="ky-service-logo" href="/">
+              <strong>계룡평생교육원</strong><span>시설예약</span>
+            </Link>
+            <nav className="ky-desktop-nav" aria-label="주 메뉴">
+              <a href="#facilities">시설안내</a>
+              <a href="#reservation-status">예약현황</a>
+              <a href="#facilities">시설예약</a>
+              <Link href="/reservation" prefetch={false}>내 예약 조회</Link>
+              <Link href="/checkin" prefetch={false}>QR 체크인</Link>
+            </nav>
+            <details className="ky-mobile-nav">
+              <summary aria-label="메뉴 열기"><span /><span /><span /></summary>
+              <div>
+                <a href="#facilities">시설안내</a><a href="#reservation-status">예약현황</a><a href="#facilities">시설예약</a>
+                <Link href="/reservation" prefetch={false}>내 예약 조회</Link><Link href="/checkin" prefetch={false}>QR 체크인</Link>
+              </div>
+            </details>
+          </div>
+        </div>
+      </header>
 
-        {/* 공지사항 */}
-        <NoticeList />
-
-        {/* 대시보드 */}
-        <DashboardClient />
-
-        {/* 시설물 목록 (클라이언트 컴포넌트) */}
+      <main id="main-content">
+        <section className="ky-hero">
+          <div className="ky-shell ky-hero-content">
+            <p className="ky-eyebrow">KONYANG UNIVERSITY · GYERYONG</p>
+            <h1>배움이 이어지는 공간,<br />간편하게 예약하세요</h1>
+            <p className="ky-hero-copy">계룡평생교육원 강의실 현황을 확인하고 원하는 시간에 예약할 수 있습니다.</p>
+            <a className="ky-hero-button" href="#facilities">시설 예약하기 <span aria-hidden="true">→</span></a>
+          </div>
+        </section>
+        <section className="ky-quick-links" aria-label="빠른 메뉴">
+          <div className="ky-shell ky-quick-grid">
+            <a href="#facilities"><span className="ky-quick-icon">⌂</span><span><small>FACILITIES</small>시설 안내</span></a>
+            <a href="#reservation-status"><span className="ky-quick-icon">▦</span><span><small>SCHEDULE</small>예약 현황</span></a>
+            <Link href="/reservation" prefetch={false}><span className="ky-quick-icon">✓</span><span><small>MY BOOKING</small>내 예약 조회</span></Link>
+            <Link href="/checkin" prefetch={false}><span className="ky-quick-icon">▣</span><span><small>CHECK-IN</small>QR 체크인</span></Link>
+          </div>
+        </section>
+        <section className="ky-home-info" id="reservation-status">
+          <div className="ky-shell ky-home-info-grid"><NoticeList /><DashboardClient /></div>
+        </section>
         <HomeClient facilities={facilities} />
       </main>
 
-      {/* 푸터 */}
-      <footer style={{
-        borderTop: "1px solid var(--border-color, #222)",
-        padding: "24px 16px",
-        textAlign: "center",
-        background: "var(--background, #0a0a0a)",
-      }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-          <p style={{ color: "var(--text-muted, #888)", fontSize: 13, lineHeight: 1.8, margin: 0 }}>
-            <strong style={{ color: "var(--foreground, #aaa)" }}>계룡대학습관(계룡)</strong>{" "}
-            32801 충남 계룡시 신도안3길 72 계룡대학습관
-          </p>
-          <p style={{ color: "var(--text-muted, #888)", fontSize: 13, margin: "4px 0 0 0" }}>
-            TEL: 042-551-1543 &nbsp;|&nbsp; E-mail: pik8241@konyang.ac.kr
-          </p>
-          <p style={{ margin: "12px 0 0 0" }}>
-            <a 
-              href="https://sites.google.com/d/1vaqyC_wLXOUP-UWwLMARmyS8sJf9AmL7/p/1VAkK7t33fSPzxZ8dq9yV9i1ZTTePuFOG/edit"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "#6b7280", fontSize: 12, textDecoration: "none" }}
-            >
-              개인정보처리방침
-            </a>
-          </p>
-          <p style={{ color: "#555", fontSize: 12, marginTop: 12 }}>
-            Copyrightⓒbbusilleon 2026. All Rights Reserved.
-          </p>
-        </div>
+      <footer className="ky-footer">
+        <div className="ky-partner-bar"><div className="ky-shell">
+          <strong>관련 사이트</strong>
+          <a href="https://www.konyang.ac.kr" target="_blank" rel="noopener noreferrer">건양대학교</a>
+          <a href="https://leaders.konyang.ac.kr/leaders.do" target="_blank" rel="noopener noreferrer">평생교육원</a>
+          <a href="https://sites.google.com/d/1vaqyC_wLXOUP-UWwLMARmyS8sJf9AmL7/p/1VAkK7t33fSPzxZ8dq9yV9i1ZTTePuFOG/edit" target="_blank" rel="noopener noreferrer">개인정보처리방침</a>
+        </div></div>
+        <div className="ky-footer-main"><div className="ky-shell ky-footer-inner">
+          <div><p><strong>계룡평생교육원</strong> · 32801 충청남도 계룡시 신도안3길 72 계룡대학습관</p><p>TEL 042-551-1543 <span>·</span> E-mail pik8241@konyang.ac.kr</p><small>COPYRIGHT © KONYANG UNIVERSITY. ALL RIGHTS RESERVED.</small></div>
+          <img src="/konyang/logo-footer.png" alt="건양대학교" />
+        </div></div>
       </footer>
     </div>
   );
