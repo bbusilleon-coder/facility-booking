@@ -51,7 +51,7 @@ export default async function Home() {
         <div className="ky-nav-bar">
           <div className="ky-shell ky-nav-inner">
             <Link className="ky-service-logo" href="/">
-              <strong>계룡평생교육원</strong><span>시설예약</span>
+              <strong>계룡대학습관</strong><span>시설예약</span>
             </Link>
             <nav className="ky-desktop-nav" aria-label="주 메뉴">
               <a href="#facilities">시설안내</a>
@@ -76,7 +76,7 @@ export default async function Home() {
           <div className="ky-shell ky-hero-content">
             <p className="ky-eyebrow">KONYANG UNIVERSITY · GYERYONG</p>
             <h1>배움이 이어지는 공간,<br />간편하게 예약하세요</h1>
-            <p className="ky-hero-copy">계룡평생교육원 강의실 현황을 확인하고 원하는 시간에 예약할 수 있습니다.</p>
+            <p className="ky-hero-copy">계룡대학습관 강의실 현황을 확인하고 원하는 시간에 예약할 수 있습니다.</p>
             <a className="ky-hero-button" href="#facilities">시설 예약하기 <span aria-hidden="true">→</span></a>
           </div>
         </section>
@@ -102,7 +102,7 @@ export default async function Home() {
           <a href="https://sites.google.com/d/1vaqyC_wLXOUP-UWwLMARmyS8sJf9AmL7/p/1VAkK7t33fSPzxZ8dq9yV9i1ZTTePuFOG/edit" target="_blank" rel="noopener noreferrer">개인정보처리방침</a>
         </div></div>
         <div className="ky-footer-main"><div className="ky-shell ky-footer-inner">
-          <div><p><strong>계룡평생교육원</strong> · 32801 충청남도 계룡시 신도안3길 72 계룡대학습관</p><p>TEL 042-551-1543 <span>·</span> E-mail pik8241@konyang.ac.kr</p><small>COPYRIGHT © KONYANG UNIVERSITY. ALL RIGHTS RESERVED.</small></div>
+          <div><p><strong>계룡대학습관</strong> · 32801 충청남도 계룡시 신도안3길 72 계룡대학습관</p><p>TEL 042-551-1543 <span>·</span> E-mail pik8241@konyang.ac.kr</p><small>COPYRIGHT © KONYANG UNIVERSITY. ALL RIGHTS RESERVED.</small></div>
           <img src="/konyang/logo-footer.png" alt="건양대학교" />
         </div></div>
       </footer>
