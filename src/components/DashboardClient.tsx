@@ -10,6 +10,7 @@ type DashboardData = { stats: { totalFacilities: number; todayCount: number; wee
 export default function DashboardClient() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -17,6 +18,9 @@ export default function DashboardClient() {
       catch (err) { console.error(err); } finally { setLoading(false); }
     };
     fetchDashboard();
+
+    const timer = window.setInterval(() => setCurrentTime(Date.now()), 60_000);
+    return () => window.clearInterval(timer);
   }, []);
 
   const formatTime = (dateStr: string) => new Date(dateStr).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
@@ -35,10 +39,13 @@ export default function DashboardClient() {
 
     <div className="ky-dashboard-wide">
       <section className="ky-reservation-section">
-        <div className="ky-section-heading"><div><p className="ky-eyebrow ky-dark">RESERVATION</p><h2>오늘 예약</h2><p>오늘 이용 예정인 강의실과 시간을 한눈에 확인하세요.</p></div><span className="ky-count-badge">총 {data.todayReservations.length}건</span></div>
+        <div className="ky-section-heading"><div><p className="ky-eyebrow ky-dark">RESERVATION</p><h2>오늘 예약</h2><p>오늘 예약된 강의실과 이용 시간을 한눈에 확인하세요.</p></div><span className="ky-count-badge">총 {data.todayReservations.length}건</span></div>
         {data.todayReservations.length > 0 ? <div className="ky-booking-table" role="table" aria-label="오늘 예약 목록">
           <div className="ky-booking-row ky-table-head" role="row"><span>시설</span><span>예약 내용</span><span>이용 시간</span><span>상태</span></div>
-          {data.todayReservations.map((r) => <div className="ky-booking-row" role="row" key={r.id}><strong>{r.facility?.name}</strong><span>{r.purpose}</span><time>{formatTime(r.start_at)} – {formatTime(r.end_at)}</time><em>이용 예정</em></div>)}
+          {data.todayReservations.map((r) => {
+            const isFinished = new Date(r.end_at).getTime() <= currentTime;
+            return <div className="ky-booking-row" role="row" key={r.id}><strong>{r.facility?.name}</strong><span>{r.purpose}</span><time>{formatTime(r.start_at)} – {formatTime(r.end_at)}</time><em>{isFinished ? "이용 종료" : "이용 예정"}</em></div>;
+          })}
         </div> : <div className="ky-empty-message ky-empty-box">오늘 예정된 예약이 없습니다.</div>}
       </section>
 
