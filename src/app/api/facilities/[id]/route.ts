@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createServerClient } from "@/lib/supabase/server";
 
 interface RouteParams {
@@ -61,6 +62,8 @@ export async function PUT(req: Request, { params }: RouteParams) {
 
     if (error) throw error;
 
+    revalidatePath("/");
+
     return NextResponse.json({
       ok: true,
       facility: data,
@@ -85,6 +88,8 @@ export async function DELETE(req: Request, { params }: RouteParams) {
       .eq("id", id);
 
     if (error) throw error;
+
+    revalidatePath("/");
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createServerClient } from "@/lib/supabase/server";
 
 // GET: 시설물 목록 조회
@@ -51,6 +52,8 @@ export async function POST(req: Request) {
       .single();
 
     if (error) throw error;
+
+    revalidatePath("/");
 
     return NextResponse.json({
       ok: true,
