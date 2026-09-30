@@ -51,6 +51,7 @@ export default function AdminReservationsPage() {
   const [search, setSearch] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [rentalType, setRentalType] = useState<"all" | "paid" | "free">("all");
   const [viewMode, setViewMode] = useState<"active" | "archive">("active"); // 활성/보관함
   const [sortBy, setSortBy] = useState<"date" | "facility">("date"); // 정렬 기준
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc"); // 정렬 순서
@@ -113,6 +114,14 @@ export default function AdminReservationsPage() {
   // 필터링된 예약 목록 (활성/보관함)
   const filteredReservations = reservations.filter((r) => {
     const displayStatus = getDisplayStatus(r);
+    const amount = r.rental_amount || 0;
+    const matchesRentalType =
+      rentalType === "all" ||
+      (rentalType === "paid" && amount > 0) ||
+      (rentalType === "free" && amount === 0);
+
+    if (!matchesRentalType) return false;
+
     if (viewMode === "archive") {
       // 보관함: 만료됨, 거절됨, 취소됨
       return displayStatus === "expired" || r.status === "rejected" || r.status === "cancelled";
@@ -478,7 +487,7 @@ export default function AdminReservationsPage() {
   const handleExportExcel = () => {
     const dataToExport = selectedIds.size > 0
       ? reservations.filter((r) => selectedIds.has(r.id))
-      : reservations;
+      : sortedReservations;
 
     if (dataToExport.length === 0) {
       alert("내보낼 데이터가 없습니다.");
@@ -791,6 +800,29 @@ export default function AdminReservationsPage() {
           <option value="expired">사용완료</option>
         </select>
 
+        <div>
+          <label style={{ display: "block", fontSize: 12, color: "var(--text-muted, #888)", marginBottom: 4 }}>대관 구분</label>
+          <select
+            aria-label="대관 구분"
+            value={rentalType}
+            onChange={(e) => {
+              setRentalType(e.target.value as "all" | "paid" | "free");
+              setSelectedIds(new Set());
+            }}
+            style={{
+              padding: "8px 12px",
+              borderRadius: 8,
+              border: "1px solid var(--border-color, #333)",
+              background: "var(--card-bg, #1a1a1a)",
+              color: "white",
+            }}
+          >
+            <option value="all">전체 대관</option>
+            <option value="paid">유상대관</option>
+            <option value="free">무상대관</option>
+          </select>
+        </div>
+
         {/* 일괄 승인/거절/삭제 버튼 */}
         {selectedIds.size > 0 && (
           <>
@@ -933,7 +965,13 @@ export default function AdminReservationsPage() {
         <div style={{ color: "var(--text-muted, #888)", padding: 40, textAlign: "center" }}>로딩 중...</div>
       ) : sortedReservations.length === 0 ? (
         <div style={{ padding: 40, background: "var(--card-bg, #1a1a1a)", borderRadius: 12, textAlign: "center", color: "var(--text-muted, #888)" }}>
-          {viewMode === "archive" ? "보관함이 비어있습니다." : "진행중인 예약이 없습니다."}
+          {rentalType === "paid"
+            ? "유상대관 예약이 없습니다."
+            : rentalType === "free"
+              ? "무상대관 예약이 없습니다."
+              : viewMode === "archive"
+                ? "보관함이 비어있습니다."
+                : "진행중인 예약이 없습니다."}
         </div>
       ) : (
         <div style={{ display: "grid", gap: 12 }}>
@@ -996,6 +1034,18 @@ export default function AdminReservationsPage() {
                     }}
                   >
                     {statusLabels[displayStatus]}
+                  </span>
+                  <span
+                    style={{
+                      padding: "2px 8px",
+                      borderRadius: 999,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      background: (r.rental_amount || 0) > 0 ? "#f59e0b22" : "#14b8a622",
+                      color: (r.rental_amount || 0) > 0 ? "#f59e0b" : "#14b8a6",
+                    }}
+                  >
+                    {(r.rental_amount || 0) > 0 ? "유상대관" : "무상대관"}
                   </span>
                   {r.checked_in_at && (
                     <span style={{ padding: "2px 8px", borderRadius: 999, fontSize: 11, background: "#22c55e22", color: "#22c55e" }}>
