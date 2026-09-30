@@ -569,6 +569,29 @@ export default function AdminReservationsPage() {
     alert(`${dataToExport.length}건의 예약이 내보내기 되었습니다.`);
   };
 
+  // 국유재산 전대 승인신청서: 선택 건 > 지정 기간 > 이번 달 순으로 묶어서 인쇄
+  const handlePrintSubleaseApproval = () => {
+    const params = new URLSearchParams();
+
+    if (selectedIds.size > 0) {
+      const printableIds = reservations
+        .filter((reservation) => selectedIds.has(reservation.id))
+        .filter((reservation) => reservation.status === "pending" || reservation.status === "approved")
+        .map((reservation) => reservation.id);
+
+      if (printableIds.length === 0) {
+        alert("승인대기 또는 승인된 예약을 선택해주세요.");
+        return;
+      }
+      params.set("ids", printableIds.join(","));
+    } else {
+      if (dateFrom) params.set("from", dateFrom);
+      if (dateTo) params.set("to", dateTo);
+    }
+
+    window.open(`/api/admin/sublease-approval?${params.toString()}`, "_blank", "noopener,noreferrer");
+  };
+
   // 수정 모달 열기
   const openEditModal = (r: Reservation) => {
     setSelectedReservation(r);
@@ -840,6 +863,22 @@ export default function AdminReservationsPage() {
           }}
         >
           📊 엑셀 내보내기 {selectedIds.size > 0 ? `(${selectedIds.size})` : `(${sortedReservations.length})`}
+        </button>
+
+        <button
+          onClick={handlePrintSubleaseApproval}
+          title={selectedIds.size > 0 ? "선택한 예약을 한 신청서로 인쇄" : dateFrom || dateTo ? "지정 기간 예약을 한 신청서로 인쇄" : "이번 달 예약을 한 신청서로 인쇄"}
+          style={{
+            padding: "8px 16px",
+            borderRadius: 8,
+            border: "1px solid #a855f7",
+            background: "#a855f722",
+            color: "#c084fc",
+            cursor: "pointer",
+            fontWeight: 700,
+          }}
+        >
+          🧾 전대승인신청서 {selectedIds.size > 0 ? `(${selectedIds.size}건)` : dateFrom || dateTo ? "(지정 기간)" : "(이번 달)"}
         </button>
 
         {/* 정렬 버튼 */}
