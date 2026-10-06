@@ -415,7 +415,7 @@ export async function sendNewReservationNotification(data: {
           </div>
 
           <p style="text-align: center;">
-            <a href="${process.env.NEXT_PUBLIC_SITE_URL || ''}/admin/reservations" class="action-btn">
+            <a href="${process.env.ADMIN_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || ''}/admin/reservations" class="action-btn">
               예약 관리 바로가기
             </a>
           </p>
