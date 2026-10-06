@@ -17,6 +17,9 @@ export async function requireSuperAdmin(request: Request) {
 
   if (sessionError || !session) {
     if (sessionError) console.error("Admin session validation failed", sessionError.code, sessionError.message);
+    if (sessionError?.code === "42703" || sessionError?.code === "PGRST204") {
+      return NextResponse.json({ ok: false, message: "관리자 세션 테이블 설정을 확인해주세요." }, { status: 503 });
+    }
     return NextResponse.json({ ok: false, message: "유효하지 않은 세션입니다." }, { status: 401 });
   }
 

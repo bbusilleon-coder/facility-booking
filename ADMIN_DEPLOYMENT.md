@@ -3,6 +3,7 @@
 동일한 저장소를 Vercel 프로젝트 두 개로 배포합니다. 데이터베이스는 기존 Supabase를 함께 사용하므로 예약과 관리자 계정을 복사하지 않습니다.
 
 1. 새 Vercel 프로젝트에 이 저장소를 연결하고 `SITE_MODE=admin`을 설정합니다.
+   기존 DB에 세션 계정 연결 컬럼이 없다면 Supabase SQL Editor에서 `database/admin-session-account-link.sql`을 실행합니다. 변경 후 기존 관리자 계정으로 다시 로그인합니다.
 2. 기존 프로젝트의 Supabase 환경변수와 서버 전용 `SUPABASE_SERVICE_ROLE_KEY`, 이메일 설정을 새 프로젝트에도 설정합니다. 비밀 키는 공개 문서나 코드에 넣지 않습니다.
 3. 새 프로젝트의 `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_BASE_URL`은 기존 일반 예약 사이트의 실제 주소로 설정합니다. 두 프로젝트 모두 `ADMIN_SITE_URL`에 실제 관리자 사이트 주소를 설정하여 관리자 알림 이메일도 분리된 사이트로 연결합니다.
 4. 새 관리자 사이트 루트는 `/admin`으로 이동합니다. `/admin/login`에서 기존 관리자 계정으로 로그인하고 대시보드·예약 관리·관리자 계정 관리가 동작하는지 확인합니다. 사이트 주소가 달라져 재로그인이 필요합니다.
