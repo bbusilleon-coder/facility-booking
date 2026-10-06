@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
 import crypto from "crypto";
+import { requireSuperAdmin } from "@/lib/require-super-admin";
 
 function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password).digest("hex");
 }
 
 // GET: 관리자 목록 조회
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const denied = await requireSuperAdmin(req);
+    if (denied) return denied;
     const supabase = createServerClient();
 
     const { data, error } = await supabase
@@ -33,6 +36,8 @@ export async function GET() {
 // POST: 관리자 추가
 export async function POST(req: Request) {
   try {
+    const denied = await requireSuperAdmin(req);
+    if (denied) return denied;
     const body = await req.json();
     const supabase = createServerClient();
 

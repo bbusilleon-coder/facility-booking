@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
 import crypto from "crypto";
+import { requireSuperAdmin } from "@/lib/require-super-admin";
 
 function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password).digest("hex");
@@ -13,6 +14,8 @@ interface RouteParams {
 // PUT: 관리자 정보 수정
 export async function PUT(req: Request, { params }: RouteParams) {
   try {
+    const denied = await requireSuperAdmin(req);
+    if (denied) return denied;
     const { id } = await params;
     const body = await req.json();
     const supabase = createServerClient();
@@ -55,6 +58,8 @@ export async function PUT(req: Request, { params }: RouteParams) {
 // DELETE: 관리자 삭제
 export async function DELETE(req: Request, { params }: RouteParams) {
   try {
+    const denied = await requireSuperAdmin(req);
+    if (denied) return denied;
     const { id } = await params;
     const supabase = createServerClient();
 

@@ -20,6 +20,10 @@ const roleLabels: Record<string, { label: string; color: string }> = {
   viewer: { label: "뷰어", color: "#22c55e" },
 };
 
+function adminHeaders() {
+  return { Authorization: `Bearer ${localStorage.getItem("adminToken") || ""}` };
+}
+
 export default function AdminUsersPage() {
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,10 +43,12 @@ export default function AdminUsersPage() {
 
   const fetchAdmins = async () => {
     try {
-      const res = await fetch("/api/admin/users");
+      const res = await fetch("/api/admin/users", { headers: adminHeaders() });
       const json = await res.json();
       if (json.ok) {
         setAdmins(json.admins || []);
+      } else {
+        setError(json.message || "관리자 목록을 불러오지 못했습니다.");
       }
     } catch (err) {
       console.error(err);
@@ -94,7 +100,7 @@ export default function AdminUsersPage() {
       if (editing) {
         const res = await fetch(`/api/admin/users/${editing.id}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...adminHeaders() },
           body: JSON.stringify(form),
         });
         const json = await res.json();
@@ -103,7 +109,7 @@ export default function AdminUsersPage() {
         if (!form.password) throw new Error("비밀번호를 입력해주세요.");
         const res = await fetch("/api/admin/users", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...adminHeaders() },
           body: JSON.stringify(form),
         });
         const json = await res.json();
@@ -121,7 +127,7 @@ export default function AdminUsersPage() {
   const handleDelete = async (admin: Admin) => {
     if (!confirm(`"${admin.name}" 관리자를 삭제하시겠습니까?`)) return;
     try {
-      const res = await fetch(`/api/admin/users/${admin.id}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/users/${admin.id}`, { method: "DELETE", headers: adminHeaders() });
       const json = await res.json();
       if (!json.ok) {
         alert(json.message);
@@ -152,6 +158,7 @@ export default function AdminUsersPage() {
         </button>
       </div>
 
+      {error && !showModal && <p role="alert" style={{ color: "#ef4444", marginBottom: 16 }}>{error}</p>}
       {loading ? (
         <div style={{ color: "var(--text-muted, #888)", padding: 40, textAlign: "center" }}>로딩 중...</div>
       ) : admins.length === 0 ? (

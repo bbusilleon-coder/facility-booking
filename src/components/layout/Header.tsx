@@ -53,14 +53,7 @@ export function Header() {
               >
                 사용자 페이지
               </Link>
-            ) : (
-              <Link
-                href="/admin"
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-lg hover:bg-gray-900 transition-colors"
-              >
-                관리자
-              </Link>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

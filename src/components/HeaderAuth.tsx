@@ -32,6 +32,5 @@ export default function HeaderAuth() {
   return <div className="ky-auth-links">
     <Link href="/reservation" prefetch={false}>내 예약 조회</Link><Link href="/checkin" prefetch={false}>QR 체크인</Link>
     {user ? <><span className="ky-user-name">{user.name}님</span><button type="button" onClick={handleLogout}>로그아웃</button></> : <Link className="ky-auth-accent" href="/auth" prefetch={false}>로그인</Link>}
-    <Link className="ky-auth-admin" href="/admin" prefetch={false}>관리자</Link>
   </div>;
 }

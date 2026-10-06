@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("admin");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -96,7 +96,8 @@ export default function AdminLoginPage() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="admin"
+              placeholder="아이디를 입력하세요"
+              autoComplete="username"
               required
               style={{ width: "100%", padding: "12px 14px", borderRadius: 10, border: "1px solid var(--border-color, #333)", background: "var(--input-bg, #0f0f0f)", color: "var(--foreground, white)", fontSize: 14 }}
             />
@@ -106,6 +107,7 @@ export default function AdminLoginPage() {
             <label style={{ display: "block", marginBottom: 6, fontSize: 14, color: "var(--text-secondary, #aaa)" }}>비밀번호</label>
             <input
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -129,9 +131,6 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
-        <p style={{ marginTop: 16, fontSize: 12, color: "var(--text-subtle, #666)", textAlign: "center" }}>
-          기본 계정: admin / 1234
-        </p>
       </div>
     </div>
   );
