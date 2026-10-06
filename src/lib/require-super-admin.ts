@@ -16,6 +16,7 @@ export async function requireSuperAdmin(request: Request) {
     .single();
 
   if (sessionError || !session) {
+    if (sessionError) console.error("Admin session validation failed", sessionError.code, sessionError.message);
     return NextResponse.json({ ok: false, message: "유효하지 않은 세션입니다." }, { status: 401 });
   }
 

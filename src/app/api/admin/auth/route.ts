@@ -49,12 +49,19 @@ export async function POST(req: Request) {
         .lt("expires_at", new Date().toISOString());
 
       // 새 세션 저장
-      await supabase.from("admin_sessions").insert([{
+      const { error: sessionError } = await supabase.from("admin_sessions").insert([{
         token,
         expires_at: expiresAt.toISOString(),
         remember_me: rememberMe || false,
         admin_id: admin.id,
       }]);
+      if (sessionError) {
+        console.error("Admin session storage failed", sessionError.code, sessionError.message);
+        return NextResponse.json(
+          { ok: false, message: "로그인 세션을 저장하지 못했습니다. 서버 설정을 확인해주세요." },
+          { status: 503 }
+        );
+      }
 
       // 마지막 로그인 시간 업데이트
       await supabase
@@ -92,11 +99,18 @@ export async function POST(req: Request) {
         expiresAt.setMinutes(expiresAt.getMinutes() + 30);
       }
 
-      await supabase.from("admin_sessions").insert([{
+      const { error: sessionError } = await supabase.from("admin_sessions").insert([{
         token,
         expires_at: expiresAt.toISOString(),
         remember_me: rememberMe || false,
       }]);
+      if (sessionError) {
+        console.error("Admin session storage failed", sessionError.code, sessionError.message);
+        return NextResponse.json(
+          { ok: false, message: "로그인 세션을 저장하지 못했습니다. 서버 설정을 확인해주세요." },
+          { status: 503 }
+        );
+      }
 
       return NextResponse.json({
         ok: true,
