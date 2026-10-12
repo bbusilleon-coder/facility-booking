@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type Reservation = {
   id: string;
@@ -94,6 +94,8 @@ export default function AdminReservationsPage() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
   const [isBulkProcessing, setIsBulkProcessing] = useState(false);
+  const statusRequests = useRef(new Set<string>());
+  const [processingStatusIds, setProcessingStatusIds] = useState<Set<string>>(new Set());
   
   // 수정 모달 상태
   const [showEditModal, setShowEditModal] = useState(false);
@@ -233,6 +235,9 @@ export default function AdminReservationsPage() {
   };
 
   const handleStatusChange = async (id: string, status: string, reason?: string) => {
+    if (statusRequests.current.has(id) || isBulkProcessing) return;
+    statusRequests.current.add(id);
+    setProcessingStatusIds(new Set(statusRequests.current));
     try {
       const res = await fetch(`/api/reservations/${id}/status`, {
         method: "PUT",
@@ -241,7 +246,23 @@ export default function AdminReservationsPage() {
       });
       const json = await res.json();
       if (json.ok) {
-        fetchReservations();
+        // The server has confirmed the change. Update only this reservation instead
+        // of unmounting the whole list and fetching every reservation again.
+        const confirmedStatus = json.reservation?.status || status;
+        setReservations((previous) => previous.flatMap((reservation) => {
+          if (reservation.id !== id) return [reservation];
+          if (filter !== "all" && filter !== confirmedStatus) return [];
+          return [{
+            ...reservation,
+            status: confirmedStatus,
+            admin_memo: json.reservation?.admin_memo ?? reservation.admin_memo,
+          }];
+        }));
+        setSelectedIds((previous) => {
+          const next = new Set(previous);
+          next.delete(id);
+          return next;
+        });
         setSelectedReservation(null);
         setAdminMemo("");
       } else {
@@ -249,6 +270,10 @@ export default function AdminReservationsPage() {
       }
     } catch (err) {
       console.error(err);
+      alert("상태 변경 중 오류가 발생했습니다. 예약 상태를 확인한 뒤 다시 시도해주세요.");
+    } finally {
+      statusRequests.current.delete(id);
+      setProcessingStatusIds(new Set(statusRequests.current));
     }
   };
 
@@ -385,6 +410,7 @@ export default function AdminReservationsPage() {
 
   // 일괄 승인
   const handleBulkApprove = async () => {
+    if (statusRequests.current.size > 0 || isBulkProcessing) return;
     const pendingIds = Array.from(selectedIds).filter((id) => {
       const r = reservations.find((res) => res.id === id);
       return r && r.status === "pending" && !isExpired(r);
@@ -434,6 +460,7 @@ export default function AdminReservationsPage() {
 
   // 일괄 거절
   const handleBulkReject = async () => {
+    if (statusRequests.current.size > 0 || isBulkProcessing) return;
     const pendingIds = Array.from(selectedIds).filter((id) => {
       const r = reservations.find((res) => res.id === id);
       return r && r.status === "pending" && !isExpired(r);
@@ -827,7 +854,7 @@ export default function AdminReservationsPage() {
               <>
                 <button
                   onClick={handleBulkApprove}
-                  disabled={isBulkProcessing}
+                  disabled={isBulkProcessing || processingStatusIds.size > 0}
                   style={{
                     padding: "8px 16px",
                     borderRadius: 8,
@@ -843,7 +870,7 @@ export default function AdminReservationsPage() {
                 </button>
                 <button
                   onClick={handleBulkReject}
-                  disabled={isBulkProcessing}
+                  disabled={isBulkProcessing || processingStatusIds.size > 0}
                   style={{
                     padding: "8px 16px",
                     borderRadius: 8,
@@ -1075,11 +1102,13 @@ export default function AdminReservationsPage() {
                   <>
                     <button
                       onClick={() => handleStatusChange(r.id, "approved")}
+                      disabled={processingStatusIds.has(r.id) || isBulkProcessing}
                       style={{ padding: "6px 12px", borderRadius: 6, border: "none", background: "#22c55e", color: "white", cursor: "pointer", fontSize: 12 }}
                     >
-                      승인
+                      {processingStatusIds.has(r.id) ? "처리 중..." : "승인"}
                     </button>
                     <button
+                      disabled={processingStatusIds.has(r.id) || isBulkProcessing}
                       onClick={() => {
                         const reason = prompt("거절 사유를 입력하세요:");
                         if (reason !== null) {
