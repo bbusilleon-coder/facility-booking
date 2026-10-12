@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Reservation = {
   id: string;
@@ -44,6 +44,34 @@ const statusColors: Record<string, string> = {
   expired: "#8b5cf6",
 };
 
+// Reuse locale formatters instead of constructing one for every row on every interaction.
+const reservationDateFormatter = new Intl.DateTimeFormat("ko-KR", {
+  month: "short",
+  day: "numeric",
+  weekday: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+const facilityCollator = new Intl.Collator("ko");
+
+function parseLocalDate(dateStr: string): Date {
+  if (!dateStr) return new Date();
+  if (!dateStr.includes("Z") && !dateStr.includes("+")) {
+    const [datePart, timePart] = dateStr.split("T");
+    if (!datePart || !timePart) return new Date(dateStr);
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hour, minute] = timePart.split(":").map(Number);
+    return new Date(year, month - 1, day, hour, minute);
+  }
+  return new Date(dateStr);
+}
+
+function formatDate(dateStr: string): string {
+  if (!dateStr) return "-";
+  const date = parseLocalDate(dateStr);
+  return Number.isNaN(date.getTime()) ? dateStr : reservationDateFormatter.format(date);
+}
+
 export default function AdminReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,25 +110,25 @@ export default function AdminReservationsPage() {
     status: "",
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setCurrentTime(Date.now()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const reservationPresentation = useMemo(() => new Map(reservations.map((r) => [r.id, {
+    startTime: parseLocalDate(r.start_at).getTime(),
+    endTime: parseLocalDate(r.end_at).getTime(),
+    startLabel: formatDate(r.start_at),
+    endLabel: formatDate(r.end_at),
+  }])), [reservations]);
 
   // 만료 여부 체크 함수
   const isExpired = (r: Reservation): boolean => {
     if (r.status === "rejected" || r.status === "cancelled") return false;
-    const endAt = parseLocalDate(r.end_at);
-    return endAt < new Date();
-  };
-
-  // 로컬 시간 파싱
-  const parseLocalDate = (dateStr: string): Date => {
-    if (!dateStr) return new Date();
-    if (!dateStr.includes("Z") && !dateStr.includes("+")) {
-      const [datePart, timePart] = dateStr.split("T");
-      if (!datePart || !timePart) return new Date(dateStr);
-      const [year, month, day] = datePart.split("-").map(Number);
-      const [hour, minute] = timePart.split(":").map(Number);
-      return new Date(year, month - 1, day, hour, minute);
-    }
-    return new Date(dateStr);
+    const endTime = reservationPresentation.get(r.id)?.endTime ?? parseLocalDate(r.end_at).getTime();
+    return endTime < currentTime;
   };
 
   // 표시용 상태 (만료 체크 포함)
@@ -112,8 +140,10 @@ export default function AdminReservationsPage() {
   };
 
   // 필터링된 예약 목록 (활성/보관함)
-  const filteredReservations = reservations.filter((r) => {
-    const displayStatus = getDisplayStatus(r);
+  const filteredReservations = useMemo(() => reservations.filter((r) => {
+    const endTime = reservationPresentation.get(r.id)!.endTime;
+    const displayStatus = endTime < currentTime && (r.status === "approved" || r.status === "pending")
+      ? "expired" : r.status;
     const amount = r.rental_amount || 0;
     const matchesRentalType =
       rentalType === "all" ||
@@ -129,27 +159,27 @@ export default function AdminReservationsPage() {
       // 활성: 승인대기, 승인됨 (만료되지 않은)
       return displayStatus === "pending" || displayStatus === "approved";
     }
-  });
+  }), [reservations, reservationPresentation, currentTime, rentalType, viewMode]);
 
   // 정렬된 예약 목록
-  const sortedReservations = [...filteredReservations].sort((a, b) => {
+  const sortedReservations = useMemo(() => [...filteredReservations].sort((a, b) => {
     if (sortBy === "facility") {
       // 시설명으로 1차 정렬
       const facilityA = a.facility?.name || "";
       const facilityB = b.facility?.name || "";
-      const facilityCompare = facilityA.localeCompare(facilityB, "ko");
+      const facilityCompare = facilityCollator.compare(facilityA, facilityB);
       if (facilityCompare !== 0) {
         return sortOrder === "asc" ? facilityCompare : -facilityCompare;
       }
       // 같은 시설이면 날짜순 (항상 오름차순)
-      return parseLocalDate(a.start_at).getTime() - parseLocalDate(b.start_at).getTime();
+      return reservationPresentation.get(a.id)!.startTime - reservationPresentation.get(b.id)!.startTime;
     } else {
       // 날짜순 정렬
-      const dateA = parseLocalDate(a.start_at).getTime();
-      const dateB = parseLocalDate(b.start_at).getTime();
+      const dateA = reservationPresentation.get(a.id)!.startTime;
+      const dateB = reservationPresentation.get(b.id)!.startTime;
       return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
     }
-  });
+  }), [filteredReservations, reservationPresentation, sortBy, sortOrder]);
 
   const fetchReservations = async () => {
     setLoading(true);
@@ -280,39 +310,6 @@ export default function AdminReservationsPage() {
     } catch (err) {
       console.error(err);
     }
-  };
-
-  // 로컬 시간 문자열을 올바르게 파싱
-  const formatDate = (dateStr: string) => {
-    // "2026-02-24T10:00" 형식 -> 로컬 시간으로 파싱
-    if (!dateStr) return "-";
-    
-    // UTC 형식(Z 또는 +포함)이 아니면 로컬 시간으로 직접 파싱
-    if (!dateStr.includes("Z") && !dateStr.includes("+")) {
-      const [datePart, timePart] = dateStr.split("T");
-      if (!datePart || !timePart) return dateStr;
-      
-      const [year, month, day] = datePart.split("-").map(Number);
-      const [hour, minute] = timePart.split(":").map(Number);
-      
-      const date = new Date(year, month - 1, day, hour, minute);
-      return date.toLocaleString("ko-KR", {
-        month: "short",
-        day: "numeric",
-        weekday: "short",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    }
-    
-    // UTC 형식이면 그대로 변환
-    return new Date(dateStr).toLocaleString("ko-KR", {
-      month: "short",
-      day: "numeric",
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
   };
 
   const getName = (r: Reservation) => r.applicant_name || r.booker_name || "-";
@@ -1054,7 +1051,7 @@ export default function AdminReservationsPage() {
                   )}
                 </div>
                 <div style={{ fontSize: 13, color: "var(--text-muted, #888)" }}>
-                  {formatDate(r.start_at)} ~ {formatDate(r.end_at)}
+                  {reservationPresentation.get(r.id)!.startLabel} ~ {reservationPresentation.get(r.id)!.endLabel}
                 </div>
                 <div style={{ fontSize: 13, color: "var(--text-muted, #888)", marginTop: 4 }}>
                   {getName(r)} · {getPhone(r)} · {r.purpose || "-"}
