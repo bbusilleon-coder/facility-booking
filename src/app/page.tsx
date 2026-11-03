@@ -102,7 +102,7 @@ export default async function Home() {
           <a href="https://sites.google.com/d/1vaqyC_wLXOUP-UWwLMARmyS8sJf9AmL7/p/1VAkK7t33fSPzxZ8dq9yV9i1ZTTePuFOG/edit" target="_blank" rel="noopener noreferrer">개인정보처리방침</a>
         </div></div>
         <div className="ky-footer-main"><div className="ky-shell ky-footer-inner">
-          <div><p><strong>계룡대학습관</strong> · 32801 충청남도 계룡시 신도안3길 72 계룡대학습관</p><p>TEL 042-551-1543 <span>·</span> E-mail pik8241@konyang.ac.kr</p><small>COPYRIGHT © KONYANG UNIVERSITY. ALL RIGHTS RESERVED.</small></div>
+          <div><p><strong>계룡대학습관</strong> · 32801 충청남도 계룡시 신도안3길 72 계룡대학습관</p><p>TEL 042-551-1541 <span>·</span> E-mail pik8241@konyang.ac.kr</p><small>COPYRIGHT © KONYANG UNIVERSITY. ALL RIGHTS RESERVED.</small></div>
           <img src="/konyang/logo-footer.png" alt="건양대학교" />
         </div></div>
       </footer>
