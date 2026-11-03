@@ -278,7 +278,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* 메인 콘텐츠 */}
       <main className="admin-main" style={{ flex: 1, overflow: "auto" }}>
-        <div className="admin-topbar"><span>계룡대학습관 <span className="admin-topbar-divider">/</span> 관리자 워크스페이스</span><Link href="/">예약 홈페이지 ↗</Link></div>
+        <div className="admin-topbar"><span>계룡대학습관 <span className="admin-topbar-divider">/</span> 관리자 워크스페이스</span><a href={process.env.NEXT_PUBLIC_SITE_URL || "https://facility-booking-nine.vercel.app"}>예약 홈페이지 ↗</a></div>
         {children}
       </main>
     </div>
