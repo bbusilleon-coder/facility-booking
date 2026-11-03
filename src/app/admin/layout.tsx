@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import AdminIcon from "@/components/admin/AdminIcon";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -178,7 +179,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="admin-shell" style={{ display: "flex", minHeight: "100vh", background: "var(--background, #0a0a0a)" }}>
       {/* 사이드바 */}
-      <aside
+      <aside className="admin-sidebar"
         style={{
           width: sidebarOpen ? 240 : 60,
           background: "var(--card-bg, #111)",
@@ -193,10 +194,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
           {sidebarOpen && (
             <Link href="/" style={{ fontSize: 18, fontWeight: 800, color: "var(--foreground, white)", textDecoration: "none" }}>
-              🏢 시설예약
+              <span className="admin-brand-mark"><AdminIcon name="/admin/facilities" /></span> 시설예약
             </Link>
           )}
           <button
+            aria-label={sidebarOpen ? "메뉴 접기" : "메뉴 펼치기"}
+            aria-expanded={sidebarOpen}
             onClick={() => setSidebarOpen(!sidebarOpen)}
             style={{
               background: "none",
@@ -211,12 +214,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </button>
         </div>
 
-        <nav style={{ flex: 1 }}>
+        <nav aria-label="관리자 메뉴" style={{ flex: 1 }}>
+          {sidebarOpen && <p className="admin-nav-caption">WORKSPACE</p>}
           {filteredMenuItems.map((item) => {
             const isActive = item.exact ? pathname === item.href : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.href}
+                className={`admin-nav-link ${isActive ? "is-active" : ""}`}
+                aria-current={isActive ? "page" : undefined}
+                aria-label={item.label.split(" ").slice(1).join(" ")}
                 href={item.href}
                 style={{
                   display: "flex",
@@ -234,7 +241,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 }}
                 title={!sidebarOpen ? item.label : undefined}
               >
-                <span>{item.label.split(" ")[0]}</span>
+                <AdminIcon name={item.href} />
                 {sidebarOpen && <span>{item.label.split(" ").slice(1).join(" ")}</span>}
               </Link>
             );
@@ -245,10 +252,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {sidebarOpen && (
           <div style={{ borderTop: "1px solid var(--border-color, #222)", paddingTop: 16 }}>
             <div style={{ fontSize: 13, color: "var(--text-muted, #888)", marginBottom: 4 }}>
-              👤 {adminName}
+              {adminName}
             </div>
             <div style={{ fontSize: 11, color: (adminRole === "super" || adminRole === "super_admin") ? "#22c55e" : "#888", marginBottom: 8 }}>
-              {(adminRole === "super" || adminRole === "super_admin") ? "🔑 슈퍼관리자" : adminRole ? "👔 관리자" : ""}
+              {(adminRole === "super" || adminRole === "super_admin") ? "슈퍼관리자" : adminRole ? "관리자" : ""}
             </div>
             <button
               onClick={handleLogout}
@@ -271,6 +278,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* 메인 콘텐츠 */}
       <main className="admin-main" style={{ flex: 1, overflow: "auto" }}>
+        <div className="admin-topbar"><span>계룡대학습관 <span className="admin-topbar-divider">/</span> 관리자 워크스페이스</span><Link href="/">예약 홈페이지 ↗</Link></div>
         {children}
       </main>
     </div>

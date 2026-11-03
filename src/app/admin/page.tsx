@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AdminIcon from "@/components/admin/AdminIcon";
 import { createServerClient } from "@/lib/supabase/server";
 import ExportButton from "@/components/admin/ExportButton";
 
@@ -123,8 +124,8 @@ const statusLabels: Record<string, string> = {
 };
 
 const statusColors: Record<string, string> = {
-  pending: "#eab308",
-  approved: "#22c55e",
+  pending: "#a16a10",
+  approved: "#16805f",
   rejected: "#ef4444",
   cancelled: "#6b7280",
 };
@@ -175,16 +176,17 @@ export default async function AdminDashboard() {
   };
 
   return (
-    <div style={{ padding: 24 }}>
+    <div className="admin-dashboard" style={{ padding: 24 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 800 }}>대시보드</h1>
+        <div><p className="dashboard-eyebrow">OVERVIEW</p><h1 style={{ fontSize: 24, fontWeight: 800 }}>대시보드</h1><p className="dashboard-description">시설 운영과 예약 현황을 한눈에 확인하세요.</p></div>
         <ExportButton />
       </div>
 
       {/* 통계 카드 */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 32 }}>
+      <div className="dashboard-stats" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 32 }}>
         {statCards.map((card) => (
           <Link
+            className="dashboard-stat"
             key={card.label}
             href={card.link || "#"}
             style={{
@@ -202,14 +204,14 @@ export default async function AdminDashboard() {
                 <div style={{ color: "var(--text-muted, #888)", fontSize: 12, marginBottom: 4 }}>{card.label}</div>
                 <div style={{ fontSize: 28, fontWeight: 700 }}>{card.value}</div>
               </div>
-              <span style={{ fontSize: 20 }}>{card.icon}</span>
+              <span className="dashboard-stat-icon"><AdminIcon name={card.label} /></span>
             </div>
           </Link>
         ))}
       </div>
 
       {/* 빠른 작업 */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginBottom: 32 }}>
+      <div className="dashboard-actions" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 12, marginBottom: 32 }}>
         <Link
           href="/admin/facilities/new"
           style={{
@@ -224,7 +226,7 @@ export default async function AdminDashboard() {
             border: "1px dashed var(--border-color, #333)",
           }}
         >
-          <span style={{ fontSize: 24 }}>➕</span>
+          <span className="dashboard-action-icon"><AdminIcon name="/admin/facilities" /></span>
           <div>
             <div style={{ fontWeight: 600 }}>시설물 등록</div>
             <div style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>새 시설물 추가</div>
@@ -245,7 +247,7 @@ export default async function AdminDashboard() {
             border: "1px dashed var(--border-color, #333)",
           }}
         >
-          <span style={{ fontSize: 24 }}>📋</span>
+          <span className="dashboard-action-icon"><AdminIcon name="/admin/reservations" /></span>
           <div>
             <div style={{ fontWeight: 600 }}>예약 관리</div>
             <div style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>승인/거절 처리</div>
@@ -266,7 +268,7 @@ export default async function AdminDashboard() {
             border: "1px dashed var(--border-color, #333)",
           }}
         >
-          <span style={{ fontSize: 24 }}>📆</span>
+          <span className="dashboard-action-icon"><AdminIcon name="/admin/calendar" /></span>
           <div>
             <div style={{ fontWeight: 600 }}>전체 현황</div>
             <div style={{ fontSize: 12, color: "var(--text-muted, #888)" }}>캘린더 보기</div>
@@ -275,7 +277,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* 최근 예약 */}
-      <div style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 20 }}>
+      <div className="dashboard-recent" style={{ background: "var(--card-bg, #1a1a1a)", borderRadius: 12, padding: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <h2 style={{ fontSize: 16, fontWeight: 700 }}>최근 예약 신청</h2>
           <Link href="/admin/reservations" style={{ color: "#3b82f6", fontSize: 13 }}>
