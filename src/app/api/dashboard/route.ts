@@ -6,11 +6,16 @@ export async function GET() {
     const supabase = createServerClient();
 
     const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    // Database timestamps are UTC; dashboard calendar boundaries must follow Korea time.
+    const kstDate = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit",
+    }).format(now);
+    const [year, month, day] = kstDate.split("-").map(Number);
+    const today = new Date(Date.UTC(year, month - 1, day) - 9 * 60 * 60 * 1000);
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-    
-    // 이번 주 시작/끝
-    const dayOfWeek = today.getDay();
+
+    // Sunday-start week, in Asia/Seoul local dates.
+    const dayOfWeek = new Date(Date.UTC(year, month - 1, day)).getUTCDay();
     const weekStart = new Date(today.getTime() - dayOfWeek * 24 * 60 * 60 * 1000);
     const weekEnd = new Date(weekStart.getTime() + 7 * 24 * 60 * 60 * 1000);
 
@@ -26,7 +31,7 @@ export async function GET() {
       supabase
         .from("reservations")
         .select(`
-          id, purpose, start_at, end_at, applicant_name,
+          id, purpose, start_at, end_at,
           facility:facilities(id, name, location)
         `)
         .eq("status", "approved")
@@ -59,7 +64,7 @@ export async function GET() {
       supabase
         .from("reservations")
         .select(`
-          id, purpose, start_at, end_at, applicant_name, status,
+          id, purpose, start_at, end_at, status,
           facility:facilities(id, name)
         `)
         .in("status", ["approved", "pending"])
