@@ -7,10 +7,14 @@ export async function GET() {
 
     const now = new Date();
     // Database timestamps are UTC; dashboard calendar boundaries must follow Korea time.
-    const kstDate = new Intl.DateTimeFormat("en-CA", {
+    const kstParts = new Intl.DateTimeFormat("en-US", {
       timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit",
-    }).format(now);
-    const [year, month, day] = kstDate.split("-").map(Number);
+    }).formatToParts(now);
+    const dateNumber = (type: "year" | "month" | "day") =>
+      Number(kstParts.find((part) => part.type === type)?.value);
+    const year = dateNumber("year");
+    const month = dateNumber("month");
+    const day = dateNumber("day");
     const today = new Date(Date.UTC(year, month - 1, day) - 9 * 60 * 60 * 1000);
     const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
 
