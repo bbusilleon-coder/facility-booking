@@ -21,7 +21,7 @@ async function getFacilities(): Promise<Facility[]> {
   const supabase = createServerClient();
   const { data, error } = await supabase
     .from("facilities")
-    .select("*")
+    .select("id, name, location, description, image_url, min_people, max_people, features, is_active")
     .eq("is_active", true)
     .order("name", { ascending: true });
 
