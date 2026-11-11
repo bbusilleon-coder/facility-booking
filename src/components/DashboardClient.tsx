@@ -13,14 +13,35 @@ export default function DashboardClient() {
   const [currentTime, setCurrentTime] = useState(() => Date.now());
 
   useEffect(() => {
+    let mounted = true;
+    const controller = new AbortController();
     const fetchDashboard = async () => {
-      try { const res = await fetch("/api/dashboard"); const json = await res.json(); if (json.ok) setData(json); }
-      catch (err) { console.error(err); } finally { setLoading(false); }
+      try {
+        const res = await fetch("/api/dashboard", { signal: controller.signal });
+        if (!res.ok) throw new Error(`Dashboard request failed: ${res.status}`);
+        const json = await res.json();
+        if (mounted && json.ok) setData(json);
+      } catch (err) {
+        if (!controller.signal.aborted) console.error(err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
     };
-    fetchDashboard();
-
-    const timer = window.setInterval(() => setCurrentTime(Date.now()), 60_000);
-    return () => window.clearInterval(timer);
+    void fetchDashboard();
+    const refreshOnReturn = () => {
+      if (document.visibilityState === "visible") void fetchDashboard();
+    };
+    document.addEventListener("visibilitychange", refreshOnReturn);
+    const timer = window.setInterval(() => {
+      setCurrentTime(Date.now());
+      if (document.visibilityState === "visible") void fetchDashboard();
+    }, 60_000);
+    return () => {
+      mounted = false;
+      controller.abort();
+      document.removeEventListener("visibilitychange", refreshOnReturn);
+      window.clearInterval(timer);
+    };
   }, []);
 
   const formatTime = (dateStr: string) => new Date(dateStr).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
