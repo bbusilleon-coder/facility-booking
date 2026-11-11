@@ -395,3 +395,9 @@ body.dark-mode .dashboard-stat-icon,body.dark-mode .dashboard-action-icon { back
 @media(max-width:1000px) { .admin-main > div:not(.admin-topbar) { padding:24px !important; } .admin-topbar { padding:0 24px; } .dashboard-actions { grid-template-columns:1fr !important; } }
 @media(max-width:700px) { .admin-sidebar { width:64px !important; padding:20px 8px !important; } .admin-sidebar > div:first-child a,.admin-nav-caption,.admin-nav-link > span,.admin-sidebar > div:last-child { display:none !important; } .admin-nav-link { justify-content:center !important; padding:12px !important; } .admin-sidebar > div:first-child { justify-content:center !important; } .admin-topbar { height:60px; padding:0 16px; font-size:10px; } .admin-topbar-divider { padding:0 5px; } .admin-main > div:not(.admin-topbar) { padding:22px 16px !important; } .dashboard-stats { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:10px !important; } .dashboard-stat { padding:16px !important; } .dashboard-stat-icon { display:none; } .dashboard-recent { padding:16px !important; } .admin-dashboard > div:first-child { align-items:flex-start !important; flex-direction:column; } }
 @media(prefers-reduced-motion:reduce) { .admin-shell * { transition:none !important; } }
+
+/* Responsive facility detail overview: preserve desktop layout, stack on narrow screens. */
+.facility-detail-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 720px) {
+  .facility-detail-overview { grid-template-columns: minmax(0, 1fr); }
+}
