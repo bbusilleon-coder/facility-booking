@@ -38,6 +38,7 @@ export default async function Home() {
 
   return (
     <div className="home-page">
+      <link rel="preload" as="image" href="/konyang/hero.jpg" fetchPriority="high" />
       <a className="ky-skip" href="#main-content">본문 바로가기</a>
       <header className="ky-header">
         <div className="ky-utility-bar">
