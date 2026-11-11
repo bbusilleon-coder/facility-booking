@@ -110,12 +110,15 @@ export default function FacilityDetailPage() {
       </div>
 
       {/* 시설 정보 */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 32 }}>
+      <div className="facility-detail-overview" style={{ display: "grid", gap: 24, marginBottom: 32 }}>
         <div>
           {facility.image_url ? (
             <img
               src={facility.image_url}
               alt={facility.name}
+              width={800}
+              height={500}
+              decoding="async"
               style={{ width: "100%", height: 280, objectFit: "cover", borderRadius: 16 }}
             />
           ) : (
