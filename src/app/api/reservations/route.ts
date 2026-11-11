@@ -199,11 +199,12 @@ export async function POST(req: Request) {
     // 중복 체크 - KST 문자열 기준으로 비교
     const { data: existing, error: overlapError } = await supabase
       .from("reservations")
-      .select("id, start_at, end_at, status")
+      .select("id")
       .eq("facility_id", body.facility_id)
       .in("status", ["pending", "approved"])
       .lt("start_at", end.kstString)
-      .gt("end_at", start.kstString);
+      .gt("end_at", start.kstString)
+      .limit(1);
 
     if (overlapError) throw overlapError;
 
